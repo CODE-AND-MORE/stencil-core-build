@@ -1740,7 +1740,7 @@ export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNe
     inlineDynamicImports?: boolean;
     includeGlobalScripts?: boolean;
     minify?: boolean;
-    typesDir: string;
+    typesDir?: string;
 }
 export interface OutputTargetBase {
     type: string;

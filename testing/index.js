@@ -1,5 +1,5 @@
 /*!
- Stencil Testing v0.0.0-dev.20210326213131 | MIT Licensed | https://stenciljs.com
+ Stencil Testing v0.0.0-dev.20210326213941 | MIT Licensed | https://stenciljs.com
  */
 function _lazyRequire(e) {
  return new Proxy({}, {
@@ -2833,7 +2833,7 @@ const createSystem = e => {
  u("/");
  const T = {
   name: "in-memory",
-  version: "0.0.0-dev.20210326213131",
+  version: "0.0.0-dev.20210326213941",
   events: o,
   access: async e => c(e),
   accessSync: c,

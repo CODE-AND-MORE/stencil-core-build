@@ -1,5 +1,5 @@
 /*
- Stencil Client Platform v0.0.0-dev.20210326213131 | MIT Licensed | https://stenciljs.com
+ Stencil Client Platform v0.0.0-dev.20210326213941 | MIT Licensed | https://stenciljs.com
  */
 /**
  * @license
