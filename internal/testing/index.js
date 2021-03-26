@@ -690,7 +690,8 @@ const callRender = (e, t, a) => {
 }, proxyCustomElement = (e, t) => {
  const a = {
   $flags$: t[0],
-  $tagName$: t[1]
+  $tagName$: t[1],
+  $customElement$: !0
  };
  appData.BUILD.member && (a.$members$ = t[2]), appData.BUILD.hostListener && (a.$listeners$ = t[3]), 
  appData.BUILD.watchCallback && (a.$watchers$ = e.$watchers$), appData.BUILD.reflect && (a.$attrsToReflect$ = []), 

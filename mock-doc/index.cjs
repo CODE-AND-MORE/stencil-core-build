@@ -1,5 +1,5 @@
 /*!
- Stencil Mock Doc (CommonJS) v0.0.0-dev.20210326203916 | MIT Licensed | https://stenciljs.com
+ Stencil Mock Doc (CommonJS) v0.0.0-dev.20210326213131 | MIT Licensed | https://stenciljs.com
  */
 var mockDoc = (function(exports) {
 'use strict';

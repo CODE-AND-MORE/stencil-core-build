@@ -676,7 +676,7 @@ function createDenoSys(e = {}) {
    })), await Promise.all(e), l.clear();
   },
   dynamicImport: e => (c && (e = (e => (!isString(e) || isRemoteUrl(e) || isFileUrl(e) || (e = isFileUrl(e) ? new URL(e).href : (e = normalizePath(e)).startsWith("/") ? "file://" + e : "file:///" + e), 
-  e))(e)), import(`${e}?0.0.0-dev.20210326203916`)),
+  e))(e)), import(`${e}?0.0.0-dev.20210326213131`)),
   encodeToBase64: e => Buffer.from(e).toString("base64"),
   async ensureDependencies(e) {
    const i = e.logger.createTimeSpan("ensure dependencies start", !0), s = [], l = e.dependencies.find((e => "@stencil/core" === e.name)), c = e.dependencies.find((e => "typescript" === e.name));

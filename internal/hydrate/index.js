@@ -745,7 +745,8 @@ const callRender = (e, t, o) => {
 }, proxyCustomElement = (e, t) => {
  const o = {
   $flags$: t[0],
-  $tagName$: t[1]
+  $tagName$: t[1],
+  $customElement$: !0
  };
  BUILD.member && (o.$members$ = t[2]), BUILD.hostListener && (o.$listeners$ = t[3]), 
  BUILD.watchCallback && (o.$watchers$ = e.$watchers$), BUILD.reflect && (o.$attrsToReflect$ = []), 

@@ -11,7 +11,7 @@ let renderingRef = null;
 let queueCongestion = 0;
 let queuePending = false;
 /*
- Stencil Client Platform v0.0.0-dev.20210326203916 | MIT Licensed | https://stenciljs.com
+ Stencil Client Platform v0.0.0-dev.20210326213131 | MIT Licensed | https://stenciljs.com
  */
 import { BUILD, NAMESPACE } from '@stencil/core/internal/app-data';
 const win = typeof window !== 'undefined' ? window : {};
@@ -2151,6 +2151,7 @@ const proxyCustomElement = (Cstr, compactMeta) => {
     const cmpMeta = {
         $flags$: compactMeta[0],
         $tagName$: compactMeta[1],
+        $customElement$: true
     };
     if (BUILD.member) {
         cmpMeta.$members$ = compactMeta[2];
