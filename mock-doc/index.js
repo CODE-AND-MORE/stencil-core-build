@@ -1,5 +1,5 @@
 /*!
- Stencil Mock Doc v0.0.0-dev.20210326213131 | MIT Licensed | https://stenciljs.com
+ Stencil Mock Doc v0.0.0-dev.20210327185042 | MIT Licensed | https://stenciljs.com
  */
 const CONTENT_REF_ID = 'r';
 const ORG_LOCATION_ID = 'o';

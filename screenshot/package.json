@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core/screenshot",
-  "version": "0.0.0-dev.20210326213941",
+  "version": "0.0.0-dev.20210327185042",
   "description": "Stencil Screenshot.",
   "main": "./index.js",
   "types": "./index.d.ts",
