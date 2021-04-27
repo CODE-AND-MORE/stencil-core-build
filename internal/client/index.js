@@ -11,7 +11,7 @@ let renderingRef = null;
 let queueCongestion = 0;
 let queuePending = false;
 /*
- Stencil Client Platform v0.0.0-dev.20210427172912 | MIT Licensed | https://stenciljs.com
+ Stencil Client Platform v0.0.0-dev.20210427205737 | MIT Licensed | https://stenciljs.com
  */
 import { BUILD, NAMESPACE } from '@stencil/core/internal/app-data';
 const win = typeof window !== 'undefined' ? window : {};
