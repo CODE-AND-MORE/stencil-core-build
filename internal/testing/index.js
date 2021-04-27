@@ -639,7 +639,7 @@ const callRender = (e, t, a) => {
  if (0 == (1 & plt.$flags$)) {
   const t = getHostRef(e), a = t.$cmpMeta$, o = createTime("connectedCallback", a.$tagName$);
   if (appData.BUILD.hostListenerTargetParent && addHostEventListeners(e, t, a.$listeners$, !0), 
-  1 & t.$flags$) addHostEventListeners(e, t, a.$listeners$, !1), fireConnectedCallback(t.$lazyInstance$); else {
+  1 & t.$flags$) addHostEventListeners(e, t, a.$listeners$, !1), a.$customElement$ || fireConnectedCallback(t.$lazyInstance$); else {
    let o;
    if (t.$flags$ |= 1, appData.BUILD.hydrateClientSide && (o = e.getAttribute("s-id"), 
    o)) {
@@ -684,7 +684,7 @@ const callRender = (e, t, a) => {
   const t = getHostRef(e), a = appData.BUILD.lazyLoad ? t.$lazyInstance$ : e;
   appData.BUILD.hostListener && t.$rmListeners$ && (t.$rmListeners$.map((e => e())), 
   t.$rmListeners$ = void 0), appData.BUILD.cssVarShim && plt.$cssShim$ && plt.$cssShim$.removeHost(e), 
-  appData.BUILD.lazyLoad && appData.BUILD.disconnectedCallback && safeCall(a, "disconnectedCallback"), 
+  !t.$cmpMeta$.$customElement$ && appData.BUILD.lazyLoad && appData.BUILD.disconnectedCallback && safeCall(a, "disconnectedCallback"), 
   appData.BUILD.cmpDidUnload && safeCall(a, "componentDidUnload");
  }
 }, proxyCustomElement = (e, t) => {

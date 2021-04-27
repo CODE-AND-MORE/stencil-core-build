@@ -1,5 +1,5 @@
 /*!
- Stencil CLI (CommonJS) v0.0.0-dev.20210427083727 | MIT Licensed | https://stenciljs.com
+ Stencil CLI (CommonJS) v0.0.0-dev.20210427172912 | MIT Licensed | https://stenciljs.com
  */
 'use strict';
 
@@ -478,7 +478,7 @@ const getNpmConfigEnvArgs = (sys) => {
 const dependencies = [
 	{
 		name: "@stencil/core",
-		version: "0.0.0-dev.20210427083727",
+		version: "0.0.0-dev.20210427172912",
 		main: "compiler/stencil.js",
 		resources: [
 			"package.json",

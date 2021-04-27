@@ -1,5 +1,5 @@
 /*
- Stencil Client Patch Browser v0.0.0-dev.20210427083727 | MIT Licensed | https://stenciljs.com
+ Stencil Client Patch Browser v0.0.0-dev.20210427172912 | MIT Licensed | https://stenciljs.com
  */
 import { BUILD, NAMESPACE } from '@stencil/core/internal/app-data';
 import { consoleDevInfo, plt, win, doc, promiseResolve, H } from '@stencil/core';

@@ -694,7 +694,7 @@ const callRender = (e, t, o) => {
  if (0 == (1 & plt.$flags$)) {
   const t = getHostRef(e), o = t.$cmpMeta$, n = createTime("connectedCallback", o.$tagName$);
   if (BUILD.hostListenerTargetParent && addHostEventListeners(e, t, o.$listeners$, !0), 
-  1 & t.$flags$) addHostEventListeners(e, t, o.$listeners$, !1), fireConnectedCallback(t.$lazyInstance$); else {
+  1 & t.$flags$) addHostEventListeners(e, t, o.$listeners$, !1), o.$customElement$ || fireConnectedCallback(t.$lazyInstance$); else {
    let n;
    if (t.$flags$ |= 1, BUILD.hydrateClientSide && (n = e.getAttribute("s-id"), n)) {
     if (BUILD.shadowDom && supportsShadow && 1 & o.$flags$) {
@@ -737,7 +737,7 @@ const callRender = (e, t, o) => {
  if (0 == (1 & plt.$flags$)) {
   const t = getHostRef(e), o = BUILD.lazyLoad ? t.$lazyInstance$ : e;
   BUILD.hostListener && t.$rmListeners$ && (t.$rmListeners$.map((e => e())), t.$rmListeners$ = void 0), 
-  BUILD.cssVarShim && plt.$cssShim$ && plt.$cssShim$.removeHost(e), BUILD.lazyLoad && BUILD.disconnectedCallback && safeCall(o, "disconnectedCallback"), 
+  BUILD.cssVarShim && plt.$cssShim$ && plt.$cssShim$.removeHost(e), !t.$cmpMeta$.$customElement$ && BUILD.lazyLoad && BUILD.disconnectedCallback && safeCall(o, "disconnectedCallback"), 
   BUILD.cmpDidUnload && safeCall(o, "componentDidUnload");
  }
 }, defineCustomElement = (e, t) => {

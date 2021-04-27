@@ -11,7 +11,7 @@ let renderingRef = null;
 let queueCongestion = 0;
 let queuePending = false;
 /*
- Stencil Client Platform v0.0.0-dev.20210427083727 | MIT Licensed | https://stenciljs.com
+ Stencil Client Platform v0.0.0-dev.20210427172912 | MIT Licensed | https://stenciljs.com
  */
 import { BUILD, NAMESPACE } from '@stencil/core/internal/app-data';
 const win = typeof window !== 'undefined' ? window : {};
@@ -1988,6 +1988,7 @@ const initializeComponent = async (elm, hostRef, cmpMeta, hmrVersionId, Cstr) =>
             // sync constructor component
             Cstr = elm.constructor;
             hostRef.$flags$ |= 128 /* isWatchReady */ | 32 /* hasInitializedComponent */;
+            // todo we do not fire connectectCallback, cause it will be fired elsewhere, is it valid?
         }
         if (BUILD.style && Cstr.style) {
             // this component has styles but we haven't registered them yet
@@ -2106,7 +2107,9 @@ const connectedCallback = (elm) => {
             // since they would have been removed when disconnected
             addHostEventListeners(elm, hostRef, cmpMeta.$listeners$, false);
             // fire off connectedCallback() on component instance
-            fireConnectedCallback(hostRef.$lazyInstance$);
+            if (!cmpMeta.$customElement$) {
+                fireConnectedCallback(hostRef.$lazyInstance$);
+            }
         }
         endConnected();
     }
@@ -2136,7 +2139,7 @@ const disconnectedCallback = (elm) => {
         if (BUILD.cssVarShim && plt.$cssShim$) {
             plt.$cssShim$.removeHost(elm);
         }
-        if (BUILD.lazyLoad && BUILD.disconnectedCallback) {
+        if (!hostRef.$cmpMeta$.$customElement$ && BUILD.lazyLoad && BUILD.disconnectedCallback) {
             safeCall(instance, 'disconnectedCallback');
         }
         if (BUILD.cmpDidUnload) {
