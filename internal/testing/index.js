@@ -674,19 +674,21 @@ const callRender = (e, t, a) => {
     }
    })), appData.BUILD.initializeNextTick ? nextTick((() => initializeComponent(e, t, a))) : initializeComponent(e, t, a);
   }
-  o();
+  return o(), !0;
  }
+ return !1;
 }, setContentReference = e => {
  const t = e["s-cr"] = doc.createComment(appData.BUILD.isDebug ? `content-ref (host=${e.localName})` : "");
  t["s-cn"] = !0, e.insertBefore(t, e.firstChild);
 }, disconnectedCallback = e => {
  if (0 == (1 & plt.$flags$)) {
   const t = getHostRef(e), a = appData.BUILD.lazyLoad ? t.$lazyInstance$ : e;
-  appData.BUILD.hostListener && t.$rmListeners$ && (t.$rmListeners$.map((e => e())), 
+  return appData.BUILD.hostListener && t.$rmListeners$ && (t.$rmListeners$.map((e => e())), 
   t.$rmListeners$ = void 0), appData.BUILD.cssVarShim && plt.$cssShim$ && plt.$cssShim$.removeHost(e), 
   !t.$cmpMeta$.$customElement$ && appData.BUILD.lazyLoad && appData.BUILD.disconnectedCallback && safeCall(a, "disconnectedCallback"), 
-  appData.BUILD.cmpDidUnload && safeCall(a, "componentDidUnload");
+  appData.BUILD.cmpDidUnload && safeCall(a, "componentDidUnload"), !0;
  }
+ return !1;
 }, proxyCustomElement = (e, t) => {
  const a = {
   $flags$: t[0],
@@ -702,10 +704,10 @@ const callRender = (e, t, a) => {
    registerHost(this, a);
   },
   connectedCallback() {
-   connectedCallback(this), appData.BUILD.connectedCallback && o && o.call(this);
+   connectedCallback(this) && appData.BUILD.connectedCallback && o && o.call(this);
   },
   disconnectedCallback() {
-   disconnectedCallback(this), appData.BUILD.disconnectedCallback && s && s.call(this);
+   disconnectedCallback(this) && appData.BUILD.disconnectedCallback && s && s.call(this);
   }
  }), e.is = a.$tagName$, proxyComponent(e, a, 3);
 }, patchCloneNode = e => {

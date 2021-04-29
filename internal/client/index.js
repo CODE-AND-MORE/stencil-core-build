@@ -11,7 +11,7 @@ let renderingRef = null;
 let queueCongestion = 0;
 let queuePending = false;
 /*
- Stencil Client Platform v0.0.0-dev.20210427205737 | MIT Licensed | https://stenciljs.com
+ Stencil Client Platform v0.0.0-dev.20210429143648 | MIT Licensed | https://stenciljs.com
  */
 import { BUILD, NAMESPACE } from '@stencil/core/internal/app-data';
 const win = typeof window !== 'undefined' ? window : {};
@@ -2031,6 +2031,9 @@ const fireConnectedCallback = (instance) => {
         safeCall(instance, 'connectedCallback');
     }
 };
+/**
+ * @returns true if connectedCallback was executed, false if is temporary disabled
+ */
 const connectedCallback = (elm) => {
     if ((plt.$flags$ & 1 /* isTmpDisconnected */) === 0) {
         const hostRef = getHostRef(elm);
@@ -2112,7 +2115,9 @@ const connectedCallback = (elm) => {
             }
         }
         endConnected();
+        return true;
     }
+    return false;
 };
 const setContentReference = (elm) => {
     // only required when we're NOT using native shadow dom (slot)
@@ -2125,6 +2130,9 @@ const setContentReference = (elm) => {
     contentRefElm['s-cn'] = true;
     elm.insertBefore(contentRefElm, elm.firstChild);
 };
+/**
+ * @returns true if disconnectedCallback was executed, false if is temporary disabled
+ */
 const disconnectedCallback = (elm) => {
     if ((plt.$flags$ & 1 /* isTmpDisconnected */) === 0) {
         const hostRef = getHostRef(elm);
@@ -2145,7 +2153,9 @@ const disconnectedCallback = (elm) => {
         if (BUILD.cmpDidUnload) {
             safeCall(instance, 'componentDidUnload');
         }
+        return true;
     }
+    return false;
 };
 const defineCustomElement = (Cstr, compactMeta) => {
     customElements.define(compactMeta[1], proxyCustomElement(Cstr, compactMeta));
@@ -2178,14 +2188,12 @@ const proxyCustomElement = (Cstr, compactMeta) => {
             registerHost(this, cmpMeta);
         },
         connectedCallback() {
-            connectedCallback(this);
-            if (BUILD.connectedCallback && originalConnectedCallback) {
+            if (connectedCallback(this) && BUILD.connectedCallback && originalConnectedCallback) {
                 originalConnectedCallback.call(this);
             }
         },
         disconnectedCallback() {
-            disconnectedCallback(this);
-            if (BUILD.disconnectedCallback && originalDisconnectedCallback) {
+            if (disconnectedCallback(this) && BUILD.disconnectedCallback && originalDisconnectedCallback) {
                 originalDisconnectedCallback.call(this);
             }
         },

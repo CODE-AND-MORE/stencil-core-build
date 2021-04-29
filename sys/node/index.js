@@ -1,5 +1,5 @@
 /*!
- Stencil Node System v0.0.0-dev.20210427205737 | MIT Licensed | https://stenciljs.com
+ Stencil Node System v0.0.0-dev.20210429143648 | MIT Licensed | https://stenciljs.com
  */
 function _interopDefaultLegacy(e) {
  return e && "object" == typeof e && "default" in e ? e : {

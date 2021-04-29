@@ -728,18 +728,21 @@ const callRender = (e, t, o) => {
     }
    })), BUILD.initializeNextTick ? nextTick((() => initializeComponent(e, t, o))) : initializeComponent(e, t, o);
   }
-  n();
+  return n(), !0;
  }
+ return !1;
 }, setContentReference = e => {
  const t = e["s-cr"] = doc.createComment(BUILD.isDebug ? `content-ref (host=${e.localName})` : "");
  t["s-cn"] = !0, e.insertBefore(t, e.firstChild);
 }, disconnectedCallback = e => {
  if (0 == (1 & plt.$flags$)) {
   const t = getHostRef(e), o = BUILD.lazyLoad ? t.$lazyInstance$ : e;
-  BUILD.hostListener && t.$rmListeners$ && (t.$rmListeners$.map((e => e())), t.$rmListeners$ = void 0), 
-  BUILD.cssVarShim && plt.$cssShim$ && plt.$cssShim$.removeHost(e), !t.$cmpMeta$.$customElement$ && BUILD.lazyLoad && BUILD.disconnectedCallback && safeCall(o, "disconnectedCallback"), 
-  BUILD.cmpDidUnload && safeCall(o, "componentDidUnload");
+  return BUILD.hostListener && t.$rmListeners$ && (t.$rmListeners$.map((e => e())), 
+  t.$rmListeners$ = void 0), BUILD.cssVarShim && plt.$cssShim$ && plt.$cssShim$.removeHost(e), 
+  !t.$cmpMeta$.$customElement$ && BUILD.lazyLoad && BUILD.disconnectedCallback && safeCall(o, "disconnectedCallback"), 
+  BUILD.cmpDidUnload && safeCall(o, "componentDidUnload"), !0;
  }
+ return !1;
 }, defineCustomElement = (e, t) => {
  customElements.define(t[1], proxyCustomElement(e, t));
 }, proxyCustomElement = (e, t) => {
@@ -757,10 +760,10 @@ const callRender = (e, t, o) => {
    registerHost(this, o);
   },
   connectedCallback() {
-   connectedCallback(this), BUILD.connectedCallback && n && n.call(this);
+   connectedCallback(this) && BUILD.connectedCallback && n && n.call(this);
   },
   disconnectedCallback() {
-   disconnectedCallback(this), BUILD.disconnectedCallback && s && s.call(this);
+   disconnectedCallback(this) && BUILD.disconnectedCallback && s && s.call(this);
   }
  }), e.is = o.$tagName$, proxyComponent(e, o, 3);
 }, forceModeUpdate = e => {

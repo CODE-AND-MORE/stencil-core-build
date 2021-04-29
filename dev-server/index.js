@@ -1,5 +1,5 @@
 /*!
- Stencil Dev Server v0.0.0-dev.20210427205737 | MIT Licensed | https://stenciljs.com
+ Stencil Dev Server v0.0.0-dev.20210429143648 | MIT Licensed | https://stenciljs.com
  */
 'use strict';
 
