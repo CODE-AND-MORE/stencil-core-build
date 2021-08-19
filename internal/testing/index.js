@@ -582,7 +582,7 @@ const callRender = (e, t, a) => {
    s.attributeChangedCallback = function(e, t, o) {
     plt.jmp((() => {
      const t = a.get(e);
-     this[t] = (null !== o || "boolean" != typeof this[t]) && o;
+     this.hasOwnProperty(t) && (o = this[t], delete this[t]), this[t] = (null !== o || "boolean" != typeof this[t]) && o;
     }));
    }, e.observedAttributes = o.filter((([e, t]) => 15 & t[0])).map((([e, o]) => {
     const s = o[1] || e;
@@ -595,7 +595,7 @@ const callRender = (e, t, a) => {
 }, initializeComponent = async (e, t, a, o, s) => {
  if ((appData.BUILD.lazyLoad || appData.BUILD.hydrateServerSide || appData.BUILD.style) && 0 == (32 & t.$flags$)) {
   if (a.$customElement$ || !appData.BUILD.lazyLoad && !appData.BUILD.hydrateClientSide) s = e.constructor, 
-  t.$flags$ |= 160; else {
+  t.$flags$ |= 32, customElements.whenDefined(a.$tagName$).then((() => t.$flags$ |= 128)); else {
    if (t.$flags$ |= 32, (s = loadModule(a)).then) {
     const e = (n = `st:load:${a.$tagName$}:${t.$modeName$}`, l = `[Stencil] Load module for <${a.$tagName$}>`, 
     appData.BUILD.profile && performance.mark ? (0 === performance.getEntriesByName(n).length && performance.mark(n), 
@@ -667,7 +667,7 @@ const callRender = (e, t, a) => {
      break;
     }
    }
-   appData.BUILD.prop && appData.BUILD.lazyLoad && !appData.BUILD.hydrateServerSide && a.$members$ && Object.entries(a.$members$).map((([t, [a]]) => {
+   appData.BUILD.prop && !appData.BUILD.hydrateServerSide && a.$members$ && Object.entries(a.$members$).map((([t, [a]]) => {
     if (31 & a && e.hasOwnProperty(t)) {
      const a = e[t];
      delete e[t], e[t] = a;
@@ -1045,8 +1045,9 @@ exports.readTask = readTask, exports.registerComponents = e => {
   moduleLoaded.clear(), queuedLoadModules.length = 0, caughtErrors.length = 0;
  }(), stopAutoApplyChanges(), cstrs.clear();
 }, exports.setAssetPath = e => plt.$resourcesUrl$ = e, exports.setErrorHandler = e => customError = e, 
-exports.setMode = e => modeResolutionChain.push(e), exports.setPlatformOptions = e => Object.assign(plt, e), 
-exports.setSupportsShadowDom = e => {
+exports.setMode = e => modeResolutionChain.push(e), exports.setPlatformHelpers = e => {
+ Object.assign(plt, e);
+}, exports.setPlatformOptions = e => Object.assign(plt, e), exports.setSupportsShadowDom = e => {
  exports.supportsShadow = e;
 }, exports.setValue = setValue, exports.startAutoApplyChanges = async function e() {
  isAutoApplyingChanges = !0, flushAll().then((() => {

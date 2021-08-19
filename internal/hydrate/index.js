@@ -639,7 +639,7 @@ const callRender = (e, t, o) => {
    s.attributeChangedCallback = function(e, t, n) {
     plt.jmp((() => {
      const t = o.get(e);
-     this[t] = (null !== n || "boolean" != typeof this[t]) && n;
+     this.hasOwnProperty(t) && (n = this[t], delete this[t]), this[t] = (null !== n || "boolean" != typeof this[t]) && n;
     }));
    }, e.observedAttributes = n.filter((([e, t]) => 15 & t[0])).map((([e, n]) => {
     const s = n[1] || e;
@@ -652,7 +652,7 @@ const callRender = (e, t, o) => {
 }, initializeComponent = async (e, t, o, n, s) => {
  if ((BUILD.lazyLoad || BUILD.hydrateServerSide || BUILD.style) && 0 == (32 & t.$flags$)) {
   if (o.$customElement$ || !BUILD.lazyLoad && !BUILD.hydrateClientSide) s = e.constructor, 
-  t.$flags$ |= 160; else {
+  t.$flags$ |= 32, customElements.whenDefined(o.$tagName$).then((() => t.$flags$ |= 128)); else {
    if (t.$flags$ |= 32, (s = loadModule(o)).then) {
     const e = (l = `st:load:${o.$tagName$}:${t.$modeName$}`, a = `[Stencil] Load module for <${o.$tagName$}>`, 
     BUILD.profile && performance.mark ? (0 === performance.getEntriesByName(l).length && performance.mark(l), 
@@ -721,7 +721,7 @@ const callRender = (e, t, o) => {
      break;
     }
    }
-   BUILD.prop && BUILD.lazyLoad && !BUILD.hydrateServerSide && o.$members$ && Object.entries(o.$members$).map((([t, [o]]) => {
+   BUILD.prop && !BUILD.hydrateServerSide && o.$members$ && Object.entries(o.$members$).map((([t, [o]]) => {
     if (31 & o && e.hasOwnProperty(t)) {
      const o = e[t];
      delete e[t], e[t] = o;
@@ -1082,6 +1082,8 @@ const cmpModules = new Map, getModule = e => {
  ael: (e, t, o, n) => e.addEventListener(t, o, n),
  rel: (e, t, o, n) => e.removeEventListener(t, o, n),
  ce: (e, t) => new win.CustomEvent(e, t)
+}, setPlatformHelpers = e => {
+ Object.assign(plt, e);
 }, supportsShadow = !1, supportsListenerOptions = !1, supportsConstructibleStylesheets = !1, hostRefs = new WeakMap, getHostRef = e => hostRefs.get(e), registerInstance = (e, t) => hostRefs.set(t.$lazyInstance$ = e, t), registerHost = (e, t) => {
  const o = {
   $flags$: 0,
@@ -1099,4 +1101,4 @@ const cmpModules = new Map, getModule = e => {
  isTesting: !1
 }, styles = new Map, modeResolutionChain = [];
 
-export { Build, Context, Fragment, Host, addHostEventListeners, attachShadow, bootstrapLazy, cmpModules, connectedCallback, consoleDevError, consoleDevInfo, consoleDevWarn, consoleError, createEvent, defineCustomElement, disconnectedCallback, doc, forceModeUpdate, forceUpdate$1 as forceUpdate, getAssetPath, getConnect, getContext, getElement, getHostRef, getMode, getRenderingRef, getValue, hAsync as h, hydrateApp, insertVdomAnnotations, isMemberInElement, loadModule, modeResolutionChain, nextTick, parsePropertyValue, plt, postUpdateComponent, proxyComponent, proxyCustomElement, readTask, registerComponents, registerHost, registerInstance, renderVdom, setAssetPath, setErrorHandler, setMode, setValue, styles, supportsConstructibleStylesheets, supportsListenerOptions, supportsShadow, win, writeTask };
+export { Build, Context, Fragment, Host, addHostEventListeners, attachShadow, bootstrapLazy, cmpModules, connectedCallback, consoleDevError, consoleDevInfo, consoleDevWarn, consoleError, createEvent, defineCustomElement, disconnectedCallback, doc, forceModeUpdate, forceUpdate$1 as forceUpdate, getAssetPath, getConnect, getContext, getElement, getHostRef, getMode, getRenderingRef, getValue, hAsync as h, hydrateApp, insertVdomAnnotations, isMemberInElement, loadModule, modeResolutionChain, nextTick, parsePropertyValue, plt, postUpdateComponent, proxyComponent, proxyCustomElement, readTask, registerComponents, registerHost, registerInstance, renderVdom, setAssetPath, setErrorHandler, setMode, setPlatformHelpers, setValue, styles, supportsConstructibleStylesheets, supportsListenerOptions, supportsShadow, win, writeTask };

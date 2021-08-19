@@ -1,5 +1,5 @@
 /*!
- Stencil Node System v0.0.0-dev.20210429143648 | MIT Licensed | https://stenciljs.com
+ Stencil Node System v0.0.0-dev.20210819202209 | MIT Licensed | https://stenciljs.com
  */
 function _interopDefaultLegacy(e) {
  return e && "object" == typeof e && "default" in e ? e : {
@@ -229,13 +229,13 @@ function getNextWorker(e) {
  return 0 === t.length ? null : t.sort(((e, t) => e.tasks.size < t.tasks.size ? -1 : e.tasks.size > t.tasks.size ? 1 : e.totalTasksAssigned < t.totalTasksAssigned ? -1 : e.totalTasksAssigned > t.totalTasksAssigned ? 1 : 0))[0];
 }
 
-var symbols, ansiColors, create_1, fn, exit;
+var ansiColors, create_1, fn;
 
 Object.defineProperty(exports, "__esModule", {
  value: !0
 });
 
-const fs = require("./graceful-fs.js"), path = require("path"), util = require("util"), glob = require("./glob.js"), os = require("os"), crypto = require("crypto"), events = require("events"), cp = require("child_process"), fs__default = _interopDefaultLegacy(fs), path__default = _interopDefaultLegacy(path), glob__default = _interopDefaultLegacy(glob), cp__namespace = _interopNamespace(cp), createTerminalLogger = e => {
+const fs = require("./graceful-fs.js"), path = require("path"), util = require("util"), glob = require("./glob.js"), os = require("os"), crypto = require("crypto"), events = require("events"), cp = require("child_process"), fs__default = _interopDefaultLegacy(fs), path__default = _interopDefaultLegacy(path), glob__default = _interopDefaultLegacy(glob), os__namespace = _interopNamespace(os), cp__namespace = _interopNamespace(cp), createTerminalLogger = e => {
  let t = "info", r = null;
  const s = [], n = e => {
   if (e.length) {
@@ -436,9 +436,7 @@ const fs = require("./graceful-fs.js"), path = require("path"), util = require("
   if (" " !== r && "\t" !== r) return !1;
  }
  return !0;
-}, isMeaningfulLine = e => !!e && (e = e.trim()).length > 0, JS_KEYWORDS = [ "abstract", "any", "as", "break", "boolean", "case", "catch", "class", "console", "const", "continue", "debugger", "declare", "default", "delete", "do", "else", "enum", "export", "extends", "false", "finally", "for", "from", "function", "get", "if", "import", "in", "implements", "Infinity", "instanceof", "let", "module", "namespace", "NaN", "new", "number", "null", "public", "private", "protected", "require", "return", "static", "set", "string", "super", "switch", "this", "throw", "try", "true", "type", "typeof", "undefined", "var", "void", "with", "while", "yield" ], INDENT$1 = "           ";
-
-symbols = function createCommonjsModule(e, t, r) {
+}, isMeaningfulLine = e => !!e && (e = e.trim()).length > 0, JS_KEYWORDS = [ "abstract", "any", "as", "break", "boolean", "case", "catch", "class", "console", "const", "continue", "debugger", "declare", "default", "delete", "do", "else", "enum", "export", "extends", "false", "finally", "for", "from", "function", "get", "if", "import", "in", "implements", "Infinity", "instanceof", "let", "module", "namespace", "NaN", "new", "number", "null", "public", "private", "protected", "require", "return", "static", "set", "string", "super", "switch", "this", "throw", "try", "true", "type", "typeof", "undefined", "var", "void", "with", "while", "yield" ], INDENT$1 = "           ", require$$0 = function createCommonjsModule(e, t, r) {
  return e(r = {
   path: t,
   exports: {},
@@ -514,9 +512,7 @@ symbols = function createCommonjsModule(e, t, r) {
   enumerable: !1,
   value: i
  });
-}));
-
-const ANSI_REGEX = /[\u001b\u009b][[\]#;?()]*(?:(?:(?:[^\W_]*;?[^\W_]*)\u0007)|(?:(?:[0-9]{1,4}(;[0-9]{0,4})*)?[~0-9=<>cf-nqrtyA-PRZ]))/g, create = () => {
+})), ANSI_REGEX = /[\u001b\u009b][[\]#;?()]*(?:(?:(?:[^\W_]*;?[^\W_]*)\u0007)|(?:(?:[0-9]{1,4}(;[0-9]{0,4})*)?[~0-9=<>cf-nqrtyA-PRZ]))/g, create = () => {
  const e = {
   enabled: !0,
   visible: !0,
@@ -595,10 +591,14 @@ const ANSI_REGEX = /[\u001b\u009b][[\]#;?()]*(?:(?:(?:[^\W_]*;?[^\W_]*)\u0007)|(
   return e;
  }, e.alias("unstyle", (t => "string" == typeof t && "" !== t ? (e.ansiRegex.lastIndex = 0, 
  t.replace(e.ansiRegex, "")) : "")), e.alias("noop", (e => e)), e.none = e.clear = e.noop, 
- e.stripColor = e.unstyle, e.symbols = symbols, e.define = s, e;
+ e.stripColor = e.unstyle, e.symbols = require$$0, e.define = s, e;
 };
 
-ansiColors = create(), create_1 = create, ansiColors.create = create_1;
+ansiColors = create(), create_1 = create;
+
+const ansiColor = ansiColors;
+
+ansiColors.create = create_1;
 
 const noop = () => {}, isString = e => "string" == typeof e, buildError = e => {
  const t = {
@@ -699,21 +699,6 @@ fn = new Intl.Collator(0, {
 }).compare;
 
 const REGISTRY_URL = "https://registry.npmjs.org/@stencil/core", CHANGELOG = "https://github.com/ionic-team/stencil/blob/master/CHANGELOG.md", ARROW = "→", BOX_TOP_LEFT = "╭", BOX_TOP_RIGHT = "╮", BOX_BOTTOM_LEFT = "╰", BOX_BOTTOM_RIGHT = "╯", BOX_VERTICAL = "│", BOX_HORIZONTAL = "─", PADDING = 2, INDENT = "   ";
-
-exit = function e(t, r) {
- function s() {
-  n === r.length && process.exit(t);
- }
- r || (r = [ process.stdout, process.stderr ]);
- var n = 0;
- r.forEach((function(e) {
-  0 === e.bufferSize ? n++ : e.write("", "utf-8", (function() {
-   n++, s();
-  })), e.write = function() {};
- })), s(), process.on("exit", (function() {
-  process.exit(t);
- }));
-};
 
 class NodeLazyRequire {
  constructor(e, t) {
@@ -920,7 +905,7 @@ class NodeWorkerController extends events.EventEmitter {
 exports.createNodeLogger = e => {
  let t = !0;
  const r = e.process, s = createTerminalLogger({
-  color: (e, r) => t ? ansiColors[r](e) : e,
+  color: (e, r) => t ? ansiColor[r](e) : e,
   cwd: () => r.cwd(),
   emoji: e => "win32" !== r.platform ? e : "",
   enableColors: e => t = e,
@@ -996,6 +981,14 @@ exports.createNodeLogger = e => {
    e.window.fetch = global.fetch, e.window.Headers = global.Headers, e.window.Request = global.Request, 
    e.window.Response = global.Response, e.window.FetchError = global.FetchError;
   },
+  fetch: (e, t) => {
+   const r = require(path__default.default.join(__dirname, "node-fetch.js"));
+   if ("string" == typeof e) {
+    const s = new URL(e).href;
+    return r.fetch(s, t);
+   }
+   return e.url = new URL(e.url).href, r.fetch(e, t);
+  },
   checkVersion,
   copyFile: (e, t) => new Promise((r => {
    fs__default.default.copyFile(e, t, (e => {
@@ -1059,7 +1052,20 @@ exports.createNodeLogger = e => {
   }),
   async ensureResources() {},
   exit: async e => {
-   await c(), exit(e);
+   await c(), function e(t, r) {
+    function s() {
+     n === r.length && process.exit(t);
+    }
+    r || (r = [ process.stdout, process.stderr ]);
+    var n = 0;
+    r.forEach((function(e) {
+     0 === e.bufferSize ? n++ : e.write("", "utf-8", (function() {
+      n++, s();
+     })), e.write = function() {};
+    })), s(), process.on("exit", (function() {
+     process.exit(t);
+    }));
+   }(e);
   },
   getCurrentDirectory: () => normalizePath(t.cwd()),
   getCompilerExecutingPath: () => a,
@@ -1089,6 +1095,10 @@ exports.createNodeLogger = e => {
     t(r ? [] : s.map((t => normalizePath(path__default.default.join(e, t)))));
    }));
   })),
+  isTTY() {
+   var e;
+   return !!(null === (e = null === process || void 0 === process ? void 0 : process.stdout) || void 0 === e ? void 0 : e.isTTY);
+  },
   readDirSync(e) {
    try {
     return fs__default.default.readdirSync(e).map((t => normalizePath(path__default.default.join(e, t))));
@@ -1107,6 +1117,11 @@ exports.createNodeLogger = e => {
   readFileSync(e) {
    try {
     return fs__default.default.readFileSync(e, "utf8");
+   } catch (e) {}
+  },
+  homeDir() {
+   try {
+    return os__namespace.homedir();
    } catch (e) {}
   },
   realpath: e => new Promise((t => {
@@ -1259,7 +1274,7 @@ exports.createNodeLogger = e => {
     };
    })(), u.watchDirectory = (e, t, s) => {
     const n = r(e, (e => {
-     t(normalizePath(e), null);
+     t(normalizePath(e), "fileUpdate");
     }), s), o = () => {
      n.close();
     };
@@ -1367,11 +1382,10 @@ exports.createNodeLogger = e => {
  }, d = new NodeResolveModule;
  return u.lazyRequire = new NodeLazyRequire(d, {
   "@types/jest": [ "24.9.1", "26.0.21" ],
-  "@types/puppeteer": [ "1.19.0", "5.4.3" ],
   jest: [ "24.9.0", "26.6.3" ],
   "jest-cli": [ "24.9.0", "26.6.3" ],
   pixelmatch: [ "4.0.2", "4.0.2" ],
-  puppeteer: [ "1.19.0", "5.5.0" ],
+  puppeteer: [ "1.19.0", "10.0.0" ],
   "puppeteer-core": [ "1.19.0", "5.2.1" ],
   "workbox-build": [ "4.3.1", "4.3.1" ]
  }), t.on("SIGINT", c), t.on("exit", c), u;
