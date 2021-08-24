@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core/compiler",
-  "version": "0.0.0-dev.20210819202209",
+  "version": "0.0.0-dev.20210824195911",
   "description": "Stencil Compiler.",
   "main": "./stencil.js",
   "types": "./stencil.d.ts",

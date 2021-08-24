@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "license": "MIT",
   "main": "./internal/stencil-core/index.cjs",
   "module": "./internal/stencil-core/index.js",
@@ -111,7 +111,7 @@
     "prettier": "2.3.2",
     "prompts": "2.4.0",
     "puppeteer": "~10.0.0",
-    "rollup": "^2.56.2",
+    "rollup": "2.42.3",
     "semiver": "^1.1.0",
     "semver": "7.3.4",
     "sizzle": "^2.3.6",

@@ -1,5 +1,5 @@
 /*!
- Stencil Testing v0.0.0-dev.20210819202209 | MIT Licensed | https://stenciljs.com
+ Stencil Testing v0.0.0-dev.20210824195911 | MIT Licensed | https://stenciljs.com
  */
 function _lazyRequire(e) {
  return new Proxy({}, {
@@ -2927,11 +2927,11 @@ const resolve$1 = async, createSystem = e => {
    data: t
   }), v(e, new Set);
   return s;
- }, E = global.fetch, T = Promise.resolve();
+ }, E = "undefined" != typeof self ? null === self || void 0 === self ? void 0 : self.fetch : "undefined" != typeof window ? null === window || void 0 === window ? void 0 : window.fetch : "undefined" != typeof global ? null === global || void 0 === global ? void 0 : global.fetch : void 0, T = Promise.resolve();
  u("/");
  const S = {
   name: "in-memory",
-  version: "0.0.0-dev.20210819202209",
+  version: "0.0.0-dev.20210824195911",
   events: i,
   access: async e => c(e),
   accessSync: c,

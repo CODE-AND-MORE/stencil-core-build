@@ -1,5 +1,5 @@
 /*!
- Stencil CLI (CommonJS) v0.0.0-dev.20210819202209 | MIT Licensed | https://stenciljs.com
+ Stencil CLI (CommonJS) v0.0.0-dev.20210824195911 | MIT Licensed | https://stenciljs.com
  */
 'use strict';
 
@@ -485,7 +485,7 @@ const getNpmConfigEnvArgs = (sys) => {
 const dependencies = [
 	{
 		name: "@stencil/core",
-		version: "0.0.0-dev.20210819202209",
+		version: "0.0.0-dev.20210824195911",
 		main: "compiler/stencil.js",
 		resources: [
 			"package.json",
@@ -898,6 +898,11 @@ function uuidv4() {
         return v.toString(16);
     });
 }
+/**
+ * Reads and parses a JSON file from the given `path`
+ * @param path the path on the file system to read and parse
+ * @returns the parsed JSON
+ */
 async function readJson(path) {
     const file = await getCompilerSystem().readFile(path);
     return !!file && JSON.parse(file);
@@ -921,6 +926,11 @@ async function shouldTrack(ci) {
 const isTest$1 = () => process.env.JEST_WORKER_ID !== undefined;
 const defaultConfig = () => getCompilerSystem().resolvePath(`${getCompilerSystem().homeDir()}/.ionic/${isTest$1() ? 'tmp-config.json' : 'config.json'}`);
 const defaultConfigDirectory = () => getCompilerSystem().resolvePath(`${getCompilerSystem().homeDir()}/.ionic`);
+/**
+ * Reads an Ionic configuration file from disk, parses it, and performs any necessary corrections to it if ceratin
+ * values are deemed to be malformed
+ * @returns the config read from disk that has been potentially been updated
+ */
 async function readConfig() {
     let config = await readJson(defaultConfig());
     if (!config) {
@@ -930,7 +940,7 @@ async function readConfig() {
         };
         await writeConfig(config);
     }
-    else if (!!config && !config['tokens.telemetry'].match(UUID_REGEX)) {
+    else if (!UUID_REGEX.test(config['tokens.telemetry'])) {
         const newUuid = uuidv4();
         await writeConfig({ ...config, 'tokens.telemetry': newUuid });
         config['tokens.telemetry'] = newUuid;
