@@ -679,6 +679,7 @@ export declare namespace JSXBase {
         media?: string;
         rel?: string;
         target?: string;
+        referrerPolicy?: ReferrerPolicy;
     }
     interface AudioHTMLAttributes<T> extends MediaHTMLAttributes<T> {
     }
