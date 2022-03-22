@@ -1,5 +1,5 @@
 /*!
- Stencil CLI v0.0.0-dev.20211210183644 | MIT Licensed | https://stenciljs.com
+ Stencil CLI v0.0.0-dev.20220322081806 | MIT Licensed | https://stenciljs.com
  */
 const toLowerCase = (str) => str.toLowerCase();
 const dashToPascalCase = (str) => toLowerCase(str)
@@ -9,6 +9,16 @@ const dashToPascalCase = (str) => toLowerCase(str)
 const isFunction = (v) => typeof v === 'function';
 const isString = (v) => typeof v === 'string';
 
+/**
+ * Builds a template `Diagnostic` entity for a build error. The created `Diagnostic` is returned, and have little
+ * detail attached to it regarding the specifics of the error - it is the responsibility of the caller of this method
+ * to attach the specifics of the error message.
+ *
+ * The created `Diagnostic` is pushed to the `diagnostics` argument as a side effect of calling this method.
+ *
+ * @param diagnostics the existing diagnostics that the created template `Diagnostic` should be added to
+ * @returns the created `Diagnostic`
+ */
 const buildError = (diagnostics) => {
     const diagnostic = {
         level: 'error',
@@ -55,6 +65,12 @@ const catchError = (diagnostics, err, msg) => {
     }
     return diagnostic;
 };
+/**
+ * Determine if the provided diagnostics have any build errors
+ * @param diagnostics the diagnostics to inspect
+ * @returns true if any of the diagnostics in the list provided are errors that did not occur at runtime. false
+ * otherwise.
+ */
 const hasError = (diagnostics) => {
     if (diagnostics == null || diagnostics.length === 0) {
         return false;
@@ -466,7 +482,7 @@ const getNpmConfigEnvArgs = (sys) => {
 const dependencies = [
 	{
 		name: "@stencil/core",
-		version: "0.0.0-dev.20211210183644",
+		version: "0.0.0-dev.20220322081806",
 		main: "compiler/stencil.js",
 		resources: [
 			"package.json",
@@ -1665,7 +1681,7 @@ const runTask = async (coreCompiler, config, task, sys) => {
             await taskGenerate(coreCompiler, config);
             break;
         case 'help':
-            taskHelp(config, config.logger, sys);
+            await taskHelp(config, config.logger, sys);
             break;
         case 'prerender':
             await taskPrerender(coreCompiler, config);
@@ -1687,7 +1703,7 @@ const runTask = async (coreCompiler, config, task, sys) => {
             break;
         default:
             config.logger.error(`${config.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`);
-            taskHelp(config, config.logger, sys);
+            await taskHelp(config, config.logger, sys);
             return config.sys.exit(1);
     }
 };

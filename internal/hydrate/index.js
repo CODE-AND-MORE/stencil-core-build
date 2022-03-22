@@ -281,7 +281,8 @@ const createTime = (e, t = "") => {
  t;
 }, validateInputProperties = e => {
  const t = Object.keys(e);
- t.indexOf("type"), t.indexOf("min"), t.indexOf("max"), t.indexOf("min"), t.indexOf("value");
+ -1 !== t.indexOf("value") && (t.indexOf("type"), t.indexOf("min"), t.indexOf("max"), 
+ t.indexOf("step"));
 }, setAccessor = (e, t, o, n, s, l) => {
  if (o !== n) {
   let a = isMemberInElement(e, t), r = t.toLowerCase();

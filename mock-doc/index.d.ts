@@ -283,6 +283,7 @@ declare class MockEvent {
   preventDefault(): void;
   stopPropagation(): void;
   stopImmediatePropagation(): void;
+  composedPath(): MockElement[];
 }
 declare class MockCustomEvent extends MockEvent {
   detail: any;

@@ -1,5 +1,5 @@
 /*!
- Stencil Mock Doc v0.0.0-dev.20211210183644 | MIT Licensed | https://stenciljs.com
+ Stencil Mock Doc v0.0.0-dev.20220322081806 | MIT Licensed | https://stenciljs.com
  */
 const CONTENT_REF_ID = 'r';
 const ORG_LOCATION_ID = 'o';
@@ -544,7 +544,7 @@ class MockCSSStyleDeclaration {
         const splt = rule.split(':');
         if (splt.length > 1) {
           const prop = splt[0].trim();
-          const value = splt[1].trim();
+          const value = splt.slice(1).join(':').trim();
           if (prop !== '' && value !== '') {
             this._styles.set(jsCaseToCssCase(prop), value);
           }
@@ -625,6 +625,21 @@ class MockEvent {
   }
   stopImmediatePropagation() {
     this.cancelBubble = true;
+  }
+  composedPath() {
+    const composedPath = [];
+    let currentElement = this.target;
+    while (currentElement) {
+      composedPath.push(currentElement);
+      if (!currentElement.parentElement && currentElement.nodeName === "#document" /* DOCUMENT_NODE */) {
+        // the current element doesn't have a parent, but we've detected it's our root document node. push the window
+        // object associated with the document onto the path
+        composedPath.push(currentElement.defaultView);
+        break;
+      }
+      currentElement = currentElement.parentElement;
+    }
+    return composedPath;
   }
 }
 class MockCustomEvent extends MockEvent {
@@ -1507,6 +1522,9 @@ class MockNode {
     return null;
   }
   contains(otherNode) {
+    if (otherNode === this) {
+      return true;
+    }
     return this.childNodes.includes(otherNode);
   }
   removeChild(childNode) {

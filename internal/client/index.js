@@ -11,7 +11,7 @@ let renderingRef = null;
 let queueCongestion = 0;
 let queuePending = false;
 /*
- Stencil Client Platform v0.0.0-dev.20211210183644 | MIT Licensed | https://stenciljs.com
+ Stencil Client Platform v0.0.0-dev.20220322081806 | MIT Licensed | https://stenciljs.com
  */
 import { BUILD, NAMESPACE } from '@stencil/core/internal/app-data';
 const win = typeof window !== 'undefined' ? window : {};
@@ -478,16 +478,20 @@ const convertToPrivate = (node) => {
     vnode.$name$ = node.vname;
     return vnode;
 };
-const validateInputProperties = (vnodeData) => {
-    const props = Object.keys(vnodeData);
-    const typeIndex = props.indexOf('type');
-    const minIndex = props.indexOf('min');
-    const maxIndex = props.indexOf('max');
-    const stepIndex = props.indexOf('min');
+/**
+ * Validates the ordering of attributes on an input element
+ * @param inputElm the element to validate
+ */
+const validateInputProperties = (inputElm) => {
+    const props = Object.keys(inputElm);
     const value = props.indexOf('value');
     if (value === -1) {
         return;
     }
+    const typeIndex = props.indexOf('type');
+    const minIndex = props.indexOf('min');
+    const maxIndex = props.indexOf('max');
+    const stepIndex = props.indexOf('step');
     if (value < typeIndex || value < minIndex || value < maxIndex || value < stepIndex) {
         consoleDevWarn(`The "value" prop of <input> should be set after "min", "max", "type" and "step"`);
     }

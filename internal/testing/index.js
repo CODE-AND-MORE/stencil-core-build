@@ -228,8 +228,10 @@ const createTime = (e, t = "") => {
  return t.$attrs$ = e.vattrs, t.$children$ = e.vchildren, t.$key$ = e.vkey, t.$name$ = e.vname, 
  t;
 }, validateInputProperties = e => {
- const t = Object.keys(e), a = t.indexOf("type"), o = t.indexOf("min"), s = t.indexOf("max"), n = t.indexOf("min"), l = t.indexOf("value");
- -1 !== l && (l < a || l < o || l < s || l < n) && consoleDevWarn('The "value" prop of <input> should be set after "min", "max", "type" and "step"');
+ const t = Object.keys(e), a = t.indexOf("value");
+ if (-1 === a) return;
+ const o = t.indexOf("type"), s = t.indexOf("min"), n = t.indexOf("max"), l = t.indexOf("step");
+ (a < o || a < s || a < n || a < l) && consoleDevWarn('The "value" prop of <input> should be set after "min", "max", "type" and "step"');
 }, setAccessor = (e, t, a, o, s, n) => {
  if (a !== o) {
   let l = isMemberInElement(e, t), r = t.toLowerCase();

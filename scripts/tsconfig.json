@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "lib": [
+      "dom",
+      "es2017",
+      "esnext.array"
+    ],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "build/",
+    "pretty": true,
+    "target": "es2017",
+    "incremental": false,
+  },
+  "include": [
+    "**/*.ts"
+  ]
+}

@@ -1774,6 +1774,7 @@ export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNe
     inlineDynamicImports?: boolean;
     includeGlobalScripts?: boolean;
     defineFunctionName?: string;
+    autoDefineCustomElements?: boolean;
     minify?: boolean;
     typesDir?: string;
 }
