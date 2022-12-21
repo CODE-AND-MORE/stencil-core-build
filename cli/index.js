@@ -1,5 +1,5 @@
 /*!
- Stencil CLI v0.0.0-dev.20221221154011 | MIT Licensed | https://stenciljs.com
+ Stencil CLI v0.0.0-dev.20221221203401 | MIT Licensed | https://stenciljs.com
  */
 const toLowerCase = (str) => str.toLowerCase();
 const dashToPascalCase = (str) => toLowerCase(str)
@@ -506,7 +506,7 @@ const getNpmConfigEnvArgs = (sys) => {
 const dependencies = [
 	{
 		name: "@stencil/core",
-		version: "0.0.0-dev.20221221154011",
+		version: "0.0.0-dev.20221221203401",
 		main: "compiler/stencil.js",
 		resources: [
 			"package.json",

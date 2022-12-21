@@ -1,5 +1,5 @@
 /*
- Stencil Client Patch Esm v0.0.0-dev.20221221154011 | MIT Licensed | https://stenciljs.com
+ Stencil Client Patch Esm v0.0.0-dev.20221221203401 | MIT Licensed | https://stenciljs.com
  */
 import { BUILD } from '@stencil/core/internal/app-data';
 import { CSS, plt, win, promiseResolve } from '@stencil/core';

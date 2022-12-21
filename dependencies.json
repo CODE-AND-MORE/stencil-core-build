@@ -2,7 +2,7 @@
   "dependencies": [
     {
       "name": "@stencil/core",
-      "version": "0.0.0-dev.20211210183644",
+      "version": "0.0.0-dev.20221221154011",
       "main": "compiler/stencil.js",
       "resources": [
         "package.json",
@@ -52,6 +52,7 @@
         "compiler/lib.es2020.symbol.wellknown.d.ts",
         "compiler/lib.es2021.d.ts",
         "compiler/lib.es2021.full.d.ts",
+        "compiler/lib.es2021.intl.d.ts",
         "compiler/lib.es2021.promise.d.ts",
         "compiler/lib.es2021.string.d.ts",
         "compiler/lib.es2021.weakref.d.ts",
