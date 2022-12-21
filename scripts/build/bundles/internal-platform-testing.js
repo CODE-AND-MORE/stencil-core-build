@@ -13,11 +13,11 @@ const banner_1 = require("../utils/banner");
 const write_pkg_json_1 = require("../utils/write-pkg-json");
 const pretty_minify_1 = require("./plugins/pretty-minify");
 async function internalTesting(opts) {
-    const inputTestingPlatform = path_1.join(opts.buildDir, 'testing', 'platform', 'index.js');
-    const outputTestingPlatformDir = path_1.join(opts.output.internalDir, 'testing');
+    const inputTestingPlatform = (0, path_1.join)(opts.buildDir, 'testing', 'platform', 'index.js');
+    const outputTestingPlatformDir = (0, path_1.join)(opts.output.internalDir, 'testing');
     await fs_extra_1.default.emptyDir(outputTestingPlatformDir);
     // write @stencil/core/internal/testing/package.json
-    write_pkg_json_1.writePkgJson(opts, outputTestingPlatformDir, {
+    (0, write_pkg_json_1.writePkgJson)(opts, outputTestingPlatformDir, {
         name: '@stencil/core/internal/testing',
         description: 'Stencil internal testing platform to be imported by the Stencil Compiler. Breaking changes can and will happen at any time.',
         main: 'index.js',
@@ -27,7 +27,7 @@ async function internalTesting(opts) {
         dir: outputTestingPlatformDir,
         entryFileNames: '[name].js',
         chunkFileNames: '[name].js',
-        banner: banner_1.getBanner(opts, 'Stencil Testing Platform'),
+        banner: (0, banner_1.getBanner)(opts, 'Stencil Testing Platform'),
         esModule: false,
         preferConst: true,
     };
@@ -46,10 +46,10 @@ async function internalTesting(opts) {
                     return null;
                 },
             },
-            alias_plugin_1.aliasPlugin(opts),
-            replace_plugin_1.replacePlugin(opts),
-            reorder_statements_1.reorderCoreStatementsPlugin(),
-            pretty_minify_1.prettyMinifyPlugin(opts),
+            (0, alias_plugin_1.aliasPlugin)(opts),
+            (0, replace_plugin_1.replacePlugin)(opts),
+            (0, reorder_statements_1.reorderCoreStatementsPlugin)(),
+            (0, pretty_minify_1.prettyMinifyPlugin)(opts),
         ],
     };
     return [internalTestingPlatformBundle];

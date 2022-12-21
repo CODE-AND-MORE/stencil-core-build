@@ -15,11 +15,11 @@ const sizzle_plugin_1 = require("./plugins/sizzle-plugin");
 const write_pkg_json_1 = require("../utils/write-pkg-json");
 const banner_1 = require("../utils/banner");
 async function mockDoc(opts) {
-    const inputDir = path_1.join(opts.buildDir, 'mock-doc');
+    const inputDir = (0, path_1.join)(opts.buildDir, 'mock-doc');
     const outputDir = opts.output.mockDocDir;
     // bundle d.ts
     const bundleDtsPromise = bundleMockDocDts(inputDir, outputDir);
-    write_pkg_json_1.writePkgJson(opts, outputDir, {
+    (0, write_pkg_json_1.writePkgJson)(opts, outputDir, {
         name: '@stencil/core/mock-doc',
         description: 'Mock window, document and DOM outside of a browser environment.',
         main: 'index.cjs',
@@ -29,29 +29,29 @@ async function mockDoc(opts) {
     });
     const esOutput = {
         format: 'es',
-        file: path_1.join(outputDir, 'index.js'),
+        file: (0, path_1.join)(outputDir, 'index.js'),
         preferConst: true,
-        banner: banner_1.getBanner(opts, `Stencil Mock Doc`, true),
+        banner: (0, banner_1.getBanner)(opts, `Stencil Mock Doc`, true),
     };
     const cjsOutput = {
         format: 'cjs',
-        file: path_1.join(outputDir, 'index.cjs'),
+        file: (0, path_1.join)(outputDir, 'index.cjs'),
         intro: CJS_INTRO,
         outro: CJS_OUTRO,
         strict: false,
         esModule: false,
-        banner: banner_1.getBanner(opts, `Stencil Mock Doc (CommonJS)`, true),
+        banner: (0, banner_1.getBanner)(opts, `Stencil Mock Doc (CommonJS)`, true),
     };
     const mockDocBundle = {
-        input: path_1.join(inputDir, 'index.js'),
+        input: (0, path_1.join)(inputDir, 'index.js'),
         output: [esOutput, cjsOutput],
         plugins: [
-            parse5_plugin_1.parse5Plugin(opts),
-            sizzle_plugin_1.sizzlePlugin(opts),
-            alias_plugin_1.aliasPlugin(opts),
-            replace_plugin_1.replacePlugin(opts),
-            plugin_node_resolve_1.default(),
-            plugin_commonjs_1.default(),
+            (0, parse5_plugin_1.parse5Plugin)(opts),
+            (0, sizzle_plugin_1.sizzlePlugin)(opts),
+            (0, alias_plugin_1.aliasPlugin)(opts),
+            (0, replace_plugin_1.replacePlugin)(opts),
+            (0, plugin_node_resolve_1.default)(),
+            (0, plugin_commonjs_1.default)(),
         ],
     };
     await bundleDtsPromise;
@@ -78,12 +78,12 @@ async function bundleMockDocDts(inputDir, outputDir) {
     const output = await Promise.all(srcDtsFiles.map((inputDtsFile) => {
         return getDtsContent(inputDir, inputDtsFile);
     }));
-    const srcIndexDts = await fs_extra_1.default.readFile(path_1.join(inputDir, 'index.d.ts'), 'utf8');
+    const srcIndexDts = await fs_extra_1.default.readFile((0, path_1.join)(inputDir, 'index.d.ts'), 'utf8');
     output.push(getMockDocExports(srcIndexDts));
-    await fs_extra_1.default.writeFile(path_1.join(outputDir, 'index.d.ts'), output.join('\n') + '\n');
+    await fs_extra_1.default.writeFile((0, path_1.join)(outputDir, 'index.d.ts'), output.join('\n') + '\n');
 }
 async function getDtsContent(inputDir, inputDtsFile) {
-    const srcDtsText = await fs_extra_1.default.readFile(path_1.join(inputDir, inputDtsFile), 'utf8');
+    const srcDtsText = await fs_extra_1.default.readFile((0, path_1.join)(inputDir, inputDtsFile), 'utf8');
     const allLines = srcDtsText.split('\n');
     const filteredLines = allLines.filter((ln) => {
         if (ln.trim().startsWith('///')) {

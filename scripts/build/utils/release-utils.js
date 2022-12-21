@@ -35,7 +35,7 @@ exports.isValidVersion = isValidVersion;
  * @param input the version string to validate
  * @returns true if the string is valid, false otherwise
  */
-const isValidVersionInput = (input) => exports.SEMVER_INCREMENTS.indexOf(input) !== -1 || exports.isValidVersion(input);
+const isValidVersionInput = (input) => exports.SEMVER_INCREMENTS.indexOf(input) !== -1 || (0, exports.isValidVersion)(input);
 exports.isValidVersionInput = isValidVersionInput;
 /**
  * Determines if the provided `version` is a semver pre-release or not
@@ -56,7 +56,7 @@ exports.isPrereleaseVersion = isPrereleaseVersion;
  * @returns new version's string
  */
 function getNewVersion(oldVersion, input) {
-    if (!exports.isValidVersionInput(input)) {
+    if (!(0, exports.isValidVersionInput)(input)) {
         throw new Error(`Version should be either ${exports.SEMVER_INCREMENTS.join(', ')} or a valid semver version.`);
     }
     return exports.SEMVER_INCREMENTS.indexOf(input) === -1 ? input : semver_1.default.inc(oldVersion, input);
@@ -96,8 +96,8 @@ exports.prettyVersionDiff = prettyVersionDiff;
  * @param opts build options to be used to update the changelog
  */
 async function updateChangeLog(opts) {
-    const ccPath = path_1.join(opts.nodeModulesDir, '.bin', 'conventional-changelog');
-    await execa_1.default('node', [ccPath, '-p', 'angular', '-o', '-i', opts.changelogPath, '-s'], { cwd: opts.rootDir });
+    const ccPath = (0, path_1.join)(opts.nodeModulesDir, '.bin', 'conventional-changelog');
+    await (0, execa_1.default)('node', [ccPath, '-p', 'angular', '-o', '-i', opts.changelogPath, '-s'], { cwd: opts.rootDir });
     let changelog = await fs_extra_1.default.readFile(opts.changelogPath, 'utf8');
     changelog = changelog.replace(/\# \[/, '# ' + opts.vermoji + ' [');
     await fs_extra_1.default.writeFile(opts.changelogPath, changelog);
@@ -113,10 +113,17 @@ async function postGithubRelease(opts) {
     const lines = (await fs_extra_1.default.readFile(opts.changelogPath, 'utf8')).trim().split('\n');
     let body = '';
     for (let i = 1; i < 500; i++) {
-        if (lines[i].startsWith('## ')) {
+        const currentLine = lines[i];
+        if (currentLine == undefined) {
+            // we don't test this as `!currentLine`, as an empty string is permitted in the changelog
             break;
         }
-        body += lines[i] + '\n';
+        const isMajorOrMinorVersionHeader = currentLine.startsWith('# ');
+        const isPatchVersionHeader = currentLine.startsWith('## ');
+        if (isMajorOrMinorVersionHeader || isPatchVersionHeader) {
+            break;
+        }
+        body += currentLine + '\n';
     }
     // https://docs.github.com/en/github/administering-a-repository/automation-for-release-forms-with-query-parameters
     const url = new URL(`https://github.com/${opts.ghRepoOrg}/${opts.ghRepoName}/releases/new`);
@@ -129,6 +136,6 @@ async function postGithubRelease(opts) {
     if (opts.tag === 'next' || opts.tag === 'test') {
         url.searchParams.set('prerelease', '1');
     }
-    await open_1.default(url.href);
+    await (0, open_1.default)(url.href);
 }
 exports.postGithubRelease = postGithubRelease;

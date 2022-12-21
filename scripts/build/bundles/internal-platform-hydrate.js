@@ -15,17 +15,17 @@ const plugin_node_resolve_1 = __importDefault(require("@rollup/plugin-node-resol
 const write_pkg_json_1 = require("../utils/write-pkg-json");
 const pretty_minify_1 = require("./plugins/pretty-minify");
 async function internalHydrate(opts) {
-    const inputHydrateDir = path_1.join(opts.buildDir, 'hydrate');
-    const outputInternalHydrateDir = path_1.join(opts.output.internalDir, 'hydrate');
+    const inputHydrateDir = (0, path_1.join)(opts.buildDir, 'hydrate');
+    const outputInternalHydrateDir = (0, path_1.join)(opts.output.internalDir, 'hydrate');
     await fs_extra_1.default.emptyDir(outputInternalHydrateDir);
     // write @stencil/core/internal/hydrate/package.json
-    write_pkg_json_1.writePkgJson(opts, outputInternalHydrateDir, {
+    (0, write_pkg_json_1.writePkgJson)(opts, outputInternalHydrateDir, {
         name: '@stencil/core/internal/hydrate',
         description: 'Stencil internal hydrate platform to be imported by the Stencil Compiler. Breaking changes can and will happen at any time.',
         main: 'index.js',
     });
     await createHydrateRunnerDtsBundle(opts, inputHydrateDir, outputInternalHydrateDir);
-    const hydratePlatformInput = path_1.join(inputHydrateDir, 'platform', 'index.js');
+    const hydratePlatformInput = (0, path_1.join)(inputHydrateDir, 'platform', 'index.js');
     const internalHydratePlatformBundle = {
         input: hydratePlatformInput,
         output: {
@@ -33,7 +33,7 @@ async function internalHydrate(opts) {
             dir: outputInternalHydrateDir,
             entryFileNames: '[name].js',
             chunkFileNames: '[name].js',
-            banner: banner_1.getBanner(opts, 'Stencil Hydrate Platform'),
+            banner: (0, banner_1.getBanner)(opts, 'Stencil Hydrate Platform'),
             preferConst: true,
         },
         plugins: [
@@ -45,31 +45,31 @@ async function internalHydrate(opts) {
                     }
                 },
             },
-            alias_plugin_1.aliasPlugin(opts),
-            replace_plugin_1.replacePlugin(opts),
-            plugin_node_resolve_1.default({
+            (0, alias_plugin_1.aliasPlugin)(opts),
+            (0, replace_plugin_1.replacePlugin)(opts),
+            (0, plugin_node_resolve_1.default)({
                 preferBuiltins: true,
             }),
-            plugin_commonjs_1.default(),
-            pretty_minify_1.prettyMinifyPlugin(opts),
+            (0, plugin_commonjs_1.default)(),
+            (0, pretty_minify_1.prettyMinifyPlugin)(opts),
         ],
     };
     const internalHydrateRunnerBundle = {
-        input: path_1.join(inputHydrateDir, 'runner', 'index.js'),
+        input: (0, path_1.join)(inputHydrateDir, 'runner', 'index.js'),
         output: {
             format: 'es',
-            file: path_1.join(outputInternalHydrateDir, 'runner.js'),
-            banner: banner_1.getBanner(opts, 'Stencil Hydrate Runner'),
+            file: (0, path_1.join)(outputInternalHydrateDir, 'runner.js'),
+            banner: (0, banner_1.getBanner)(opts, 'Stencil Hydrate Runner'),
             preferConst: true,
         },
         plugins: [
-            alias_plugin_1.aliasPlugin(opts),
-            replace_plugin_1.replacePlugin(opts),
-            plugin_node_resolve_1.default({
+            (0, alias_plugin_1.aliasPlugin)(opts),
+            (0, replace_plugin_1.replacePlugin)(opts),
+            (0, plugin_node_resolve_1.default)({
                 preferBuiltins: true,
             }),
-            plugin_commonjs_1.default(),
-            pretty_minify_1.prettyMinifyPlugin(opts),
+            (0, plugin_commonjs_1.default)(),
+            (0, pretty_minify_1.prettyMinifyPlugin)(opts),
         ],
     };
     return [internalHydratePlatformBundle, internalHydrateRunnerBundle];
@@ -77,8 +77,8 @@ async function internalHydrate(opts) {
 exports.internalHydrate = internalHydrate;
 async function createHydrateRunnerDtsBundle(opts, inputHydrateDir, outputDir) {
     // bundle @stencil/core/internal/hydrate/runner.d.ts
-    const dtsEntry = path_1.join(inputHydrateDir, 'runner', 'index.d.ts');
-    const dtsContent = await bundle_dts_1.bundleDts(opts, dtsEntry);
-    const outputPath = path_1.join(outputDir, 'runner.d.ts');
+    const dtsEntry = (0, path_1.join)(inputHydrateDir, 'runner', 'index.d.ts');
+    const dtsContent = await (0, bundle_dts_1.bundleDts)(opts, dtsEntry);
+    const outputPath = (0, path_1.join)(outputDir, 'runner.d.ts');
     await fs_extra_1.default.writeFile(outputPath, dtsContent);
 }

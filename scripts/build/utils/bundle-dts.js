@@ -19,7 +19,7 @@ async function bundleDts(opts, inputFile) {
             filePath: inputFile,
         },
     ];
-    let outputCode = bundle_generator_js_1.generateDtsBundle(entries).join('\n');
+    let outputCode = (0, bundle_generator_js_1.generateDtsBundle)(entries).join('\n');
     outputCode = cleanDts(outputCode);
     await fs_extra_1.default.writeFile(cachedDtsOutput, outputCode);
     return outputCode;

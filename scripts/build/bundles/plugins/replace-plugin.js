@@ -12,9 +12,9 @@ const options_1 = require("../../utils/options");
  * @returns the plugin that replaces specific pre-defined strings during the build
  */
 function replacePlugin(opts) {
-    const replaceData = options_1.createReplaceData(opts);
+    const replaceData = (0, options_1.createReplaceData)(opts);
     replaceData[`process.env.NODE_DEBUG`] = false;
     replaceData[`process.binding('natives')`] = '';
-    return plugin_replace_1.default(replaceData);
+    return (0, plugin_replace_1.default)(replaceData);
 }
 exports.replacePlugin = replacePlugin;

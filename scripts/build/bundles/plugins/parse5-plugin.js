@@ -66,12 +66,12 @@ exports.parse5Plugin = parse5Plugin;
  */
 async function bundleParse5(opts) {
     const fileName = `parse5-${opts.parse5Verion.replace(/\./g, '_')}-bundle-cache${opts.isProd ? '.min' : ''}.js`;
-    const cacheFile = path_1.join(opts.scriptsBuildDir, fileName);
+    const cacheFile = (0, path_1.join)(opts.scriptsBuildDir, fileName);
     try {
         return await fs_extra_1.default.readFile(cacheFile, 'utf8');
     }
     catch (e) { }
-    const rollupBuild = await rollup_1.rollup({
+    const rollupBuild = await (0, rollup_1.rollup)({
         input: '@parse5-entry',
         plugins: [
             {
@@ -100,9 +100,9 @@ async function bundleParse5(opts) {
                     return null;
                 },
             },
-            alias_plugin_1.aliasPlugin(opts),
-            plugin_node_resolve_1.default(),
-            plugin_commonjs_1.default(),
+            (0, alias_plugin_1.aliasPlugin)(opts),
+            (0, plugin_node_resolve_1.default)(),
+            (0, plugin_commonjs_1.default)(),
         ],
     });
     const { output } = await rollupBuild.generate({
@@ -114,7 +114,7 @@ async function bundleParse5(opts) {
     });
     let code = output[0].code;
     if (opts.isProd) {
-        const minified = await terser_1.minify(code, {
+        const minified = await (0, terser_1.minify)(code, {
             ecma: 2018,
             module: true,
             compress: {

@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core/testing",
-  "version": "0.0.0-dev.20220322081806",
+  "version": "0.0.0-dev.20221221154011",
   "description": "Stencil testing suite.",
   "main": "./index.js",
   "types": "./index.d.ts",

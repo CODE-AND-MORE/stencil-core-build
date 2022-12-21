@@ -1,5 +1,5 @@
 /*!
- Stencil Testing v0.0.0-dev.20220322081806 | MIT Licensed | https://stenciljs.com
+ Stencil Testing v0.0.0-dev.20221221154011 | MIT Licensed | https://stenciljs.com
  */
 function _lazyRequire(e) {
  return new Proxy({}, {
@@ -135,7 +135,6 @@ async function runJest(e, t) {
    e.flags.devtools && r.push("--runInBand"), e.logger.info(e.logger.magenta(`jest args: ${r.join(" ")}`));
    let s = t(r).argv;
    if (s = {
-    ...s,
     detectLeaks: !1,
     "detect-leaks": !1,
     detectOpenHandles: !1,
@@ -153,7 +152,8 @@ async function runJest(e, t) {
     runTestsByPath: !1,
     "run-tests-by-path": !1,
     testLocationInResults: !1,
-    "test-location-in-results": !1
+    "test-location-in-results": !1,
+    ...s
    }, s.config = function n(e) {
     const t = e.testing, r = require("jest-config").defaults, s = Object.keys(r), n = {};
     return Object.keys(t).forEach((e => {
@@ -1027,7 +1027,7 @@ async function compareScreenshot(e, t, r, s, n, o, i, a) {
   const r = crypto$3.createHash("md5");
   return r.update(t + ":"), r.update(e.userAgent + ":"), r.update(e.viewport.width + ":"), 
   r.update(e.viewport.height + ":"), r.update(e.viewport.deviceScaleFactor + ":"), 
-  r.update(e.viewport.hasTouch + ":"), r.update(e.viewport.isMobile + ":"), r.digest("hex").substr(0, 8).toLowerCase();
+  r.update(e.viewport.hasTouch + ":"), r.update(e.viewport.isMobile + ":"), r.digest("hex").slice(0, 8).toLowerCase();
  }(e, s), p = {
   id: d,
   image: l,
@@ -1066,7 +1066,7 @@ async function compareScreenshot(e, t, r, s, n, o, i, a) {
  if (p.diff.imageA = f, p.diff.imageA !== p.diff.imageB) {
   p.diff.cacheKey = function m(e, t, r) {
    const s = crypto$3.createHash("md5");
-   return s.update(`${e}:${t}:${r}`), s.digest("hex").substr(0, 10);
+   return s.update(`${e}:${t}:${r}`), s.digest("hex").slice(0, 10);
   }(p.diff.imageA, p.diff.imageB, a);
   const r = t.cache[p.diff.cacheKey];
   if ("number" != typeof r || isNaN(r)) {
@@ -1237,7 +1237,7 @@ const path$2 = require("path"), index_js = _lazyRequire("../dev-server/index.js"
  return t;
 }, trimFalsy = e => {
  const t = e;
- for (var r = t.length - 1; r >= 0 && !t[r]; r--) t.pop();
+ for (let e = t.length - 1; e >= 0 && !t[e]; e--) t.pop();
  return t;
 }, noop = () => {}, isFunction = e => "function" == typeof e, isString = e => "string" == typeof e, isIterable = e => (e => null != e)(e) && isFunction(e[Symbol.iterator]), windowsPathRegex = /^(?:[a-zA-Z]:|[\\/]{2}[^\\/]+[\\/]+[^\\/]+)?[\\/]$/, hasError = e => null != e && 0 !== e.length && e.some((e => "error" === e.level && "runtime" !== e.type)), normalizePath = e => {
  if ("string" != typeof e) throw new Error("invalid path to normalize");
@@ -1351,22 +1351,26 @@ const jestPreprocessor = {
   return [ process.version, _tsCompilerOptionsKey, e, t, r, !!s.instrument, 7 ].join(":");
  }
 }, deepEqual = function e(t, r) {
- var s, n, o, i, a, l, c, u, d, h;
  if (t === r) return !0;
  if (t && r && "object" == typeof t && "object" == typeof r) {
-  if (s = Array.isArray(t), n = Array.isArray(r), s && n) {
-   if ((i = t.length) != r.length) return !1;
+  const s = Array.isArray(t), n = Array.isArray(r);
+  let o, i, a;
+  if (s && n) {
+   if (i = t.length, i != r.length) return !1;
    for (o = i; 0 != o--; ) if (!e(t[o], r[o])) return !1;
    return !0;
   }
   if (s != n) return !1;
-  if ((l = t instanceof Date) != (c = r instanceof Date)) return !1;
+  const l = t instanceof Date, c = r instanceof Date;
+  if (l != c) return !1;
   if (l && c) return t.getTime() == r.getTime();
-  if ((u = t instanceof RegExp) != (d = r instanceof RegExp)) return !1;
+  const u = t instanceof RegExp, d = r instanceof RegExp;
+  if (u != d) return !1;
   if (u && d) return t.toString() == r.toString();
-  if ((i = (h = Object.keys(t)).length) !== Object.keys(r).length) return !1;
+  const h = Object.keys(t);
+  if (i = h.length, i !== Object.keys(r).length) return !1;
   for (o = i; 0 != o--; ) if (!Object.prototype.hasOwnProperty.call(r, h[o])) return !1;
-  for (o = i; 0 != o--; ) if (!e(t[a = h[o]], r[a])) return !1;
+  for (o = i; 0 != o--; ) if (a = h[o], !e(t[a], r[a])) return !1;
   return !0;
  }
  return t != t && r != r;
@@ -2177,37 +2181,36 @@ caller = function() {
   }
  }, r.exports), r.exports;
 }((function(e) {
- var t, r, s = "win32" === process.platform, n = /^([a-zA-Z]:|[\\\/]{2}[^\\\/]+[\\\/]+[^\\\/]+)?([\\\/])?([\s\S]*?)$/, o = /^([\s\S]*?)((?:\.{1,2}|[^\\\/]+?|)(\.[^.\/\\]*|))(?:[\\\/]*)$/, i = {
+ var t, r, s = "win32" === process.platform, n = /^(((?:[a-zA-Z]:|[\\\/]{2}[^\\\/]+[\\\/]+[^\\\/]+)?[\\\/]?)(?:[^\\\/]*[\\\/])*)((\.{1,2}|[^\\\/]+?|)(\.[^.\/\\]*|))[\\\/]*$/, o = {
   parse: function(e) {
    if ("string" != typeof e) throw new TypeError("Parameter 'pathString' must be a string, not " + typeof e);
    var t = function r(e) {
-    var t = n.exec(e), r = (t[1] || "") + (t[2] || ""), s = t[3] || "", i = o.exec(s);
-    return [ r, i[1], i[2], i[3] ];
+    return n.exec(e).slice(1);
    }(e);
-   if (!t || 4 !== t.length) throw new TypeError("Invalid path '" + e + "'");
+   if (!t || 5 !== t.length) throw new TypeError("Invalid path '" + e + "'");
    return {
-    root: t[0],
-    dir: t[0] + t[1].slice(0, -1),
+    root: t[1],
+    dir: t[0] === t[1] ? t[0] : t[0].slice(0, -1),
     base: t[2],
-    ext: t[3],
-    name: t[2].slice(0, t[2].length - t[3].length)
+    ext: t[4],
+    name: t[3]
    };
   }
  };
- t = /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/, (r = {}).parse = function(e) {
+ t = /^((\/?)(?:[^\/]*\/)*)((\.{1,2}|[^\/]+?|)(\.[^.\/]*|))[\/]*$/, (r = {}).parse = function(e) {
   if ("string" != typeof e) throw new TypeError("Parameter 'pathString' must be a string, not " + typeof e);
   var r = function s(e) {
    return t.exec(e).slice(1);
   }(e);
-  if (!r || 4 !== r.length) throw new TypeError("Invalid path '" + e + "'");
-  return r[1] = r[1] || "", r[2] = r[2] || "", r[3] = r[3] || "", {
-   root: r[0],
-   dir: r[0] + r[1].slice(0, -1),
+  if (!r || 5 !== r.length) throw new TypeError("Invalid path '" + e + "'");
+  return {
+   root: r[1],
+   dir: r[0].slice(0, -1),
    base: r[2],
-   ext: r[3],
-   name: r[2].slice(0, r[2].length - r[3].length)
+   ext: r[4],
+   name: r[3]
   };
- }, e.exports = s ? i.parse : r.parse, e.exports.posix = r.parse, e.exports.win32 = i.parse;
+ }, e.exports = s ? o.parse : r.parse, e.exports.posix = r.parse, e.exports.win32 = o.parse;
 })), parse = path__default.default.parse || pathParse, getNodeModulesDirs = function e(t, r) {
  var s, n, o = "/";
  for (/^([A-Za-z]:)/.test(t) ? o = "" : /^\\\\/.test(t) && (o = "\\\\"), s = [ t ], 
@@ -2883,7 +2886,7 @@ const createSystem = e => {
  u("/");
  const S = {
   name: "in-memory",
-  version: "0.0.0-dev.20220322081806",
+  version: "0.0.0-dev.20221221154011",
   events: i,
   access: async e => c(e),
   accessSync: c,
@@ -3018,7 +3021,7 @@ const createSystem = e => {
   generateContentHash: async (e, t) => {
    const r = await crypto.subtle.digest("SHA-256", (new TextEncoder).encode(e));
    let s = Array.from(new Uint8Array(r)).map((e => e.toString(16).padStart(2, "0"))).join("");
-   return "number" == typeof t && (s = s.substr(0, t)), s;
+   return "number" == typeof t && (s = s.slice(0, t)), s;
   },
   createWorkerController: HAS_WEB_WORKER ? e => ((e, t) => {
    let r, s = 0, n = !1, o = !1, i = 0;
@@ -3157,7 +3160,7 @@ const createSystem = e => {
  const r = createSystem();
  r.platformPath = path__default.default, r.generateContentHash = (e, t) => {
   let r = crypto$3.createHash("sha1").update(e).digest("hex").toLowerCase();
-  return "number" == typeof t && (r = r.substr(0, t)), Promise.resolve(r);
+  return "number" == typeof t && (r = r.slice(0, t)), Promise.resolve(r);
  };
  const s = t => {
   const r = t;
@@ -3731,7 +3734,7 @@ exports.createJestPuppeteerEnvironment = function createJestPuppeteerEnvironment
        }
       }
      } catch (t) {
-      e.logger.error(t, t.stack);
+      t instanceof Error ? e.logger.error(t, t.stack) : e.logger.error(t);
      }
      return c;
     }(e, r) : await runJest(e, r), e.logger.info(""), c && await c.close();

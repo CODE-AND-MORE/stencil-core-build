@@ -156,7 +156,8 @@ const createTime = (e, t = "") => {
  let o = styles.get(e);
  o = t, styles.set(e, o);
 }, addStyle = (e, t, a, o) => {
- let s = getScopeId(t, a), n = styles.get(s);
+ let s = getScopeId(t, a);
+ const n = styles.get(s);
  if (!appData.BUILD.attachStyles) return s;
  if (e = 11 === e.nodeType ? e : doc, n) if ("string" == typeof n) {
   e = e.head || e;
@@ -181,8 +182,8 @@ const createTime = (e, t = "") => {
  a.classList.add(n + "-h"), appData.BUILD.scoped && 2 & o && a.classList.add(n + "-s")), 
  s();
 }, getScopeId = (e, t) => "sc-" + (appData.BUILD.mode && t && 32 & e.$flags$ ? e.$tagName$ + "-" + t : e.$tagName$), computeMode = e => modeResolutionChain.map((t => t(e))).find((e => !!e)), EMPTY_OBJ = {}, isComplexType = e => "object" == (e = typeof e) || "function" === e, h = (e, t, ...a) => {
- let o = null, s = null, n = null, l = !1, r = !1, p = [];
- const i = t => {
+ let o = null, s = null, n = null, l = !1, r = !1;
+ const p = [], i = t => {
   for (let a = 0; a < t.length; a++) o = t[a], Array.isArray(o) ? i(o) : null != o && "boolean" != typeof o && ((l = "function" != typeof e && !isComplexType(o)) ? o = String(o) : appData.BUILD.isDev && "function" != typeof e && void 0 === o.$flags$ && consoleDevError("vNode passed as children has unexpected type.\nMake sure it's using the correct h() function.\nEmpty objects can also be the cause, look for JSX comments that became objects."), 
   l && r ? p[p.length - 1].$text$ += o : p.push(l ? newVNode(null, o) : o), r = l);
  };
@@ -246,7 +247,7 @@ const createTime = (e, t = "") => {
     const p = isComplexType(o);
     if ((l || p && null !== o) && !s) try {
      if (e.tagName.includes("-")) e[t] = o; else {
-      let s = null == o ? "" : o;
+      const s = null == o ? "" : o;
       "list" === t ? l = !1 : null != a && e[t] == s || (e[t] = s);
      }
     } catch (e) {}
@@ -267,22 +268,23 @@ const createTime = (e, t = "") => {
 let scopeId, contentRef, hostTagName, useNativeShadowDom = !1, checkSlotFallbackVisibility = !1, checkSlotRelocate = !1, isSvgMode = !1;
 
 const createElm = (e, t, a, o) => {
- let s, n, l, r = t.$children$[a], p = 0;
+ const s = t.$children$[a];
+ let n, l, r, p = 0;
  if (appData.BUILD.slotRelocation && !useNativeShadowDom && (checkSlotRelocate = !0, 
- "slot" === r.$tag$ && (scopeId && o.classList.add(scopeId + "-s"), r.$flags$ |= r.$children$ ? 2 : 1)), 
- appData.BUILD.isDev && r.$elm$ && consoleDevError(`The JSX ${null !== r.$text$ ? `"${r.$text$}" text` : `"${r.$tag$}" element`} node should not be shared within the same renderer. The renderer caches element lookups in order to improve performance. However, a side effect from this is that the exact same JSX node should not be reused. For more information please see https://stenciljs.com/docs/templating-jsx#avoid-shared-jsx-nodes`), 
- appData.BUILD.vdomText && null !== r.$text$) s = r.$elm$ = doc.createTextNode(r.$text$); else if (appData.BUILD.slotRelocation && 1 & r.$flags$) s = r.$elm$ = appData.BUILD.isDebug || appData.BUILD.hydrateServerSide ? slotReferenceDebugNode(r) : doc.createTextNode(""); else {
-  if (appData.BUILD.svg && !isSvgMode && (isSvgMode = "svg" === r.$tag$), s = r.$elm$ = appData.BUILD.svg ? doc.createElementNS(isSvgMode ? "http://www.w3.org/2000/svg" : "http://www.w3.org/1999/xhtml", appData.BUILD.slotRelocation && 2 & r.$flags$ ? "slot-fb" : r.$tag$) : doc.createElement(appData.BUILD.slotRelocation && 2 & r.$flags$ ? "slot-fb" : r.$tag$), 
-  appData.BUILD.svg && isSvgMode && "foreignObject" === r.$tag$ && (isSvgMode = !1), 
-  appData.BUILD.vdomAttribute && updateElement(null, r, isSvgMode), (appData.BUILD.shadowDom || appData.BUILD.scoped) && null != scopeId && s["s-si"] !== scopeId && s.classList.add(s["s-si"] = scopeId), 
-  r.$children$) for (p = 0; p < r.$children$.length; ++p) n = createElm(e, r, p, s), 
-  n && s.appendChild(n);
-  appData.BUILD.svg && ("svg" === r.$tag$ ? isSvgMode = !1 : "foreignObject" === s.tagName && (isSvgMode = !0));
+ "slot" === s.$tag$ && (scopeId && o.classList.add(scopeId + "-s"), s.$flags$ |= s.$children$ ? 2 : 1)), 
+ appData.BUILD.isDev && s.$elm$ && consoleDevError(`The JSX ${null !== s.$text$ ? `"${s.$text$}" text` : `"${s.$tag$}" element`} node should not be shared within the same renderer. The renderer caches element lookups in order to improve performance. However, a side effect from this is that the exact same JSX node should not be reused. For more information please see https://stenciljs.com/docs/templating-jsx#avoid-shared-jsx-nodes`), 
+ appData.BUILD.vdomText && null !== s.$text$) n = s.$elm$ = doc.createTextNode(s.$text$); else if (appData.BUILD.slotRelocation && 1 & s.$flags$) n = s.$elm$ = appData.BUILD.isDebug || appData.BUILD.hydrateServerSide ? slotReferenceDebugNode(s) : doc.createTextNode(""); else {
+  if (appData.BUILD.svg && !isSvgMode && (isSvgMode = "svg" === s.$tag$), n = s.$elm$ = appData.BUILD.svg ? doc.createElementNS(isSvgMode ? "http://www.w3.org/2000/svg" : "http://www.w3.org/1999/xhtml", appData.BUILD.slotRelocation && 2 & s.$flags$ ? "slot-fb" : s.$tag$) : doc.createElement(appData.BUILD.slotRelocation && 2 & s.$flags$ ? "slot-fb" : s.$tag$), 
+  appData.BUILD.svg && isSvgMode && "foreignObject" === s.$tag$ && (isSvgMode = !1), 
+  appData.BUILD.vdomAttribute && updateElement(null, s, isSvgMode), (appData.BUILD.shadowDom || appData.BUILD.scoped) && null != scopeId && n["s-si"] !== scopeId && n.classList.add(n["s-si"] = scopeId), 
+  s.$children$) for (p = 0; p < s.$children$.length; ++p) l = createElm(e, s, p, n), 
+  l && n.appendChild(l);
+  appData.BUILD.svg && ("svg" === s.$tag$ ? isSvgMode = !1 : "foreignObject" === n.tagName && (isSvgMode = !0));
  }
- return appData.BUILD.slotRelocation && (s["s-hn"] = hostTagName, 3 & r.$flags$ && (s["s-sr"] = !0, 
- s["s-cr"] = contentRef, s["s-sn"] = r.$name$ || "", l = e && e.$children$ && e.$children$[a], 
- l && l.$tag$ === r.$tag$ && e.$elm$ && putBackInOriginalLocation(e.$elm$, !1))), 
- s;
+ return appData.BUILD.slotRelocation && (n["s-hn"] = hostTagName, 3 & s.$flags$ && (n["s-sr"] = !0, 
+ n["s-cr"] = contentRef, n["s-sn"] = s.$name$ || "", r = e && e.$children$ && e.$children$[a], 
+ r && r.$tag$ === s.$tag$ && e.$elm$ && putBackInOriginalLocation(e.$elm$, !1))), 
+ n;
 }, putBackInOriginalLocation = (e, t) => {
  plt.$flags$ |= 1;
  const a = e.childNodes;
@@ -323,22 +325,24 @@ const createElm = (e, t, a, o) => {
  addVnodes(a, null, t, s, 0, s.length - 1)) : appData.BUILD.updatable && null !== o && removeVnodes(o, 0, o.length - 1), 
  appData.BUILD.svg && isSvgMode && "svg" === n && (isSvgMode = !1));
 }, updateFallbackSlotVisibility = e => {
- let t, a, o, s, n, l, r = e.childNodes;
- for (a = 0, o = r.length; a < o; a++) if (t = r[a], 1 === t.nodeType) {
-  if (t["s-sr"]) for (n = t["s-sn"], t.hidden = !1, s = 0; s < o; s++) if (l = r[s].nodeType, 
-  r[s]["s-hn"] !== t["s-hn"] || "" !== n) {
-   if (1 === l && n === r[s].getAttribute("slot")) {
-    t.hidden = !0;
+ const t = e.childNodes;
+ let a, o, s, n, l, r;
+ for (o = 0, s = t.length; o < s; o++) if (a = t[o], 1 === a.nodeType) {
+  if (a["s-sr"]) for (l = a["s-sn"], a.hidden = !1, n = 0; n < s; n++) if (r = t[n].nodeType, 
+  t[n]["s-hn"] !== a["s-hn"] || "" !== l) {
+   if (1 === r && l === t[n].getAttribute("slot")) {
+    a.hidden = !0;
     break;
    }
-  } else if (1 === l || 3 === l && "" !== r[s].textContent.trim()) {
-   t.hidden = !0;
+  } else if (1 === r || 3 === r && "" !== t[n].textContent.trim()) {
+   a.hidden = !0;
    break;
   }
-  updateFallbackSlotVisibility(t);
+  updateFallbackSlotVisibility(a);
  }
 }, relocateNodes = [], relocateSlotContent = e => {
- let t, a, o, s, n, l, r = 0, p = e.childNodes, i = p.length;
+ let t, a, o, s, n, l, r = 0;
+ const p = e.childNodes, i = p.length;
  for (;r < i; r++) {
   if (t = p[r], t["s-sr"] && (a = t["s-cr"]) && a.parentNode) for (o = a.parentNode.childNodes, 
   s = t["s-sn"], l = o.length - 1; l >= 0; l--) a = o[l], a["s-cn"] || a["s-nr"] || a["s-hn"] === t["s-hn"] || (isNodeLocatedInSlot(a, s) ? (n = relocateNodes.find((e => e.$nodeToRelocate$ === a)), 
@@ -537,7 +541,9 @@ const callRender = (e, t, a) => {
  }
 }, parsePropertyValue = (e, t) => null == e || isComplexType(e) ? e : appData.BUILD.propBoolean && 4 & t ? "false" !== e && ("" === e || !!e) : appData.BUILD.propNumber && 2 & t ? parseFloat(e) : appData.BUILD.propString && 1 & t ? String(e) : e, getValue = (e, t) => getHostRef(e).$instanceValues$.get(t), setValue = (e, t, a, o) => {
  const s = getHostRef(e), n = appData.BUILD.lazyLoad ? s.$hostElement$ : e, l = s.$instanceValues$.get(t), r = s.$flags$, p = appData.BUILD.lazyLoad ? s.$lazyInstance$ : n;
- if (a = parsePropertyValue(a, o.$members$[t][0]), !(appData.BUILD.lazyLoad && 8 & r && void 0 !== l || a === l) && (s.$instanceValues$.set(t, a), 
+ a = parsePropertyValue(a, o.$members$[t][0]);
+ const i = Number.isNaN(l) && Number.isNaN(a), d = a !== l && !i;
+ if ((!appData.BUILD.lazyLoad || !(8 & r) || void 0 === l) && d && (s.$instanceValues$.set(t, a), 
  appData.BUILD.isDev && (1024 & s.$flags$ ? consoleDevWarn(`The state/prop "${t}" changed during rendering. This can potentially lead to infinite-loops and other bugs.`, "\nElement", n, "\nNew value", a, "\nOld value", l) : 2048 & s.$flags$ && consoleDevWarn(`The state/prop "${t}" changed during "componentDidLoad()", this triggers extra re-renders, try to setup on "componentWillLoad()"`, "\nElement", n, "\nNew value", a, "\nOld value", l)), 
  !appData.BUILD.lazyLoad || p)) {
   if (appData.BUILD.watchCallback && o.$watchers$ && 128 & r) {
@@ -726,7 +732,8 @@ const callRender = (e, t, a) => {
  e.cloneNode = function(e) {
   const a = this, o = !!appData.BUILD.shadowDom && a.shadowRoot && exports.supportsShadow, s = t.call(a, !!o && e);
   if (appData.BUILD.slot && !o && e) {
-   let e, t, o = 0, n = [ "s-id", "s-cr", "s-lr", "s-rc", "s-sc", "s-p", "s-cn", "s-sr", "s-sn", "s-hn", "s-ol", "s-nr", "s-si" ];
+   let e, t, o = 0;
+   const n = [ "s-id", "s-cr", "s-lr", "s-rc", "s-sc", "s-p", "s-cn", "s-sr", "s-sn", "s-hn", "s-ol", "s-nr", "s-si" ];
    for (;o < a.childNodes.length; o++) e = a.childNodes[o]["s-nr"], t = n.every((e => !a.childNodes[o][e])), 
    e && (appData.BUILD.appendChildSlotFix && s.__appendChild ? s.__appendChild(e.cloneNode(!0)) : s.appendChild(e.cloneNode(!0))), 
    t && s.appendChild(a.childNodes[o].cloneNode(!0));

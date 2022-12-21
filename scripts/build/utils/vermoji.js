@@ -5,7 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getVermoji = void 0;
 const fs_extra_1 = __importDefault(require("fs-extra"));
-const VERMOJIS = [
+const UNKNOWN_VERMOJI = '❓';
+let vermojis = [
     '💯',
     '☀️',
     '☕️',
@@ -319,11 +320,21 @@ const VERMOJIS = [
     '🦄',
     '🧀',
 ];
+// filter out the 'unknown version vermoji'
+vermojis = vermojis.filter((vermoji) => vermoji !== UNKNOWN_VERMOJI);
 function getVermoji(changelogPath) {
     const changelog = fs_extra_1.default.readFileSync(changelogPath, 'utf8');
     while (true) {
-        const vermoji = VERMOJIS[Math.round(Math.random() * (VERMOJIS.length - 1))];
-        if (!changelog.includes(vermoji)) {
+        const randomIndex = Math.floor(Math.random() * vermojis.length);
+        const vermoji = vermojis[randomIndex];
+        if (changelog.includes(vermoji)) {
+            vermojis.splice(randomIndex, 1);
+            if (vermojis.length === 0) {
+                console.warn(`We're out of Vermoji! Create a task to add some more!`);
+                return UNKNOWN_VERMOJI;
+            }
+        }
+        else {
             return vermoji;
         }
     }

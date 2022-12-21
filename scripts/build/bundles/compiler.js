@@ -29,15 +29,15 @@ const magic_string_1 = __importDefault(require("magic-string"));
  * @returns an array containing the generated rollup options
  */
 async function compiler(opts) {
-    const inputDir = path_1.join(opts.buildDir, 'compiler');
+    const inputDir = (0, path_1.join)(opts.buildDir, 'compiler');
     const compilerFileName = 'stencil.js';
     const compilerDtsName = compilerFileName.replace('.js', '.d.ts');
     // create public d.ts
-    let dts = await fs_extra_1.default.readFile(path_1.join(inputDir, 'public.d.ts'), 'utf8');
+    let dts = await fs_extra_1.default.readFile((0, path_1.join)(inputDir, 'public.d.ts'), 'utf8');
     dts = dts.replace('@stencil/core/internal', '../internal/index');
-    await fs_extra_1.default.writeFile(path_1.join(opts.output.compilerDir, compilerDtsName), dts);
+    await fs_extra_1.default.writeFile((0, path_1.join)(opts.output.compilerDir, compilerDtsName), dts);
     // write @stencil/core/compiler/package.json
-    write_pkg_json_1.writePkgJson(opts, opts.output.compilerDir, {
+    (0, write_pkg_json_1.writePkgJson)(opts, opts.output.compilerDir, {
         name: '@stencil/core/compiler',
         description: 'Stencil Compiler.',
         main: compilerFileName,
@@ -50,26 +50,26 @@ async function compiler(opts) {
      * to the comment being added to the compiler output itself. These files could be converted to non-JS files, at the
      * cost of losing some source code highlighting in editors.
      */
-    const cjsIntro = fs_extra_1.default.readFileSync(path_1.join(opts.bundleHelpersDir, 'compiler-cjs-intro.js'), 'utf8');
-    const cjsOutro = fs_extra_1.default.readFileSync(path_1.join(opts.bundleHelpersDir, 'compiler-cjs-outro.js'), 'utf8');
-    const rollupWatchPath = path_1.join(opts.nodeModulesDir, 'rollup', 'dist', 'es', 'shared', 'watch.js');
+    const cjsIntro = fs_extra_1.default.readFileSync((0, path_1.join)(opts.bundleHelpersDir, 'compiler-cjs-intro.js'), 'utf8');
+    const cjsOutro = fs_extra_1.default.readFileSync((0, path_1.join)(opts.bundleHelpersDir, 'compiler-cjs-outro.js'), 'utf8');
+    const rollupWatchPath = (0, path_1.join)(opts.nodeModulesDir, 'rollup', 'dist', 'es', 'shared', 'watch.js');
     const compilerBundle = {
-        input: path_1.join(inputDir, 'index.js'),
+        input: (0, path_1.join)(inputDir, 'index.js'),
         output: {
             format: 'cjs',
-            file: path_1.join(opts.output.compilerDir, compilerFileName),
+            file: (0, path_1.join)(opts.output.compilerDir, compilerFileName),
             intro: cjsIntro,
             outro: cjsOutro,
             strict: false,
-            banner: banner_1.getBanner(opts, `Stencil Compiler`, true),
+            banner: (0, banner_1.getBanner)(opts, `Stencil Compiler`, true),
             esModule: false,
             preferConst: true,
             freeze: false,
             sourcemap: true,
         },
         plugins: [
-            typescript_source_plugin_1.typescriptSourcePlugin(opts),
-            terser_plugin_1.terserPlugin(opts),
+            (0, typescript_source_plugin_1.typescriptSourcePlugin)(opts),
+            (0, terser_plugin_1.terserPlugin)(opts),
             {
                 name: 'compilerMockDocResolvePlugin',
                 /**
@@ -80,7 +80,7 @@ async function compiler(opts) {
                  */
                 resolveId(id) {
                     if (id === '@stencil/core/mock-doc') {
-                        return path_1.join(opts.buildDir, 'mock-doc', 'index.js');
+                        return (0, path_1.join)(opts.buildDir, 'mock-doc', 'index.js');
                     }
                     if (id === '@microsoft/typescript-etw' || id === 'inspector') {
                         return id;
@@ -116,7 +116,7 @@ async function compiler(opts) {
                     return null;
                 },
             },
-            replace_plugin_1.replacePlugin(opts),
+            (0, replace_plugin_1.replacePlugin)(opts),
             {
                 name: 'hackReplaceNodeProcessBinding',
                 /**
@@ -141,20 +141,20 @@ async function compiler(opts) {
                     };
                 },
             },
-            inlined_compiler_deps_plugin_1.inlinedCompilerDepsPlugin(opts, inputDir),
-            parse5_plugin_1.parse5Plugin(opts),
-            sizzle_plugin_1.sizzlePlugin(opts),
-            alias_plugin_1.aliasPlugin(opts),
-            sys_modules_plugin_1.sysModulesPlugin(inputDir),
-            plugin_node_resolve_1.default({
+            (0, inlined_compiler_deps_plugin_1.inlinedCompilerDepsPlugin)(opts, inputDir),
+            (0, parse5_plugin_1.parse5Plugin)(opts),
+            (0, sizzle_plugin_1.sizzlePlugin)(opts),
+            (0, alias_plugin_1.aliasPlugin)(opts),
+            (0, sys_modules_plugin_1.sysModulesPlugin)(inputDir),
+            (0, plugin_node_resolve_1.default)({
                 mainFields: ['module', 'main'],
                 preferBuiltins: false,
             }),
-            plugin_commonjs_1.default({
+            (0, plugin_commonjs_1.default)({
                 transformMixedEsModules: false,
                 sourceMap: true,
             }),
-            plugin_json_1.default({
+            (0, plugin_json_1.default)({
                 preferConst: true,
             }),
             {
@@ -164,11 +164,11 @@ async function compiler(opts) {
                         const compilerFilename = Object.keys(bundleFiles).find((f) => f.includes('stencil'));
                         const compilerBundle = bundleFiles[compilerFilename];
                         const minified = await minifyStencilCompiler(compilerBundle.code, opts);
-                        await fs_extra_1.default.writeFile(path_1.join(opts.output.compilerDir, compilerFilename.replace('.js', '.min.js')), minified);
+                        await fs_extra_1.default.writeFile((0, path_1.join)(opts.output.compilerDir, compilerFilename.replace('.js', '.min.js')), minified);
                     }
                 },
             },
-            rollup_plugin_sourcemaps_1.default(),
+            (0, rollup_plugin_sourcemaps_1.default)(),
         ],
         treeshake: {
             moduleSideEffects: false,
@@ -183,8 +183,8 @@ async function compiler(opts) {
         },
     };
     // copy typescript default lib dts files
-    const tsLibNames = await dependencies_json_1.getTypeScriptDefaultLibNames(opts);
-    await Promise.all(tsLibNames.map((f) => fs_extra_1.default.copy(path_1.join(opts.typescriptLibDir, f), path_1.join(opts.output.compilerDir, f))));
+    const tsLibNames = await (0, dependencies_json_1.getTypeScriptDefaultLibNames)(opts);
+    await Promise.all(tsLibNames.map((f) => fs_extra_1.default.copy((0, path_1.join)(opts.typescriptLibDir, f), (0, path_1.join)(opts.output.compilerDir, f))));
     return [compilerBundle];
 }
 exports.compiler = compiler;
@@ -203,7 +203,7 @@ async function minifyStencilCompiler(code, opts) {
             comments: false,
         },
     };
-    const results = await terser_1.minify(code, minifyOpts);
-    code = banner_1.getBanner(opts, `Stencil Compiler`, true) + '\n' + results.code;
+    const results = await (0, terser_1.minify)(code, minifyOpts);
+    code = (0, banner_1.getBanner)(opts, `Stencil Compiler`, true) + '\n' + results.code;
     return code;
 }

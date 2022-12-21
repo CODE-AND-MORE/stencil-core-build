@@ -48,13 +48,13 @@ exports.terserPlugin = terserPlugin;
  */
 async function bundleTerser(opts) {
     const fileName = `terser-${opts.terserVersion.replace(/\./g, '_')}-bundle-cache${opts.isProd ? '.min' : ''}.js`;
-    const cacheFile = path_1.join(opts.scriptsBuildDir, fileName);
+    const cacheFile = (0, path_1.join)(opts.scriptsBuildDir, fileName);
     try {
         return await fs_extra_1.default.readFile(cacheFile, 'utf8');
     }
     catch (e) { }
-    const rollupBuild = await rollup_1.rollup({
-        input: path_1.join(opts.nodeModulesDir, 'terser', 'main.js'),
+    const rollupBuild = await (0, rollup_1.rollup)({
+        input: (0, path_1.join)(opts.nodeModulesDir, 'terser', 'main.js'),
         external: ['source-map'],
     });
     const { output } = await rollupBuild.generate({
@@ -64,7 +64,7 @@ async function bundleTerser(opts) {
     });
     let code = output[0].code;
     if (opts.isProd) {
-        const minified = await terser_1.minify(code, {
+        const minified = await (0, terser_1.minify)(code, {
             ecma: 2018,
             compress: {
                 ecma: 2018,

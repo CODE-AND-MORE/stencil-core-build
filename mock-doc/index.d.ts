@@ -103,7 +103,7 @@ declare class MockCustomElementRegistry implements CustomElementRegistry {
   get(tagName: string): any;
   upgrade(_rootNode: any): void;
   clear(): void;
-  whenDefined(tagName: string): Promise<void>;
+  whenDefined(tagName: string): Promise<CustomElementConstructor>;
 }
 declare function createCustomElement(customElements: MockCustomElementRegistry, ownerDocument: any, tagName: string): any;
 declare function connectNode(ownerDocument: any, node: MockNode): void;
@@ -191,6 +191,7 @@ declare class MockLinkElement extends MockHTMLElement {
   set href(value: string);
 }
 declare class MockMetaElement extends MockHTMLElement {
+  content: string;
   constructor(ownerDocument: any);
 }
 declare class MockScriptElement extends MockHTMLElement {
@@ -624,6 +625,10 @@ declare function parseHtmlToDocument(html: string, ownerDocument?: MockDocument)
 declare function parseHtmlToFragment(html: string, ownerDocument?: MockDocument): any;
 declare function parseDocumentUtil(ownerDocument: any, html: string): any;
 declare function parseFragmentUtil(ownerDocument: any, html: string): any;
+declare type DOMParserSupportedType = 'text/html' | 'text/xml' | 'application/xml' | 'application/xhtml+xml' | 'image/svg+xml';
+declare class MockDOMParser {
+  parseFromString(htmlToParse: string, mimeType: DOMParserSupportedType): MockDocument;
+}
 /**
  * https://developer.mozilla.org/en-US/docs/Web/API/Performance
  */
@@ -638,8 +643,8 @@ declare class MockPerformance implements Performance {
   getEntries(): any;
   getEntriesByName(): any;
   getEntriesByType(): any;
-  mark(): void;
-  measure(): void;
+  mark(): PerformanceMark;
+  measure(): PerformanceMeasure;
   get navigation(): any;
   now(): number;
   get onresourcetimingbufferfull(): any;
@@ -750,6 +755,11 @@ declare class MockWindow {
   screenY: number;
   scrollX: number;
   scrollY: number;
+  CustomEvent: typeof MockCustomEvent;
+  Event: typeof MockEvent;
+  Headers: typeof MockHeaders;
+  KeyboardEvent: typeof MockKeyboardEvent;
+  MouseEvent: typeof MockMouseEvent;
   constructor(html?: string | boolean);
   addEventListener(type: string, handler: (ev?: any) => void): void;
   alert(msg: string): void;
@@ -787,8 +797,8 @@ declare class MockWindow {
   get IntersectionObserver(): typeof MockIntersectionObserver;
   get localStorage(): MockStorage;
   set localStorage(locStorage: MockStorage);
-  get location(): Location;
-  set location(val: Location);
+  get location(): MockLocation;
+  set location(val: Location | string);
   matchMedia(): {
     matches: boolean;
   };

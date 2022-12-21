@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core/sys/node",
-  "version": "0.0.0-dev.20211210183644",
+  "version": "0.0.0-dev.20221221154011",
   "description": "Stencil Node System.",
   "main": "./index.js",
   "types": "./index.d.ts",

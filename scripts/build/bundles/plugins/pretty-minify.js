@@ -10,7 +10,7 @@ function prettyMinifyPlugin(opts, preamble) {
                 await Promise.all(Object.keys(bundles).map(async (fileName) => {
                     const b = bundles[fileName];
                     if (typeof b.code === 'string') {
-                        const minifyResults = await terser_1.minify(b.code, {
+                        const minifyResults = await (0, terser_1.minify)(b.code, {
                             compress: {
                                 hoist_vars: true,
                                 hoist_funs: true,

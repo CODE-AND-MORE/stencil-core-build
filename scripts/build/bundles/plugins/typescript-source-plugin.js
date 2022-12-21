@@ -51,7 +51,7 @@ exports.typescriptSourcePlugin = typescriptSourcePlugin;
  */
 async function bundleTypeScriptSource(tsPath, opts) {
     const fileName = `typescript-${opts.typescriptVersion.replace(/\./g, '_')}-bundle-cache${opts.isProd ? '.min' : ''}.js`;
-    const cacheFile = path_1.join(opts.scriptsBuildDir, fileName);
+    const cacheFile = (0, path_1.join)(opts.scriptsBuildDir, fileName);
     try {
         // check if we've already cached this bundle
         return await fs_extra_1.default.readFile(cacheFile, 'utf8');
@@ -72,7 +72,7 @@ async function bundleTypeScriptSource(tsPath, opts) {
         throw new Error(`"${tsEnding}" not found`);
     }
     const lastEnding = code.lastIndexOf(tsEnding);
-    code = code.substr(0, lastEnding + tsEnding.length);
+    code = code.slice(0, lastEnding + tsEnding.length);
     // there's a billion unnecessary "var ts;" for namespaces
     // but we'll be using the top level "const ts" instead
     code = code.replace(/var ts;/g, '');
@@ -90,7 +90,7 @@ async function bundleTypeScriptSource(tsPath, opts) {
     o.push(`export default ts;`);
     code = o.join('\n');
     if (opts.isProd) {
-        const minified = await terser_1.minify(code, {
+        const minified = await (0, terser_1.minify)(code, {
             ecma: 2018,
             module: true,
             compress: {

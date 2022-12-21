@@ -35,7 +35,7 @@ function sizzlePlugin(opts) {
                 return null;
             }
             const f = opts.isProd ? 'sizzle.min.js' : 'sizzle.js';
-            const sizzlePath = path_1.join(opts.nodeModulesDir, 'sizzle', 'dist', f);
+            const sizzlePath = (0, path_1.join)(opts.nodeModulesDir, 'sizzle', 'dist', f);
             const sizzleContent = await fs_extra_1.default.readFile(sizzlePath, 'utf8');
             return getSizzleBundle(opts, sizzleContent);
         },

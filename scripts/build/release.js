@@ -18,11 +18,11 @@ const release_utils_1 = require("./utils/release-utils");
  * @param args stringified arguments used to influence the release steps that are taken
  */
 async function release(rootDir, args) {
-    const buildDir = path_1.join(rootDir, 'build');
-    const releaseDataPath = path_1.join(buildDir, 'release-data.json');
+    const buildDir = (0, path_1.join)(rootDir, 'build');
+    const releaseDataPath = (0, path_1.join)(buildDir, 'release-data.json');
     if (args.includes('--prepare')) {
         await fs_extra_1.default.emptyDir(buildDir);
-        const opts = options_1.getOptions(rootDir, {
+        const opts = (0, options_1.getOptions)(rootDir, {
             isPublishRelease: false,
             isProd: true,
         });
@@ -30,7 +30,7 @@ async function release(rootDir, args) {
     }
     if (args.includes('--publish')) {
         const releaseData = await fs_extra_1.default.readJson(releaseDataPath);
-        const opts = options_1.getOptions(rootDir, {
+        const opts = (0, options_1.getOptions)(rootDir, {
             buildId: releaseData.buildId,
             version: releaseData.version,
             vermoji: releaseData.vermoji,
@@ -55,7 +55,7 @@ async function prepareRelease(opts, args, releaseDataPath) {
     const NON_SERVER_INCREMENTS = [
         {
             name: 'Dry Run',
-            value: release_utils_1.getNewVersion(oldVersion, 'patch') + '-dryrun',
+            value: (0, release_utils_1.getNewVersion)(oldVersion, 'patch') + '-dryrun',
         },
         {
             name: 'Other (specify)',
@@ -69,19 +69,19 @@ async function prepareRelease(opts, args, releaseDataPath) {
             message: 'Select semver increment or specify new version',
             pageSize: release_utils_1.SEMVER_INCREMENTS.length + NON_SERVER_INCREMENTS.length,
             choices: release_utils_1.SEMVER_INCREMENTS.map((inc) => ({
-                name: `${inc}   ${release_utils_1.prettyVersionDiff(oldVersion, inc)}`,
+                name: `${inc}   ${(0, release_utils_1.prettyVersionDiff)(oldVersion, inc)}`,
                 value: inc,
             })).concat([new inquirer_1.default.Separator(), ...NON_SERVER_INCREMENTS]),
-            filter: (input) => (release_utils_1.isValidVersionInput(input) ? release_utils_1.getNewVersion(oldVersion, input) : input),
+            filter: (input) => ((0, release_utils_1.isValidVersionInput)(input) ? (0, release_utils_1.getNewVersion)(oldVersion, input) : input),
         },
         {
             type: 'input',
             name: 'version',
             message: 'Version',
             when: (answers) => !answers.version,
-            filter: (input) => (release_utils_1.isValidVersionInput(input) ? release_utils_1.getNewVersion(pkg.version, input) : input),
+            filter: (input) => ((0, release_utils_1.isValidVersionInput)(input) ? (0, release_utils_1.getNewVersion)(pkg.version, input) : input),
             validate: (input) => {
-                if (!release_utils_1.isValidVersionInput(input)) {
+                if (!(0, release_utils_1.isValidVersionInput)(input)) {
                     return 'Please specify a valid semver, for example, `1.2.3`. See http://semver.org';
                 }
                 return true;
@@ -102,7 +102,7 @@ async function prepareRelease(opts, args, releaseDataPath) {
             opts.version = answers.version;
             // write `release-data.json`
             fs_extra_1.default.writeJsonSync(releaseDataPath, opts, { spaces: 2 });
-            release_tasks_1.runReleaseTasks(opts, args);
+            (0, release_tasks_1.runReleaseTasks)(opts, args);
         }
     })
         .catch((err) => {
@@ -126,8 +126,8 @@ async function publishRelease(opts, args) {
             type: 'list',
             name: 'tag',
             message: 'How should this pre-release version be tagged in npm?',
-            when: () => release_utils_1.isPrereleaseVersion(opts.version),
-            choices: () => execa_1.default('npm', ['view', '--json', pkg.name, 'dist-tags']).then(({ stdout }) => {
+            when: () => (0, release_utils_1.isPrereleaseVersion)(opts.version),
+            choices: () => (0, execa_1.default)('npm', ['view', '--json', pkg.name, 'dist-tags']).then(({ stdout }) => {
                 const existingPrereleaseTags = Object.keys(JSON.parse(stdout))
                     .filter((tag) => tag !== 'latest')
                     .map((tag) => {
@@ -155,7 +155,7 @@ async function publishRelease(opts, args) {
             type: 'input',
             name: 'tag',
             message: 'Tag',
-            when: (answers) => !pkg.private && release_utils_1.isPrereleaseVersion(opts.version) && !answers.tag,
+            when: (answers) => !pkg.private && (0, release_utils_1.isPrereleaseVersion)(opts.version) && !answers.tag,
             validate: (input) => {
                 if (input.length === 0) {
                     return 'Please specify a tag, for example, `next`.';
@@ -192,7 +192,7 @@ async function publishRelease(opts, args) {
         .then((answers) => {
         if (answers.confirm) {
             opts.otp = answers.otp;
-            release_tasks_1.runReleaseTasks(opts, args);
+            (0, release_tasks_1.runReleaseTasks)(opts, args);
         }
     })
         .catch((err) => {

@@ -15,18 +15,18 @@ const fs_extra_1 = require("fs-extra");
  * @returns an entity containing various fields to be used by some process
  */
 function getOptions(rootDir, inputOpts = {}) {
-    const srcDir = path_1.join(rootDir, 'src');
-    const packageJsonPath = path_1.join(rootDir, 'package.json');
-    const packageLockJsonPath = path_1.join(rootDir, 'package-lock.json');
-    const changelogPath = path_1.join(rootDir, 'CHANGELOG.md');
-    const nodeModulesDir = path_1.join(rootDir, 'node_modules');
-    const typescriptDir = path_1.join(nodeModulesDir, 'typescript');
-    const typescriptLibDir = path_1.join(typescriptDir, 'lib');
-    const buildDir = path_1.join(rootDir, 'build');
-    const scriptsDir = path_1.join(rootDir, 'scripts');
-    const scriptsBuildDir = path_1.join(scriptsDir, 'build');
-    const scriptsBundlesDir = path_1.join(scriptsDir, 'bundles');
-    const bundleHelpersDir = path_1.join(scriptsBundlesDir, 'helpers');
+    const srcDir = (0, path_1.join)(rootDir, 'src');
+    const packageJsonPath = (0, path_1.join)(rootDir, 'package.json');
+    const packageLockJsonPath = (0, path_1.join)(rootDir, 'package-lock.json');
+    const changelogPath = (0, path_1.join)(rootDir, 'CHANGELOG.md');
+    const nodeModulesDir = (0, path_1.join)(rootDir, 'node_modules');
+    const typescriptDir = (0, path_1.join)(nodeModulesDir, 'typescript');
+    const typescriptLibDir = (0, path_1.join)(typescriptDir, 'lib');
+    const buildDir = (0, path_1.join)(rootDir, 'build');
+    const scriptsDir = (0, path_1.join)(rootDir, 'scripts');
+    const scriptsBuildDir = (0, path_1.join)(scriptsDir, 'build');
+    const scriptsBundlesDir = (0, path_1.join)(scriptsDir, 'bundles');
+    const bundleHelpersDir = (0, path_1.join)(scriptsBundlesDir, 'helpers');
     const opts = {
         ghRepoOrg: 'ionic-team',
         ghRepoName: 'stencil',
@@ -44,16 +44,16 @@ function getOptions(rootDir, inputOpts = {}) {
         scriptsBundlesDir,
         bundleHelpersDir,
         output: {
-            cliDir: path_1.join(rootDir, 'cli'),
-            compilerDir: path_1.join(rootDir, 'compiler'),
-            devServerDir: path_1.join(rootDir, 'dev-server'),
-            internalDir: path_1.join(rootDir, 'internal'),
-            mockDocDir: path_1.join(rootDir, 'mock-doc'),
-            screenshotDir: path_1.join(rootDir, 'screenshot'),
-            sysNodeDir: path_1.join(rootDir, 'sys', 'node'),
-            testingDir: path_1.join(rootDir, 'testing'),
+            cliDir: (0, path_1.join)(rootDir, 'cli'),
+            compilerDir: (0, path_1.join)(rootDir, 'compiler'),
+            devServerDir: (0, path_1.join)(rootDir, 'dev-server'),
+            internalDir: (0, path_1.join)(rootDir, 'internal'),
+            mockDocDir: (0, path_1.join)(rootDir, 'mock-doc'),
+            screenshotDir: (0, path_1.join)(rootDir, 'screenshot'),
+            sysNodeDir: (0, path_1.join)(rootDir, 'sys', 'node'),
+            testingDir: (0, path_1.join)(rootDir, 'testing'),
         },
-        packageJson: JSON.parse(fs_extra_1.readFileSync(packageJsonPath, 'utf8')),
+        packageJson: JSON.parse((0, fs_extra_1.readFileSync)(packageJsonPath, 'utf8')),
         version: null,
         buildId: null,
         isProd: false,
@@ -76,7 +76,7 @@ function getOptions(rootDir, inputOpts = {}) {
     }
     if (!opts.vermoji) {
         if (opts.isProd) {
-            opts.vermoji = vermoji_1.getVermoji(opts.changelogPath);
+            opts.vermoji = (0, vermoji_1.getVermoji)(opts.changelogPath);
         }
         else {
             opts.vermoji = '💎';
@@ -92,7 +92,7 @@ exports.getOptions = getOptions;
  */
 function createReplaceData(opts) {
     const CACHE_BUSTER = 7;
-    const typescriptPkg = require(path_1.join(opts.typescriptDir, 'package.json'));
+    const typescriptPkg = require((0, path_1.join)(opts.typescriptDir, 'package.json'));
     opts.typescriptVersion = typescriptPkg.version;
     const transpileId = typescriptPkg.name + typescriptPkg.version + '_' + CACHE_BUSTER;
     const terserPkg = getPkg(opts, 'terser');
@@ -131,7 +131,7 @@ exports.createReplaceData = createReplaceData;
  * @returns information about the retrieved package
  */
 function getPkg(opts, pkgName) {
-    return require(path_1.join(opts.nodeModulesDir, pkgName, 'package.json'));
+    return require((0, path_1.join)(opts.nodeModulesDir, pkgName, 'package.json'));
 }
 function getBuildId() {
     const d = new Date();

@@ -16,15 +16,15 @@ const pretty_minify_1 = require("./plugins/pretty-minify");
 const write_pkg_json_1 = require("../utils/write-pkg-json");
 const banner_1 = require("../utils/banner");
 async function sysNode(opts) {
-    const inputDir = path_1.join(opts.buildDir, 'sys', 'node');
-    const inputFile = path_1.join(inputDir, 'index.js');
-    const outputFile = path_1.join(opts.output.sysNodeDir, 'index.js');
+    const inputDir = (0, path_1.join)(opts.buildDir, 'sys', 'node');
+    const inputFile = (0, path_1.join)(inputDir, 'index.js');
+    const outputFile = (0, path_1.join)(opts.output.sysNodeDir, 'index.js');
     // create public d.ts
-    let dts = await fs_extra_1.default.readFile(path_1.join(inputDir, 'public.d.ts'), 'utf8');
+    let dts = await fs_extra_1.default.readFile((0, path_1.join)(inputDir, 'public.d.ts'), 'utf8');
     dts = dts.replace('@stencil/core/internal', '../../internal/index');
-    await fs_extra_1.default.writeFile(path_1.join(opts.output.sysNodeDir, 'index.d.ts'), dts);
+    await fs_extra_1.default.writeFile((0, path_1.join)(opts.output.sysNodeDir, 'index.d.ts'), dts);
     // write @stencil/core/compiler/package.json
-    write_pkg_json_1.writePkgJson(opts, opts.output.sysNodeDir, {
+    (0, write_pkg_json_1.writePkgJson)(opts, opts.output.sysNodeDir, {
         name: '@stencil/core/sys/node',
         description: 'Stencil Node System.',
         main: 'index.js',
@@ -40,17 +40,17 @@ async function sysNode(opts) {
         },
         external: ['child_process', 'crypto', 'events', 'https', 'path', 'readline', 'os', 'util'],
         plugins: [
-            relative_path_plugin_1.relativePathPlugin('glob', './glob.js'),
-            relative_path_plugin_1.relativePathPlugin('graceful-fs', './graceful-fs.js'),
-            relative_path_plugin_1.relativePathPlugin('prompts', './prompts.js'),
-            alias_plugin_1.aliasPlugin(opts),
-            plugin_node_resolve_1.default({
+            (0, relative_path_plugin_1.relativePathPlugin)('glob', './glob.js'),
+            (0, relative_path_plugin_1.relativePathPlugin)('graceful-fs', './graceful-fs.js'),
+            (0, relative_path_plugin_1.relativePathPlugin)('prompts', './prompts.js'),
+            (0, alias_plugin_1.aliasPlugin)(opts),
+            (0, plugin_node_resolve_1.default)({
                 preferBuiltins: true,
             }),
-            plugin_commonjs_1.default({
+            (0, plugin_commonjs_1.default)({
                 transformMixedEsModules: false,
             }),
-            pretty_minify_1.prettyMinifyPlugin(opts, banner_1.getBanner(opts, `Stencil Node System`, true)),
+            (0, pretty_minify_1.prettyMinifyPlugin)(opts, (0, banner_1.getBanner)(opts, `Stencil Node System`, true)),
         ],
         treeshake: {
             moduleSideEffects: false,
@@ -58,8 +58,8 @@ async function sysNode(opts) {
             unknownGlobalSideEffects: false,
         },
     };
-    const inputWorkerFile = path_1.join(opts.buildDir, 'sys', 'node', 'worker.js');
-    const outputWorkerFile = path_1.join(opts.output.sysNodeDir, 'worker.js');
+    const inputWorkerFile = (0, path_1.join)(opts.buildDir, 'sys', 'node', 'worker.js');
+    const outputWorkerFile = (0, path_1.join)(opts.output.sysNodeDir, 'worker.js');
     const sysNodeWorkerBundle = {
         input: inputWorkerFile,
         output: {
@@ -81,18 +81,18 @@ async function sysNode(opts) {
                     }
                 },
             },
-            plugin_node_resolve_1.default({
+            (0, plugin_node_resolve_1.default)({
                 preferBuiltins: true,
             }),
-            alias_plugin_1.aliasPlugin(opts),
-            pretty_minify_1.prettyMinifyPlugin(opts, banner_1.getBanner(opts, `Stencil Node System Worker`, true)),
+            (0, alias_plugin_1.aliasPlugin)(opts),
+            (0, pretty_minify_1.prettyMinifyPlugin)(opts, (0, banner_1.getBanner)(opts, `Stencil Node System Worker`, true)),
         ],
     };
     return [sysNodeBundle, sysNodeWorkerBundle];
 }
 exports.sysNode = sysNode;
 async function sysNodeExternalBundles(opts) {
-    const cachedDir = path_1.join(opts.scriptsBuildDir, 'sys-node-bundle-cache');
+    const cachedDir = (0, path_1.join)(opts.scriptsBuildDir, 'sys-node-bundle-cache');
     await fs_extra_1.default.ensureDir(cachedDir);
     await Promise.all([
         bundleExternal(opts, opts.output.sysNodeDir, cachedDir, 'autoprefixer.js'),
@@ -104,19 +104,19 @@ async function sysNodeExternalBundles(opts) {
         bundleExternal(opts, opts.output.devServerDir, cachedDir, 'ws.js'),
     ]);
     // open-in-editor's visualstudio.vbs file
-    const visualstudioVbsSrc = path_1.join(opts.nodeModulesDir, 'open-in-editor', 'lib', 'editors', 'visualstudio.vbs');
-    const visualstudioVbsDesc = path_1.join(opts.output.devServerDir, 'visualstudio.vbs');
+    const visualstudioVbsSrc = (0, path_1.join)(opts.nodeModulesDir, 'open-in-editor', 'lib', 'editors', 'visualstudio.vbs');
+    const visualstudioVbsDesc = (0, path_1.join)(opts.output.devServerDir, 'visualstudio.vbs');
     await fs_extra_1.default.copy(visualstudioVbsSrc, visualstudioVbsDesc);
     // copy open's xdg-open file
-    const xdgOpenSrcPath = path_1.join(opts.nodeModulesDir, 'open', 'xdg-open');
-    const xdgOpenDestPath = path_1.join(opts.output.devServerDir, 'xdg-open');
+    const xdgOpenSrcPath = (0, path_1.join)(opts.nodeModulesDir, 'open', 'xdg-open');
+    const xdgOpenDestPath = (0, path_1.join)(opts.output.devServerDir, 'xdg-open');
     await fs_extra_1.default.copy(xdgOpenSrcPath, xdgOpenDestPath);
 }
 exports.sysNodeExternalBundles = sysNodeExternalBundles;
 function bundleExternal(opts, outputDir, cachedDir, entryFileName) {
     return new Promise(async (resolveBundle, rejectBundle) => {
-        const outputFile = path_1.join(outputDir, entryFileName);
-        const cachedFile = path_1.join(cachedDir, entryFileName) + (opts.isProd ? '.min.js' : '');
+        const outputFile = (0, path_1.join)(outputDir, entryFileName);
+        const cachedFile = (0, path_1.join)(cachedDir, entryFileName) + (opts.isProd ? '.min.js' : '');
         const cachedExists = fs_extra_1.default.existsSync(cachedFile);
         if (cachedExists) {
             await fs_extra_1.default.copyFile(cachedFile, outputFile);
@@ -124,8 +124,8 @@ function bundleExternal(opts, outputDir, cachedDir, entryFileName) {
             return;
         }
         const whitelist = new Set(['child_process', 'os', 'typescript']);
-        webpack_1.default({
-            entry: path_1.join(opts.srcDir, 'sys', 'node', 'bundles', entryFileName),
+        (0, webpack_1.default)({
+            entry: (0, path_1.join)(opts.srcDir, 'sys', 'node', 'bundles', entryFileName),
             output: {
                 path: outputDir,
                 filename: entryFileName,
@@ -156,10 +156,10 @@ function bundleExternal(opts, outputDir, cachedDir, entryFileName) {
             },
             resolve: {
                 alias: {
-                    '@utils': path_1.join(opts.buildDir, 'utils', 'index.js'),
-                    postcss: path_1.join(opts.nodeModulesDir, 'postcss'),
-                    'source-map': path_1.join(opts.nodeModulesDir, 'source-map'),
-                    chalk: path_1.join(opts.bundleHelpersDir, 'empty.js'),
+                    '@utils': (0, path_1.join)(opts.buildDir, 'utils', 'index.js'),
+                    postcss: (0, path_1.join)(opts.nodeModulesDir, 'postcss'),
+                    'source-map': (0, path_1.join)(opts.nodeModulesDir, 'source-map'),
+                    chalk: (0, path_1.join)(opts.bundleHelpersDir, 'empty.js'),
                 },
             },
             optimization: {
@@ -180,7 +180,7 @@ function bundleExternal(opts, outputDir, cachedDir, entryFileName) {
                     let code = await fs_extra_1.default.readFile(outputFile, 'utf8');
                     if (opts.isProd) {
                         try {
-                            const minifyResults = await terser_1.minify(code);
+                            const minifyResults = await (0, terser_1.minify)(code);
                             code = minifyResults.code;
                         }
                         catch (e) {

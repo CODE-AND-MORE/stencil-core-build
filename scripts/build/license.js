@@ -33,7 +33,7 @@ const entryDeps = [
     'postcss',
     'prompts',
     'rollup',
-    'semiver',
+    'semver',
     'sizzle',
     'source-map',
     'terser',
@@ -63,8 +63,8 @@ const manuallyNotBundled = new Set([
  * @param rootDir the root directory of the Stencil repo
  */
 function createLicense(rootDir) {
-    const opts = options_1.getOptions(rootDir);
-    const thirdPartyLicensesRootPath = path_1.join(opts.rootDir, 'NOTICE.md');
+    const opts = (0, options_1.getOptions)(rootDir);
+    const thirdPartyLicensesRootPath = (0, path_1.join)(opts.rootDir, 'NOTICE.md');
     const bundledDeps = [];
     createBundledDeps(opts, bundledDeps, entryDeps);
     bundledDeps.sort((a, b) => {
@@ -106,7 +106,7 @@ ${bundledDeps.map((l) => l.content).join('\n')}
         });
         licenseSource.push('');
     });
-    fs_extra_1.default.writeFileSync(path_1.join(opts.buildDir, 'license-source.txt'), licenseSource.join('\n'));
+    fs_extra_1.default.writeFileSync((0, path_1.join)(opts.buildDir, 'license-source.txt'), licenseSource.join('\n'));
 }
 exports.createLicense = createLicense;
 /**
@@ -132,7 +132,7 @@ function createBundledDeps(opts, bundledDeps, deps) {
  * @returns all metadata for a dependency that was able to be retrieved for the given dependency
  */
 function createBundledDepLicense(opts, moduleId) {
-    const pkgJsonFile = path_1.join(opts.nodeModulesDir, moduleId, 'package.json');
+    const pkgJsonFile = (0, path_1.join)(opts.nodeModulesDir, moduleId, 'package.json');
     const pkgJson = fs_extra_1.default.readJsonSync(pkgJsonFile);
     const output = [];
     let license = null;
@@ -234,7 +234,7 @@ function getBundledDepLicenseContent(opts, moduleId) {
     const licenseFiles = ['LICENSE', 'LICENSE.md', 'LICENSE-MIT', 'LICENSE.txt'];
     for (const licenseFile of licenseFiles) {
         try {
-            const licensePath = path_1.join(opts.nodeModulesDir, moduleId, licenseFile);
+            const licensePath = (0, path_1.join)(opts.nodeModulesDir, moduleId, licenseFile);
             return fs_extra_1.default.readFileSync(licensePath, 'utf8');
         }
         catch (e) { }

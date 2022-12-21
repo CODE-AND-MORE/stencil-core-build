@@ -27,7 +27,7 @@ exports.contentTypesPlugin = contentTypesPlugin;
 async function createContentTypeData(opts) {
     // create a focused content-type lookup object from
     // the mime db json file
-    const mimeDbSrcPath = path_1.join(opts.nodeModulesDir, 'mime-db', 'db.json');
+    const mimeDbSrcPath = (0, path_1.join)(opts.nodeModulesDir, 'mime-db', 'db.json');
     const mimeDbJson = await fs_extra_1.default.readJson(mimeDbSrcPath);
     const extData = [];
     Object.keys(mimeDbJson).forEach((mimeType) => {

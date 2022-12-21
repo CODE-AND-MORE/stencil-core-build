@@ -1,5 +1,5 @@
 /*!
- Stencil Mock Doc v0.0.0-dev.20220322081806 | MIT Licensed | https://stenciljs.com
+ Stencil Mock Doc v0.0.0-dev.20221221154011 | MIT Licensed | https://stenciljs.com
  */
 const CONTENT_REF_ID = 'r';
 const ORG_LOCATION_ID = 'o';
@@ -219,7 +219,7 @@ class MockCustomElementRegistry {
   whenDefined(tagName) {
     tagName = tagName.toLowerCase();
     if (this.__registry != null && this.__registry.has(tagName) === true) {
-      return Promise.resolve();
+      return Promise.resolve(this.__registry.get(tagName).cstr);
     }
     return new Promise((resolve) => {
       if (this.__whenDefined == null) {
@@ -378,7 +378,7 @@ function toDataAttribute(str) {
       .toLowerCase());
 }
 function dashToPascalCase(str) {
-  str = String(str).substr(5);
+  str = String(str).slice(5);
   return str
     .split('-')
     .map((segment, index) => {
@@ -582,7 +582,7 @@ function cssCaseToJsCase(str) {
       .split('-')
       .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
       .join('');
-    str = str.substr(0, 1).toLowerCase() + str.substr(1);
+    str = str.slice(0, 1).toLowerCase() + str.slice(1);
   }
   return str;
 }
@@ -1525,7 +1525,11 @@ class MockNode {
     if (otherNode === this) {
       return true;
     }
-    return this.childNodes.includes(otherNode);
+    const childNodes = Array.from(this.childNodes);
+    if (childNodes.includes(otherNode)) {
+      return true;
+    }
+    return childNodes.some((node) => this.contains.bind(node)(otherNode));
   }
   removeChild(childNode) {
     const index = this.childNodes.indexOf(childNode);
@@ -3162,6 +3166,15 @@ class MockResponse {
   }
 }
 
+class MockDOMParser {
+  parseFromString(htmlToParse, mimeType) {
+    if (mimeType !== 'text/html') {
+      console.error('XML parsing not implemented yet, continuing as html');
+    }
+    return parseHtmlToDocument(htmlToParse);
+  }
+}
+
 function setupGlobal(gbl) {
   if (gbl.window == null) {
     const win = (gbl.window = new MockWindow());
@@ -3291,6 +3304,7 @@ const GLOBAL_CONSTRUCTORS = [
   ['MouseEvent', MockMouseEvent],
   ['Request', MockRequest],
   ['Response', MockResponse],
+  ['DOMParser', MockDOMParser],
   ['HTMLAnchorElement', MockAnchorElement],
   ['HTMLBaseElement', MockBaseElement],
   ['HTMLButtonElement', MockButtonElement],
@@ -3467,9 +3481,19 @@ class MockPerformance {
   getEntriesByType() {
     return [];
   }
+  // Stencil's implementation of `mark` is non-compliant with the `Performance` interface. Because Stencil will
+  // instantiate an instance of this class and may attempt to assign it to a variable of type `Performance`, the return
+  // type must match the `Performance` interface (rather than typing this function as returning `void` and ignoring the
+  // associated errors returned by the type checker)
+  // @ts-ignore
   mark() {
     //
   }
+  // Stencil's implementation of `measure` is non-compliant with the `Performance` interface. Because Stencil will
+  // instantiate an instance of this class and may attempt to assign it to a variable of type `Performance`, the return
+  // type must match the `Performance` interface (rather than typing this function as returning `void` and ignoring the
+  // associated errors returned by the type checker)
+  // @ts-ignore
   measure() {
     //
   }
@@ -4219,6 +4243,8 @@ function cloneWindow(srcWin, opts = {}) {
   }
   const clonedWin = new MockWindow(false);
   if (!opts.customElementProxy) {
+    // TODO(STENCIL-345) - Evaluate reconciling MockWindow, Window differences
+    // @ts-ignore
     srcWin.customElements = null;
   }
   if (srcWin.document != null) {

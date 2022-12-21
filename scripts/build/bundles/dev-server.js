@@ -18,24 +18,24 @@ const typescript_1 = __importDefault(require("typescript"));
 const banner_1 = require("../utils/banner");
 const content_types_plugin_1 = require("./plugins/content-types-plugin");
 async function devServer(opts) {
-    const inputDir = path_1.join(opts.buildDir, 'dev-server');
+    const inputDir = (0, path_1.join)(opts.buildDir, 'dev-server');
     // create public d.ts
-    let dts = await fs_extra_1.default.readFile(path_1.join(inputDir, 'index.d.ts'), 'utf8');
+    let dts = await fs_extra_1.default.readFile((0, path_1.join)(inputDir, 'index.d.ts'), 'utf8');
     dts = dts.replace('../declarations', '../internal/index');
-    await fs_extra_1.default.writeFile(path_1.join(opts.output.devServerDir, 'index.d.ts'), dts);
+    await fs_extra_1.default.writeFile((0, path_1.join)(opts.output.devServerDir, 'index.d.ts'), dts);
     // write package.json
-    write_pkg_json_1.writePkgJson(opts, opts.output.devServerDir, {
+    (0, write_pkg_json_1.writePkgJson)(opts, opts.output.devServerDir, {
         name: '@stencil/core/dev-server',
         description: 'Stencil Development Server which communicates with the Stencil Compiler.',
         main: 'index.js',
         types: 'index.d.ts',
     });
     // copy static files
-    await fs_extra_1.default.copy(path_1.join(opts.srcDir, 'dev-server', 'static'), path_1.join(opts.output.devServerDir, 'static'));
+    await fs_extra_1.default.copy((0, path_1.join)(opts.srcDir, 'dev-server', 'static'), (0, path_1.join)(opts.output.devServerDir, 'static'));
     // copy server-worker-thread.js
-    await fs_extra_1.default.copy(path_1.join(opts.srcDir, 'dev-server', 'server-worker-thread.js'), path_1.join(opts.output.devServerDir, 'server-worker-thread.js'));
+    await fs_extra_1.default.copy((0, path_1.join)(opts.srcDir, 'dev-server', 'server-worker-thread.js'), (0, path_1.join)(opts.output.devServerDir, 'server-worker-thread.js'));
     // copy template files
-    await fs_extra_1.default.copy(path_1.join(opts.srcDir, 'dev-server', 'templates'), path_1.join(opts.output.devServerDir, 'templates'));
+    await fs_extra_1.default.copy((0, path_1.join)(opts.srcDir, 'dev-server', 'templates'), (0, path_1.join)(opts.output.devServerDir, 'templates'));
     const external = [
         'assert',
         'buffer',
@@ -54,7 +54,7 @@ async function devServer(opts) {
         'zlib',
     ];
     const plugins = [
-        content_types_plugin_1.contentTypesPlugin(opts),
+        (0, content_types_plugin_1.contentTypesPlugin)(opts),
         {
             name: 'devServerWorkerResolverPlugin',
             resolveId(importee) {
@@ -67,27 +67,27 @@ async function devServer(opts) {
                 return null;
             },
         },
-        relative_path_plugin_1.relativePathPlugin('@sys-api-node', '../sys/node/index.js'),
-        relative_path_plugin_1.relativePathPlugin('glob', '../sys/node/glob.js'),
-        relative_path_plugin_1.relativePathPlugin('graceful-fs', '../sys/node/graceful-fs.js'),
-        relative_path_plugin_1.relativePathPlugin('ws', './ws.js'),
-        relative_path_plugin_1.relativePathPlugin('../sys/node/node-sys.js', '../sys/node/node-sys.js'),
-        alias_plugin_1.aliasPlugin(opts),
-        plugin_node_resolve_1.default({
+        (0, relative_path_plugin_1.relativePathPlugin)('@sys-api-node', '../sys/node/index.js'),
+        (0, relative_path_plugin_1.relativePathPlugin)('glob', '../sys/node/glob.js'),
+        (0, relative_path_plugin_1.relativePathPlugin)('graceful-fs', '../sys/node/graceful-fs.js'),
+        (0, relative_path_plugin_1.relativePathPlugin)('ws', './ws.js'),
+        (0, relative_path_plugin_1.relativePathPlugin)('../sys/node/node-sys.js', '../sys/node/node-sys.js'),
+        (0, alias_plugin_1.aliasPlugin)(opts),
+        (0, plugin_node_resolve_1.default)({
             preferBuiltins: true,
         }),
-        plugin_commonjs_1.default(),
-        replace_plugin_1.replacePlugin(opts),
+        (0, plugin_commonjs_1.default)(),
+        (0, replace_plugin_1.replacePlugin)(opts),
     ];
     const devServerIndexBundle = {
-        input: path_1.join(inputDir, 'index.js'),
+        input: (0, path_1.join)(inputDir, 'index.js'),
         output: {
             format: 'cjs',
-            file: path_1.join(opts.output.devServerDir, 'index.js'),
+            file: (0, path_1.join)(opts.output.devServerDir, 'index.js'),
             hoistTransitiveImports: false,
             esModule: false,
             preferConst: true,
-            banner: banner_1.getBanner(opts, `Stencil Dev Server`, true),
+            banner: (0, banner_1.getBanner)(opts, `Stencil Dev Server`, true),
         },
         external,
         plugins,
@@ -96,14 +96,14 @@ async function devServer(opts) {
         },
     };
     const devServerProcessBundle = {
-        input: path_1.join(inputDir, 'server-process.js'),
+        input: (0, path_1.join)(inputDir, 'server-process.js'),
         output: {
             format: 'cjs',
-            file: path_1.join(opts.output.devServerDir, 'server-process.js'),
+            file: (0, path_1.join)(opts.output.devServerDir, 'server-process.js'),
             hoistTransitiveImports: false,
             esModule: false,
             preferConst: true,
-            banner: banner_1.getBanner(opts, `Stencil Dev Server Process`, true),
+            banner: (0, banner_1.getBanner)(opts, `Stencil Dev Server Process`, true),
         },
         external,
         plugins,
@@ -116,7 +116,7 @@ async function devServer(opts) {
             name: 'appErrorCss',
             resolveId(id) {
                 if (id.endsWith('app-error.css')) {
-                    return path_1.join(opts.srcDir, 'dev-server', 'client', 'app-error.css');
+                    return (0, path_1.join)(opts.srcDir, 'dev-server', 'client', 'app-error.css');
                 }
                 return null;
             },
@@ -126,7 +126,7 @@ async function devServer(opts) {
                     while (code.includes('  ')) {
                         code = code.replace(/  /g, ' ');
                     }
-                    return pluginutils_1.dataToEsm(code, { preferConst: true });
+                    return (0, pluginutils_1.dataToEsm)(code, { preferConst: true });
                 }
                 return null;
             },
@@ -134,10 +134,10 @@ async function devServer(opts) {
     }
     const connectorName = 'connector.html';
     const connectorBundle = {
-        input: path_1.join(inputDir, 'dev-server-client', 'index.js'),
+        input: (0, path_1.join)(inputDir, 'dev-server-client', 'index.js'),
         output: {
             format: 'cjs',
-            file: path_1.join(opts.output.devServerDir, connectorName),
+            file: (0, path_1.join)(opts.output.devServerDir, connectorName),
             strict: false,
             preferConst: true,
         },
@@ -146,7 +146,7 @@ async function devServer(opts) {
                 name: 'connectorPlugin',
                 resolveId(id) {
                     if (id === '@stencil/core/dev-server/client') {
-                        return path_1.join(inputDir, 'client', 'index.js');
+                        return (0, path_1.join)(inputDir, 'client', 'index.js');
                     }
                 },
             },
@@ -167,7 +167,7 @@ async function devServer(opts) {
                         code = tsResults.outputText;
                         code = intro + code + outro;
                         if (opts.isProd) {
-                            const minifyResults = await terser_1.minify(code, {
+                            const minifyResults = await (0, terser_1.minify)(code, {
                                 compress: { hoist_vars: true, hoist_funs: true, ecma: 5 },
                                 format: { ecma: 5 },
                             });
@@ -179,13 +179,13 @@ async function devServer(opts) {
                     }
                 },
             },
-            replace_plugin_1.replacePlugin(opts),
-            plugin_node_resolve_1.default(),
+            (0, replace_plugin_1.replacePlugin)(opts),
+            (0, plugin_node_resolve_1.default)(),
         ],
     };
-    await fs_extra_1.default.ensureDir(path_1.join(opts.output.devServerDir, 'client'));
+    await fs_extra_1.default.ensureDir((0, path_1.join)(opts.output.devServerDir, 'client'));
     // copy dev server client dts files
-    await fs_extra_1.default.copy(path_1.join(opts.buildDir, 'dev-server', 'client'), path_1.join(opts.output.devServerDir, 'client'), {
+    await fs_extra_1.default.copy((0, path_1.join)(opts.buildDir, 'dev-server', 'client'), (0, path_1.join)(opts.output.devServerDir, 'client'), {
         filter: (src) => {
             if (src.endsWith('.d.ts')) {
                 return true;
@@ -198,20 +198,20 @@ async function devServer(opts) {
         },
     });
     // write package.json
-    write_pkg_json_1.writePkgJson(opts, path_1.join(opts.output.devServerDir, 'client'), {
+    (0, write_pkg_json_1.writePkgJson)(opts, (0, path_1.join)(opts.output.devServerDir, 'client'), {
         name: '@stencil/core/dev-server/client',
         description: 'Stencil Dev Server Client.',
         main: 'index.js',
         types: 'index.d.ts',
     });
     const devServerClientBundle = {
-        input: path_1.join(opts.buildDir, 'dev-server', 'client', 'index.js'),
+        input: (0, path_1.join)(opts.buildDir, 'dev-server', 'client', 'index.js'),
         output: {
             format: 'esm',
-            file: path_1.join(opts.output.devServerDir, 'client', 'index.js'),
-            banner: banner_1.getBanner(opts, `Stencil Dev Server Client`, true),
+            file: (0, path_1.join)(opts.output.devServerDir, 'client', 'index.js'),
+            banner: (0, banner_1.getBanner)(opts, `Stencil Dev Server Client`, true),
         },
-        plugins: [appErrorCssPlugin(), replace_plugin_1.replacePlugin(opts), plugin_node_resolve_1.default()],
+        plugins: [appErrorCssPlugin(), (0, replace_plugin_1.replacePlugin)(opts), (0, plugin_node_resolve_1.default)()],
     };
     return [devServerIndexBundle, devServerProcessBundle, connectorBundle, devServerClientBundle];
 }

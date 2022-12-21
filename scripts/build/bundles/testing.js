@@ -16,14 +16,14 @@ const write_pkg_json_1 = require("../utils/write-pkg-json");
 const pretty_minify_1 = require("./plugins/pretty-minify");
 const banner_1 = require("../utils/banner");
 async function testing(opts) {
-    const inputDir = path_1.join(opts.buildDir, 'testing');
+    const inputDir = (0, path_1.join)(opts.buildDir, 'testing');
     await Promise.all([
         // copy jest testing entry files
-        fs_extra_1.default.copy(path_1.join(opts.scriptsBundlesDir, 'helpers', 'jest'), opts.output.testingDir),
+        fs_extra_1.default.copy((0, path_1.join)(opts.scriptsBundlesDir, 'helpers', 'jest'), opts.output.testingDir),
         copyTestingInternalDts(opts, inputDir),
     ]);
     // write package.json
-    write_pkg_json_1.writePkgJson(opts, opts.output.testingDir, {
+    (0, write_pkg_json_1.writePkgJson)(opts, opts.output.testingDir, {
         name: '@stencil/core/testing',
         description: 'Stencil testing suite.',
         main: 'index.js',
@@ -68,14 +68,14 @@ async function testing(opts) {
         preferConst: true,
     };
     const testingBundle = {
-        input: path_1.join(inputDir, 'index.js'),
+        input: (0, path_1.join)(inputDir, 'index.js'),
         output,
         external,
         plugins: [
-            lazy_require_1.lazyRequirePlugin(opts, ['@app-data'], '@stencil/core/internal/app-data'),
-            lazy_require_1.lazyRequirePlugin(opts, ['@platform', '@stencil/core/internal/testing'], '@stencil/core/internal/testing'),
-            lazy_require_1.lazyRequirePlugin(opts, ['@stencil/core/dev-server'], '../dev-server/index.js'),
-            lazy_require_1.lazyRequirePlugin(opts, ['@stencil/core/mock-doc'], '../mock-doc/index.cjs'),
+            (0, lazy_require_1.lazyRequirePlugin)(opts, ['@app-data'], '@stencil/core/internal/app-data'),
+            (0, lazy_require_1.lazyRequirePlugin)(opts, ['@platform', '@stencil/core/internal/testing'], '@stencil/core/internal/testing'),
+            (0, lazy_require_1.lazyRequirePlugin)(opts, ['@stencil/core/dev-server'], '../dev-server/index.js'),
+            (0, lazy_require_1.lazyRequirePlugin)(opts, ['@stencil/core/mock-doc'], '../mock-doc/index.cjs'),
             {
                 name: 'testingImportResolverPlugin',
                 resolveId(importee) {
@@ -91,16 +91,16 @@ async function testing(opts) {
                     return null;
                 },
             },
-            alias_plugin_1.aliasPlugin(opts),
-            replace_plugin_1.replacePlugin(opts),
-            plugin_node_resolve_1.default({
+            (0, alias_plugin_1.aliasPlugin)(opts),
+            (0, replace_plugin_1.replacePlugin)(opts),
+            (0, plugin_node_resolve_1.default)({
                 preferBuiltins: true,
             }),
-            plugin_commonjs_1.default(),
-            plugin_json_1.default({
+            (0, plugin_commonjs_1.default)(),
+            (0, plugin_json_1.default)({
                 preferConst: true,
             }),
-            pretty_minify_1.prettyMinifyPlugin(opts, banner_1.getBanner(opts, `Stencil Testing`, true)),
+            (0, pretty_minify_1.prettyMinifyPlugin)(opts, (0, banner_1.getBanner)(opts, `Stencil Testing`, true)),
         ],
         treeshake: {
             moduleSideEffects: false,
@@ -111,7 +111,7 @@ async function testing(opts) {
 exports.testing = testing;
 async function copyTestingInternalDts(opts, inputDir) {
     // copy testing d.ts files
-    await fs_extra_1.default.copy(path_1.join(inputDir), path_1.join(opts.output.testingDir), {
+    await fs_extra_1.default.copy((0, path_1.join)(inputDir), (0, path_1.join)(opts.output.testingDir), {
         filter: (f) => {
             if (f.endsWith('.d.ts')) {
                 return true;

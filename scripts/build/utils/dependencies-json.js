@@ -4,10 +4,10 @@ exports.getTypeScriptDefaultLibNames = exports.updateDependenciesJson = void 0;
 const path_1 = require("path");
 const fs_extra_1 = require("fs-extra");
 async function updateDependenciesJson(opts) {
-    const srcPath = path_1.join(opts.srcDir, 'compiler', 'sys', 'dependencies.json');
-    const rootPath = path_1.join(opts.rootDir, 'dependencies.json');
+    const srcPath = (0, path_1.join)(opts.srcDir, 'compiler', 'sys', 'dependencies.json');
+    const rootPath = (0, path_1.join)(opts.rootDir, 'dependencies.json');
     const stencilResources = await getStencilResources(opts);
-    const data = JSON.parse(await fs_extra_1.readFile(srcPath, 'utf8'));
+    const data = JSON.parse(await (0, fs_extra_1.readFile)(srcPath, 'utf8'));
     for (const dep of data.dependencies) {
         if (dep.name === '@stencil/core') {
             dep.resources = stencilResources;
@@ -15,7 +15,7 @@ async function updateDependenciesJson(opts) {
     }
     // update the src file, which most of the times is no change
     // but incase there is a change we'll then know to commit it
-    await fs_extra_1.writeFile(srcPath, JSON.stringify(data, null, 2));
+    await (0, fs_extra_1.writeFile)(srcPath, JSON.stringify(data, null, 2));
     // now update the versions and write a copy for the root
     for (const dep of data.dependencies) {
         switch (dep.name) {
@@ -33,7 +33,7 @@ async function updateDependenciesJson(opts) {
                 break;
         }
     }
-    await fs_extra_1.writeFile(rootPath, JSON.stringify(data, null, 2));
+    await (0, fs_extra_1.writeFile)(rootPath, JSON.stringify(data, null, 2));
 }
 exports.updateDependenciesJson = updateDependenciesJson;
 async function getStencilResources(opts) {
@@ -80,7 +80,7 @@ async function getStencilResources(opts) {
     });
 }
 async function getTypeScriptDefaultLibNames(opts) {
-    const tsLibNames = (await fs_extra_1.readdir(opts.typescriptLibDir)).filter((f) => {
+    const tsLibNames = (await (0, fs_extra_1.readdir)(opts.typescriptLibDir)).filter((f) => {
         return f.startsWith('lib.') && f.endsWith('.d.ts');
     });
     return tsLibNames;

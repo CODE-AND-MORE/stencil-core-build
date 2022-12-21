@@ -20,7 +20,7 @@ function aliasPlugin(opts) {
     // ensure we use the same one
     const helperResolvers = new Set(['is-resolvable', 'path-is-absolute']);
     // ensure we use the same one
-    const nodeResolvers = new Map([['source-map', path_1.join(opts.nodeModulesDir, 'source-map', 'source-map.js')]]);
+    const nodeResolvers = new Map([['source-map', (0, path_1.join)(opts.nodeModulesDir, 'source-map', 'source-map.js')]]);
     const empty = new Set([
         // we never use chalk, but many projects still pull it in
         'chalk',
@@ -41,19 +41,19 @@ function aliasPlugin(opts) {
                 };
             }
             if (id === '@runtime') {
-                return path_1.join(opts.buildDir, 'runtime', 'index.js');
+                return (0, path_1.join)(opts.buildDir, 'runtime', 'index.js');
             }
             if (id === '@utils') {
-                return path_1.join(opts.buildDir, 'utils', 'index.js');
+                return (0, path_1.join)(opts.buildDir, 'utils', 'index.js');
             }
             if (id === '@environment') {
-                return path_1.join(opts.buildDir, 'compiler', 'sys', 'environment.js');
+                return (0, path_1.join)(opts.buildDir, 'compiler', 'sys', 'environment.js');
             }
             if (helperResolvers.has(id)) {
-                return path_1.join(opts.bundleHelpersDir, `${id}.js`);
+                return (0, path_1.join)(opts.bundleHelpersDir, `${id}.js`);
             }
             if (empty.has(id)) {
-                return path_1.join(opts.bundleHelpersDir, 'empty.js');
+                return (0, path_1.join)(opts.bundleHelpersDir, 'empty.js');
             }
             if (nodeResolvers.has(id)) {
                 return nodeResolvers.get(id);

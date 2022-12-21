@@ -210,7 +210,8 @@ const createTime = (e, t = "") => {
  let n = styles.get(e);
  n = t, styles.set(e, n);
 }, addStyle = (e, t, o, n) => {
- let s = getScopeId(t, o), l = styles.get(s);
+ let s = getScopeId(t, o);
+ const l = styles.get(s);
  if (!BUILD.attachStyles) return s;
  if (e = 11 === e.nodeType ? e : doc, l) if ("string" == typeof l) {
   e = e.head || e;
@@ -235,8 +236,8 @@ const createTime = (e, t = "") => {
  o.classList.add(l + "-h"), BUILD.scoped && 2 & n && o.classList.add(l + "-s")), 
  s();
 }, getScopeId = (e, t) => "sc-" + (BUILD.mode && t && 32 & e.$flags$ ? e.$tagName$ + "-" + t : e.$tagName$), computeMode = e => modeResolutionChain.map((t => t(e))).find((e => !!e)), setMode = e => modeResolutionChain.push(e), getMode = e => getHostRef(e).$modeName$, EMPTY_OBJ = {}, isComplexType = e => "object" == (e = typeof e) || "function" === e, isPromise = e => !!e && ("object" == typeof e || "function" == typeof e) && "function" == typeof e.then, h = (e, t, ...o) => {
- let n = null, s = null, l = null, a = !1, r = !1, i = [];
- const d = t => {
+ let n = null, s = null, l = null, a = !1, r = !1;
+ const i = [], d = t => {
   for (let o = 0; o < t.length; o++) n = t[o], Array.isArray(n) ? d(n) : null != n && "boolean" != typeof n && ((a = "function" != typeof e && !isComplexType(n)) ? n = String(n) : BUILD.isDev && "function" != typeof e && n.$flags$, 
   a && r ? i[i.length - 1].$text$ += n : i.push(a ? newVNode(null, n) : n), r = a);
  };
@@ -297,7 +298,7 @@ const createTime = (e, t = "") => {
     const i = isComplexType(n);
     if ((a || i && null !== n) && !s) try {
      if (e.tagName.includes("-")) e[t] = n; else {
-      let s = null == n ? "" : n;
+      const s = null == n ? "" : n;
       "list" === t ? a = !1 : null != o && e[t] == s || (e[t] = s);
      }
     } catch (e) {}
@@ -317,21 +318,22 @@ const createTime = (e, t = "") => {
 let scopeId, contentRef, hostTagName, useNativeShadowDom = !1, checkSlotFallbackVisibility = !1, checkSlotRelocate = !1, isSvgMode = !1;
 
 const createElm = (e, t, o, n) => {
- let s, l, a, r = t.$children$[o], i = 0;
- if (BUILD.slotRelocation && !useNativeShadowDom && (checkSlotRelocate = !0, "slot" === r.$tag$ && (scopeId && n.classList.add(scopeId + "-s"), 
- r.$flags$ |= r.$children$ ? 2 : 1)), BUILD.isDev && r.$elm$ && consoleDevError(`The JSX ${null !== r.$text$ ? `"${r.$text$}" text` : `"${r.$tag$}" element`} node should not be shared within the same renderer. The renderer caches element lookups in order to improve performance. However, a side effect from this is that the exact same JSX node should not be reused. For more information please see https://stenciljs.com/docs/templating-jsx#avoid-shared-jsx-nodes`), 
- BUILD.vdomText && null !== r.$text$) s = r.$elm$ = doc.createTextNode(r.$text$); else if (BUILD.slotRelocation && 1 & r.$flags$) s = r.$elm$ = BUILD.isDebug || BUILD.hydrateServerSide ? slotReferenceDebugNode(r) : doc.createTextNode(""); else {
-  if (BUILD.svg && !isSvgMode && (isSvgMode = "svg" === r.$tag$), s = r.$elm$ = BUILD.svg ? doc.createElementNS(isSvgMode ? "http://www.w3.org/2000/svg" : "http://www.w3.org/1999/xhtml", BUILD.slotRelocation && 2 & r.$flags$ ? "slot-fb" : r.$tag$) : doc.createElement(BUILD.slotRelocation && 2 & r.$flags$ ? "slot-fb" : r.$tag$), 
-  BUILD.svg && isSvgMode && "foreignObject" === r.$tag$ && (isSvgMode = !1), BUILD.vdomAttribute && updateElement(null, r, isSvgMode), 
-  (BUILD.shadowDom || BUILD.scoped) && null != scopeId && s["s-si"] !== scopeId && s.classList.add(s["s-si"] = scopeId), 
-  r.$children$) for (i = 0; i < r.$children$.length; ++i) l = createElm(e, r, i, s), 
-  l && s.appendChild(l);
-  BUILD.svg && ("svg" === r.$tag$ ? isSvgMode = !1 : "foreignObject" === s.tagName && (isSvgMode = !0));
+ const s = t.$children$[o];
+ let l, a, r, i = 0;
+ if (BUILD.slotRelocation && !useNativeShadowDom && (checkSlotRelocate = !0, "slot" === s.$tag$ && (scopeId && n.classList.add(scopeId + "-s"), 
+ s.$flags$ |= s.$children$ ? 2 : 1)), BUILD.isDev && s.$elm$ && consoleDevError(`The JSX ${null !== s.$text$ ? `"${s.$text$}" text` : `"${s.$tag$}" element`} node should not be shared within the same renderer. The renderer caches element lookups in order to improve performance. However, a side effect from this is that the exact same JSX node should not be reused. For more information please see https://stenciljs.com/docs/templating-jsx#avoid-shared-jsx-nodes`), 
+ BUILD.vdomText && null !== s.$text$) l = s.$elm$ = doc.createTextNode(s.$text$); else if (BUILD.slotRelocation && 1 & s.$flags$) l = s.$elm$ = BUILD.isDebug || BUILD.hydrateServerSide ? slotReferenceDebugNode(s) : doc.createTextNode(""); else {
+  if (BUILD.svg && !isSvgMode && (isSvgMode = "svg" === s.$tag$), l = s.$elm$ = BUILD.svg ? doc.createElementNS(isSvgMode ? "http://www.w3.org/2000/svg" : "http://www.w3.org/1999/xhtml", BUILD.slotRelocation && 2 & s.$flags$ ? "slot-fb" : s.$tag$) : doc.createElement(BUILD.slotRelocation && 2 & s.$flags$ ? "slot-fb" : s.$tag$), 
+  BUILD.svg && isSvgMode && "foreignObject" === s.$tag$ && (isSvgMode = !1), BUILD.vdomAttribute && updateElement(null, s, isSvgMode), 
+  (BUILD.shadowDom || BUILD.scoped) && null != scopeId && l["s-si"] !== scopeId && l.classList.add(l["s-si"] = scopeId), 
+  s.$children$) for (i = 0; i < s.$children$.length; ++i) a = createElm(e, s, i, l), 
+  a && l.appendChild(a);
+  BUILD.svg && ("svg" === s.$tag$ ? isSvgMode = !1 : "foreignObject" === l.tagName && (isSvgMode = !0));
  }
- return BUILD.slotRelocation && (s["s-hn"] = hostTagName, 3 & r.$flags$ && (s["s-sr"] = !0, 
- s["s-cr"] = contentRef, s["s-sn"] = r.$name$ || "", a = e && e.$children$ && e.$children$[o], 
- a && a.$tag$ === r.$tag$ && e.$elm$ && putBackInOriginalLocation(e.$elm$, !1))), 
- s;
+ return BUILD.slotRelocation && (l["s-hn"] = hostTagName, 3 & s.$flags$ && (l["s-sr"] = !0, 
+ l["s-cr"] = contentRef, l["s-sn"] = s.$name$ || "", r = e && e.$children$ && e.$children$[o], 
+ r && r.$tag$ === s.$tag$ && e.$elm$ && putBackInOriginalLocation(e.$elm$, !1))), 
+ l;
 }, putBackInOriginalLocation = (e, t) => {
  plt.$flags$ |= 1;
  const o = e.childNodes;
@@ -372,22 +374,24 @@ const createElm = (e, t, o, n) => {
  addVnodes(o, null, t, s, 0, s.length - 1)) : BUILD.updatable && null !== n && removeVnodes(n, 0, n.length - 1), 
  BUILD.svg && isSvgMode && "svg" === l && (isSvgMode = !1));
 }, updateFallbackSlotVisibility = e => {
- let t, o, n, s, l, a, r = e.childNodes;
- for (o = 0, n = r.length; o < n; o++) if (t = r[o], 1 === t.nodeType) {
-  if (t["s-sr"]) for (l = t["s-sn"], t.hidden = !1, s = 0; s < n; s++) if (a = r[s].nodeType, 
-  r[s]["s-hn"] !== t["s-hn"] || "" !== l) {
-   if (1 === a && l === r[s].getAttribute("slot")) {
-    t.hidden = !0;
+ const t = e.childNodes;
+ let o, n, s, l, a, r;
+ for (n = 0, s = t.length; n < s; n++) if (o = t[n], 1 === o.nodeType) {
+  if (o["s-sr"]) for (a = o["s-sn"], o.hidden = !1, l = 0; l < s; l++) if (r = t[l].nodeType, 
+  t[l]["s-hn"] !== o["s-hn"] || "" !== a) {
+   if (1 === r && a === t[l].getAttribute("slot")) {
+    o.hidden = !0;
     break;
    }
-  } else if (1 === a || 3 === a && "" !== r[s].textContent.trim()) {
-   t.hidden = !0;
+  } else if (1 === r || 3 === r && "" !== t[l].textContent.trim()) {
+   o.hidden = !0;
    break;
   }
-  updateFallbackSlotVisibility(t);
+  updateFallbackSlotVisibility(o);
  }
 }, relocateNodes = [], relocateSlotContent = e => {
- let t, o, n, s, l, a, r = 0, i = e.childNodes, d = i.length;
+ let t, o, n, s, l, a, r = 0;
+ const i = e.childNodes, d = i.length;
  for (;r < d; r++) {
   if (t = i[r], t["s-sr"] && (o = t["s-cr"]) && o.parentNode) for (n = o.parentNode.childNodes, 
   s = t["s-sn"], a = n.length - 1; a >= 0; a--) o = n[a], o["s-cn"] || o["s-nr"] || o["s-hn"] === t["s-hn"] || (isNodeLocatedInSlot(o, s) ? (l = relocateNodes.find((e => e.$nodeToRelocate$ === o)), 
@@ -594,7 +598,9 @@ const callRender = (e, t, o) => {
  }
 }, parsePropertyValue = (e, t) => null == e || isComplexType(e) ? e : BUILD.propBoolean && 4 & t ? "false" !== e && ("" === e || !!e) : BUILD.propNumber && 2 & t ? parseFloat(e) : BUILD.propString && 1 & t ? String(e) : e, getValue = (e, t) => getHostRef(e).$instanceValues$.get(t), setValue = (e, t, o, n) => {
  const s = getHostRef(e), l = BUILD.lazyLoad ? s.$hostElement$ : e, a = s.$instanceValues$.get(t), r = s.$flags$, i = BUILD.lazyLoad ? s.$lazyInstance$ : l;
- if (o = parsePropertyValue(o, n.$members$[t][0]), !(BUILD.lazyLoad && 8 & r && void 0 !== a || o === a) && (s.$instanceValues$.set(t, o), 
+ o = parsePropertyValue(o, n.$members$[t][0]);
+ const d = Number.isNaN(a) && Number.isNaN(o), c = o !== a && !d;
+ if ((!BUILD.lazyLoad || !(8 & r) || void 0 === a) && c && (s.$instanceValues$.set(t, o), 
  BUILD.isDev && (1024 & s.$flags$ || s.$flags$), !BUILD.lazyLoad || i)) {
   if (BUILD.watchCallback && n.$watchers$ && 128 & r) {
    const e = n.$watchers$[t];
@@ -785,7 +791,8 @@ const callRender = (e, t, o) => {
  e.cloneNode = function(e) {
   const o = this, n = !!BUILD.shadowDom && o.shadowRoot && supportsShadow, s = t.call(o, !!n && e);
   if (BUILD.slot && !n && e) {
-   let e, t, n = 0, l = [ "s-id", "s-cr", "s-lr", "s-rc", "s-sc", "s-p", "s-cn", "s-sr", "s-sn", "s-hn", "s-ol", "s-nr", "s-si" ];
+   let e, t, n = 0;
+   const l = [ "s-id", "s-cr", "s-lr", "s-rc", "s-sc", "s-p", "s-cn", "s-sr", "s-sn", "s-hn", "s-ol", "s-nr", "s-si" ];
    for (;n < o.childNodes.length; n++) e = o.childNodes[n]["s-nr"], t = l.every((e => !o.childNodes[n][e])), 
    e && (BUILD.appendChildSlotFix && s.__appendChild ? s.__appendChild(e.cloneNode(!0)) : s.appendChild(e.cloneNode(!0))), 
    t && s.appendChild(o.childNodes[n].cloneNode(!0));

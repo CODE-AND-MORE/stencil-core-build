@@ -1,5 +1,5 @@
 /*!
- Stencil CLI v0.0.0-dev.20220322081806 | MIT Licensed | https://stenciljs.com
+ Stencil CLI v0.0.0-dev.20221221154011 | MIT Licensed | https://stenciljs.com
  */
 const toLowerCase = (str) => str.toLowerCase();
 const dashToPascalCase = (str) => toLowerCase(str)
@@ -34,6 +34,13 @@ const buildError = (diagnostics) => {
     }
     return diagnostic;
 };
+/**
+ * Builds a diagnostic from an `Error`, appends it to the `diagnostics` parameter, and returns the created diagnostic
+ * @param diagnostics the series of diagnostics the newly created diagnostics should be added to
+ * @param err the error to derive information from in generating the diagnostic
+ * @param msg an optional message to use in place of `err` to generate the diagnostic
+ * @returns the generated diagnostic
+ */
 const catchError = (diagnostics, err, msg) => {
     const diagnostic = {
         level: 'error',
@@ -45,7 +52,7 @@ const catchError = (diagnostics, err, msg) => {
         lines: [],
     };
     if (isString(msg)) {
-        diagnostic.messageText = msg;
+        diagnostic.messageText = msg.length ? msg : 'UNKNOWN ERROR';
     }
     else if (err != null) {
         if (err.stack != null) {
@@ -53,7 +60,7 @@ const catchError = (diagnostics, err, msg) => {
         }
         else {
             if (err.message != null) {
-                diagnostic.messageText = err.message.toString();
+                diagnostic.messageText = err.message.length ? err.message : 'UNKNOWN ERROR';
             }
             else {
                 diagnostic.messageText = err.toString();
@@ -228,14 +235,15 @@ const pathComponents = (path, rootLength) => {
  * @returns an error message if the tag has an invalid name, undefined if the tag name passes all checks
  */
 const validateComponentTag = (tag) => {
+    // we want to check this first since we call some String.prototype methods below
+    if (typeof tag !== 'string') {
+        return `Tag "${tag}" must be a string type`;
+    }
     if (tag !== tag.trim()) {
         return `Tag can not contain white spaces`;
     }
     if (tag !== tag.toLowerCase()) {
         return `Tag can not contain upper case characters`;
-    }
-    if (typeof tag !== 'string') {
-        return `Tag "${tag}" must be a string type`;
     }
     if (tag.length === 0) {
         return `Received empty tag value`;
@@ -298,9 +306,19 @@ const parseFlags = (args, sys) => {
     });
     return flags;
 };
+/**
+ * Parse command line arguments that are whitelisted via the BOOLEAN_ARG_OPTS,
+ * STRING_ARG_OPTS, and NUMBER_ARG_OPTS arrays in this file. Handles leading
+ * dashes on arguments, aliases that are defined for a small number of argument
+ * types, and parsing values for non-boolean arguments (e.g. port number).
+ *
+ * @param flags     a ConfigFlags object
+ * @param args      an array of command-line arguments to parse
+ * @param knownArgs an array to which all recognized, legal arguments are added
+ */
 const parseArgs = (flags, args, knownArgs) => {
-    ARG_OPTS.boolean.forEach((booleanName) => {
-        const alias = ARG_OPTS.alias[booleanName];
+    BOOLEAN_ARG_OPTS.forEach((booleanName) => {
+        const alias = ARG_OPTS_ALIASES[booleanName];
         const flagKey = configCase(booleanName);
         if (typeof flags[flagKey] !== 'boolean') {
             flags[flagKey] = null;
@@ -328,8 +346,8 @@ const parseArgs = (flags, args, knownArgs) => {
             }
         });
     });
-    ARG_OPTS.string.forEach((stringName) => {
-        const alias = ARG_OPTS.alias[stringName];
+    STRING_ARG_OPTS.forEach((stringName) => {
+        const alias = ARG_OPTS_ALIASES[stringName];
         const flagKey = configCase(stringName);
         if (typeof flags[flagKey] !== 'string') {
             flags[flagKey] = null;
@@ -372,8 +390,8 @@ const parseArgs = (flags, args, knownArgs) => {
             }
         }
     });
-    ARG_OPTS.number.forEach((numberName) => {
-        const alias = ARG_OPTS.alias[numberName];
+    NUMBER_ARG_OPTS.forEach((numberName) => {
+        const alias = ARG_OPTS_ALIASES[numberName];
         const flagKey = configCase(numberName);
         if (typeof flags[flagKey] !== 'number') {
             flags[flagKey] = null;
@@ -417,50 +435,56 @@ const parseArgs = (flags, args, knownArgs) => {
 };
 const configCase = (prop) => {
     prop = dashToPascalCase(prop);
-    return prop.charAt(0).toLowerCase() + prop.substr(1);
+    return prop.charAt(0).toLowerCase() + prop.slice(1);
 };
-const ARG_OPTS = {
-    boolean: [
-        'build',
-        'cache',
-        'check-version',
-        'ci',
-        'compare',
-        'debug',
-        'dev',
-        'devtools',
-        'docs',
-        'e2e',
-        'es5',
-        'esm',
-        'headless',
-        'help',
-        'log',
-        'open',
-        'prerender',
-        'prerender-external',
-        'prod',
-        'profile',
-        'service-worker',
-        'screenshot',
-        'serve',
-        'skip-node-check',
-        'spec',
-        'ssr',
-        'stats',
-        'update-screenshot',
-        'verbose',
-        'version',
-        'watch',
-    ],
-    number: ['max-workers', 'port'],
-    string: ['address', 'config', 'docs-json', 'emulate', 'log-level', 'root', 'screenshot-connector'],
-    alias: {
-        config: 'c',
-        help: 'h',
-        port: 'p',
-        version: 'v',
-    },
+const BOOLEAN_ARG_OPTS = [
+    'build',
+    'cache',
+    'check-version',
+    'ci',
+    'compare',
+    'debug',
+    'dev',
+    'devtools',
+    'docs',
+    'e2e',
+    'es5',
+    'esm',
+    'headless',
+    'help',
+    'log',
+    'open',
+    'prerender',
+    'prerender-external',
+    'prod',
+    'profile',
+    'service-worker',
+    'screenshot',
+    'serve',
+    'skip-node-check',
+    'spec',
+    'ssr',
+    'stats',
+    'update-screenshot',
+    'verbose',
+    'version',
+    'watch',
+];
+const NUMBER_ARG_OPTS = ['max-workers', 'port'];
+const STRING_ARG_OPTS = [
+    'address',
+    'config',
+    'docs-json',
+    'emulate',
+    'log-level',
+    'root',
+    'screenshot-connector',
+];
+const ARG_OPTS_ALIASES = {
+    config: 'c',
+    help: 'h',
+    port: 'p',
+    version: 'v',
 };
 const getNpmConfigEnvArgs = (sys) => {
     // process.env.npm_config_argv
@@ -482,7 +506,7 @@ const getNpmConfigEnvArgs = (sys) => {
 const dependencies = [
 	{
 		name: "@stencil/core",
-		version: "0.0.0-dev.20220322081806",
+		version: "0.0.0-dev.20221221154011",
 		main: "compiler/stencil.js",
 		resources: [
 			"package.json",
@@ -532,6 +556,7 @@ const dependencies = [
 			"compiler/lib.es2020.symbol.wellknown.d.ts",
 			"compiler/lib.es2021.d.ts",
 			"compiler/lib.es2021.full.d.ts",
+			"compiler/lib.es2021.intl.d.ts",
 			"compiler/lib.es2021.promise.d.ts",
 			"compiler/lib.es2021.string.d.ts",
 			"compiler/lib.es2021.weakref.d.ts",
@@ -584,7 +609,7 @@ const dependencies = [
 	},
 	{
 		name: "typescript",
-		version: "4.3.5",
+		version: "4.5.4",
 		main: "lib/typescript.js"
 	}
 ];
@@ -918,10 +943,10 @@ async function updateConfig(sys, newOptions) {
 
 const isOutputTargetDocs = (o) => o.type === DOCS_README || o.type === DOCS_JSON || o.type === DOCS_CUSTOM || o.type === DOCS_VSCODE;
 const DOCS_CUSTOM = 'docs-custom';
-const DOCS_JSON = `docs-json`;
-const DOCS_README = `docs-readme`;
-const DOCS_VSCODE = `docs-vscode`;
-const WWW = `www`;
+const DOCS_JSON = 'docs-json';
+const DOCS_README = 'docs-readme';
+const DOCS_VSCODE = 'docs-vscode';
+const WWW = 'www';
 
 /**
  * Used to within taskBuild to provide the component_count property.
@@ -1258,7 +1283,14 @@ const IS_NODE_ENV = typeof global !== 'undefined' &&
     (!global.origin || typeof global.origin !== 'string');
 
 /**
- * Task to generate component boilerplate.
+ * Task to generate component boilerplate and write it to disk. This task can
+ * cause the program to exit with an error under various circumstances, such as
+ * being called in an inappropriate place, being asked to overwrite files that
+ * already exist, etc.
+ *
+ * @param coreCompiler the CoreCompiler we're using currently, here we're
+ * mainly accessing the `path` module
+ * @param config the user-supplied config, which we need here to access `.sys`.
  */
 const taskGenerate = async (coreCompiler, config) => {
     if (!IS_NODE_ENV) {
@@ -1288,10 +1320,16 @@ const taskGenerate = async (coreCompiler, config) => {
     const testFolder = extensionsToGenerate.some(isTest) ? 'test' : '';
     const outDir = path.join(absoluteSrcDir, 'components', dir, componentName);
     await config.sys.createDir(path.join(outDir, testFolder), { recursive: true });
-    const writtenFiles = await Promise.all(extensionsToGenerate.map((extension) => writeFileByExtension(coreCompiler, config, outDir, componentName, extension, extensionsToGenerate.includes('css')))).catch((error) => config.logger.error(error));
+    const filesToGenerate = extensionsToGenerate.map((extension) => ({
+        extension,
+        path: getFilepathForFile(coreCompiler, outDir, componentName, extension),
+    }));
+    await checkForOverwrite(filesToGenerate, config);
+    const writtenFiles = await Promise.all(filesToGenerate.map((file) => getBoilerplateAndWriteFile(config, componentName, extensionsToGenerate.includes('css'), file))).catch((error) => config.logger.error(error));
     if (!writtenFiles) {
         return config.sys.exit(1);
     }
+    // TODO(STENCIL-424): Investigate moving these console.log calls to config.logger.info
     console.log();
     console.log(`${config.logger.gray('$')} stencil generate ${input}`);
     console.log();
@@ -1301,6 +1339,9 @@ const taskGenerate = async (coreCompiler, config) => {
 };
 /**
  * Show a checkbox prompt to select the files to be generated.
+ *
+ * @returns a read-only array of `GenerableExtension`, the extensions that the user has decided
+ * to generate
  */
 const chooseFilesToGenerate = async () => {
     const { prompt } = await import('../sys/node/prompts.js');
@@ -1316,22 +1357,76 @@ const chooseFilesToGenerate = async () => {
     })).filesToGenerate;
 };
 /**
- * Get a file's boilerplate by its extension and write it to disk.
+ * Get a filepath for a file we want to generate!
+ *
+ * The filepath for a given file depends on the path, the user-supplied
+ * component name, the extension, and whether we're inside of a test directory.
+ *
+ * @param coreCompiler  the compiler we're using, here to acces the `.path` module
+ * @param path          path to where we're going to generate the component
+ * @param componentName the user-supplied name for the generated component
+ * @param extension     the file extension
+ * @returns the full filepath to the component (with a possible `test` directory
+ * added)
  */
-const writeFileByExtension = async (coreCompiler, config, path, name, extension, withCss) => {
-    if (isTest(extension)) {
-        path = coreCompiler.path.join(path, 'test');
-    }
-    const outFile = coreCompiler.path.join(path, `${name}.${extension}`);
-    const boilerplate = getBoilerplateByExtension(name, extension, withCss);
-    await config.sys.writeFile(outFile, boilerplate);
-    return outFile;
+const getFilepathForFile = (coreCompiler, path, componentName, extension) => isTest(extension)
+    ? coreCompiler.path.join(path, 'test', `${componentName}.${extension}`)
+    : coreCompiler.path.join(path, `${componentName}.${extension}`);
+/**
+ * Get the boilerplate for a file and write it to disk
+ *
+ * @param config        the current config, needed for file operations
+ * @param componentName the component name (user-supplied)
+ * @param withCss       are we generating CSS?
+ * @param file          the file we want to write
+ * @returns a `Promise<string>` which holds the full filepath we've written to,
+ * used to print out a little summary of our activity to the user.
+ */
+const getBoilerplateAndWriteFile = async (config, componentName, withCss, file) => {
+    const boilerplate = getBoilerplateByExtension(componentName, file.extension, withCss);
+    await config.sys.writeFile(file.path, boilerplate);
+    return file.path;
 };
+/**
+ * Check to see if any of the files we plan to write already exist and would
+ * therefore be overwritten if we proceed, because we'd like to not overwrite
+ * people's code!
+ *
+ * This function will check all the filepaths and if it finds any files log an
+ * error and exit with an error code. If it doesn't find anything it will just
+ * peacefully return `Promise<void>`.
+ *
+ * @param files  the files we want to check
+ * @param config the Config object, used here to get access to `sys.readFile`
+ */
+const checkForOverwrite = async (files, config) => {
+    const alreadyPresent = [];
+    await Promise.all(files.map(async ({ path }) => {
+        if ((await config.sys.readFile(path)) !== undefined) {
+            alreadyPresent.push(path);
+        }
+    }));
+    if (alreadyPresent.length > 0) {
+        config.logger.error('Generating code would overwrite the following files:', ...alreadyPresent.map((path) => '\t' + path));
+        await config.sys.exit(1);
+    }
+};
+/**
+ * Check if an extension is for a test
+ *
+ * @param extension the extension we want to check
+ * @returns a boolean indicating whether or not its a test
+ */
 const isTest = (extension) => {
     return extension === 'e2e.ts' || extension === 'spec.tsx';
 };
 /**
  * Get the boilerplate for a file by its extension.
+ *
+ * @param tagName the name of the component we're generating
+ * @param extension the file extension we want boilerplate for (.css, tsx, etc)
+ * @param withCss a boolean indicating whether we're generating a CSS file
+ * @returns a string container the file boilerplate for the supplied extension
  */
 const getBoilerplateByExtension = (tagName, extension, withCss) => {
     switch (extension) {
@@ -1421,7 +1516,7 @@ describe('${name}', () => {
 /**
  * Convert a dash case string to pascal case.
  */
-const toPascalCase = (str) => str.split('-').reduce((res, part) => res + part[0].toUpperCase() + part.substr(1), '');
+const toPascalCase = (str) => str.split('-').reduce((res, part) => res + part[0].toUpperCase() + part.slice(1), '');
 
 const taskTelemetry = async (config, sys, logger) => {
     const prompt = logger.dim(sys.details.platform === 'windows' ? '>' : '$');
@@ -1661,7 +1756,8 @@ const run = async (init) => {
     }
     catch (e) {
         if (!shouldIgnoreError(e)) {
-            logger.error(`uncaught cli error: ${e}${logger.getLevel() === 'debug' ? e.stack : ''}`);
+            const details = `${logger.getLevel() === 'debug' && e instanceof Error ? e.stack : ''}`;
+            logger.error(`uncaught cli error: ${e}${details}`);
             return sys.exit(1);
         }
     }

@@ -144,7 +144,7 @@ const pkgs = [
  */
 async function validateBuild(rootDir) {
     const dtsEntries = [];
-    const opts = options_1.getOptions(rootDir);
+    const opts = (0, options_1.getOptions)(rootDir);
     pkgs.forEach((testPkg) => {
         validatePackage(opts, testPkg, dtsEntries);
     });
@@ -164,8 +164,8 @@ exports.validateBuild = validateBuild;
 function validatePackage(opts, testPkg, dtsEntries) {
     const rootDir = opts.rootDir;
     if (testPkg.packageJson) {
-        testPkg.packageJson = path_1.join(rootDir, testPkg.packageJson);
-        const pkgDir = path_1.dirname(testPkg.packageJson);
+        testPkg.packageJson = (0, path_1.join)(rootDir, testPkg.packageJson);
+        const pkgDir = (0, path_1.dirname)(testPkg.packageJson);
         const pkgJson = require(testPkg.packageJson);
         if (!pkgJson.name) {
             throw new Error('missing package.json name: ' + testPkg.packageJson);
@@ -178,18 +178,18 @@ function validatePackage(opts, testPkg, dtsEntries) {
                 throw new Error(testPkg.packageJson + ' missing "files" property');
             }
             pkgJson.files.forEach((f) => {
-                if (f === '!**/*.map') {
-                    // skip sourcemaps
+                if (f === '!**/*.map' || f === '!**/*.stub.ts' || f === '!**/*.stub.tsx') {
+                    // skip sourcemaps, stub files
                     return;
                 }
-                const pkgFile = path_1.join(pkgDir, f);
+                const pkgFile = (0, path_1.join)(pkgDir, f);
                 fs_extra_1.default.accessSync(pkgFile);
             });
             testPkg.packageJsonFiles.forEach((testPkgFile) => {
                 if (!pkgJson.files.includes(testPkgFile)) {
                     throw new Error(testPkg.packageJson + ' missing file ' + testPkgFile);
                 }
-                const filePath = path_1.join(pkgDir, testPkgFile);
+                const filePath = (0, path_1.join)(pkgDir, testPkgFile);
                 fs_extra_1.default.accessSync(filePath);
             });
         }
@@ -198,29 +198,29 @@ function validatePackage(opts, testPkg, dtsEntries) {
         }
         if (pkgJson.bin) {
             Object.keys(pkgJson.bin).forEach((k) => {
-                const binExe = path_1.join(pkgDir, pkgJson.bin[k]);
+                const binExe = (0, path_1.join)(pkgDir, pkgJson.bin[k]);
                 fs_extra_1.default.accessSync(binExe);
             });
         }
-        const mainIndex = path_1.join(pkgDir, pkgJson.main);
+        const mainIndex = (0, path_1.join)(pkgDir, pkgJson.main);
         fs_extra_1.default.accessSync(mainIndex);
         if (pkgJson.module) {
-            const moduleIndex = path_1.join(pkgDir, pkgJson.module);
+            const moduleIndex = (0, path_1.join)(pkgDir, pkgJson.module);
             fs_extra_1.default.accessSync(moduleIndex);
         }
         if (pkgJson.browser) {
-            const browserIndex = path_1.join(pkgDir, pkgJson.browser);
+            const browserIndex = (0, path_1.join)(pkgDir, pkgJson.browser);
             fs_extra_1.default.accessSync(browserIndex);
         }
         if (pkgJson.types) {
-            const pkgTypes = path_1.join(pkgDir, pkgJson.types);
+            const pkgTypes = (0, path_1.join)(pkgDir, pkgJson.types);
             fs_extra_1.default.accessSync(pkgTypes);
             dtsEntries.push(pkgTypes);
         }
     }
     if (testPkg.files) {
         testPkg.files.forEach((file) => {
-            const filePath = path_1.join(rootDir, file);
+            const filePath = (0, path_1.join)(rootDir, file);
             fs_extra_1.default.statSync(filePath);
         });
     }
@@ -234,9 +234,9 @@ function validateDts(opts, dtsEntries) {
     const program = typescript_1.default.createProgram(dtsEntries, {
         baseUrl: '.',
         paths: {
-            '@stencil/core/mock-doc': [path_1.join(opts.rootDir, 'mock-doc', 'index.d.ts')],
-            '@stencil/core/internal': [path_1.join(opts.rootDir, 'internal', 'index.d.ts')],
-            '@stencil/core/internal/testing': [path_1.join(opts.rootDir, 'internal', 'testing', 'index.d.ts')],
+            '@stencil/core/mock-doc': [(0, path_1.join)(opts.rootDir, 'mock-doc', 'index.d.ts')],
+            '@stencil/core/internal': [(0, path_1.join)(opts.rootDir, 'internal', 'index.d.ts')],
+            '@stencil/core/internal/testing': [(0, path_1.join)(opts.rootDir, 'internal', 'testing', 'index.d.ts')],
         },
     });
     const tsDiagnostics = program.getSemanticDiagnostics().concat(program.getSyntacticDiagnostics());
@@ -256,9 +256,9 @@ function validateDts(opts, dtsEntries) {
  * @param opts build options to be used to validate the compiler
  */
 async function validateCompiler(opts) {
-    const compilerPath = path_1.join(opts.output.compilerDir, 'stencil.js');
-    const cliPath = path_1.join(opts.output.cliDir, 'index.cjs');
-    const sysNodePath = path_1.join(opts.output.sysNodeDir, 'index.js');
+    const compilerPath = (0, path_1.join)(opts.output.compilerDir, 'stencil.js');
+    const cliPath = (0, path_1.join)(opts.output.cliDir, 'index.cjs');
+    const sysNodePath = (0, path_1.join)(opts.output.sysNodeDir, 'index.js');
     const compiler = await Promise.resolve().then(() => __importStar(require(compilerPath)));
     const cli = await Promise.resolve().then(() => __importStar(require(cliPath)));
     const sysNodeApi = await Promise.resolve().then(() => __importStar(require(sysNodePath)));
@@ -301,14 +301,14 @@ async function validateCompiler(opts) {
  * @param opts build options to be used to validate treeshaking
  */
 async function validateTreeshaking(opts) {
-    await validateModuleTreeshake(opts, 'app-data', path_1.join(opts.output.internalDir, 'app-data', 'index.js'));
-    await validateModuleTreeshake(opts, 'client', path_1.join(opts.output.internalDir, 'client', 'index.js'));
-    await validateModuleTreeshake(opts, 'patch-browser', path_1.join(opts.output.internalDir, 'client', 'patch-browser.js'));
-    await validateModuleTreeshake(opts, 'patch-esm', path_1.join(opts.output.internalDir, 'client', 'patch-esm.js'));
-    await validateModuleTreeshake(opts, 'shadow-css', path_1.join(opts.output.internalDir, 'client', 'shadow-css.js'));
-    await validateModuleTreeshake(opts, 'hydrate', path_1.join(opts.output.internalDir, 'hydrate', 'index.js'));
-    await validateModuleTreeshake(opts, 'stencil-core', path_1.join(opts.output.internalDir, 'stencil-core', 'index.js'));
-    await validateModuleTreeshake(opts, 'cli', path_1.join(opts.output.cliDir, 'index.js'));
+    await validateModuleTreeshake(opts, 'app-data', (0, path_1.join)(opts.output.internalDir, 'app-data', 'index.js'));
+    await validateModuleTreeshake(opts, 'client', (0, path_1.join)(opts.output.internalDir, 'client', 'index.js'));
+    await validateModuleTreeshake(opts, 'patch-browser', (0, path_1.join)(opts.output.internalDir, 'client', 'patch-browser.js'));
+    await validateModuleTreeshake(opts, 'patch-esm', (0, path_1.join)(opts.output.internalDir, 'client', 'patch-esm.js'));
+    await validateModuleTreeshake(opts, 'shadow-css', (0, path_1.join)(opts.output.internalDir, 'client', 'shadow-css.js'));
+    await validateModuleTreeshake(opts, 'hydrate', (0, path_1.join)(opts.output.internalDir, 'hydrate', 'index.js'));
+    await validateModuleTreeshake(opts, 'stencil-core', (0, path_1.join)(opts.output.internalDir, 'stencil-core', 'index.js'));
+    await validateModuleTreeshake(opts, 'cli', (0, path_1.join)(opts.output.cliDir, 'index.js'));
 }
 /**
  * Validates treeshaking for a single module & entrypoint
@@ -320,8 +320,8 @@ async function validateModuleTreeshake(opts, moduleName, entryModulePath) {
     // this is a song, 'agadoo' by Black Lace
     const virtualInputId = `@g@doo`;
     const entryId = `@entry-module`;
-    const outputFile = path_1.join(opts.scriptsBuildDir, `treeshake_${moduleName}.js`);
-    const bundle = await rollup_1.rollup({
+    const outputFile = (0, path_1.join)(opts.scriptsBuildDir, `treeshake_${moduleName}.js`);
+    const bundle = await (0, rollup_1.rollup)({
         input: virtualInputId,
         treeshake: true,
         plugins: [
@@ -329,10 +329,10 @@ async function validateModuleTreeshake(opts, moduleName, entryModulePath) {
                 name: 'stencilResolver',
                 resolveId(id) {
                     if (id === '@stencil/core/internal/client' || id === '@stencil/core') {
-                        return path_1.join(opts.output.internalDir, 'client', 'index.js');
+                        return (0, path_1.join)(opts.output.internalDir, 'client', 'index.js');
                     }
                     if (id === '@stencil/core/internal/app-data') {
-                        return path_1.join(opts.output.internalDir, 'app-data', 'index.js');
+                        return (0, path_1.join)(opts.output.internalDir, 'app-data', 'index.js');
                     }
                     if (id === '@stencil/core/internal/app-globals') {
                         return id;
@@ -370,5 +370,5 @@ async function validateModuleTreeshake(opts, moduleName, entryModulePath) {
         console.error(`\nTreeshake output: ${outputFile}\n`);
         throw new Error(`🧨  Not all code was not treeshaken (treeshooken? treeshaked?)`);
     }
-    console.log(`🌳  validated treeshake: ${path_1.relative(opts.rootDir, entryModulePath)}`);
+    console.log(`🌳  validated treeshake: ${(0, path_1.relative)(opts.rootDir, entryModulePath)}`);
 }

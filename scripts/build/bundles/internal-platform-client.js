@@ -16,27 +16,27 @@ const glob_1 = __importDefault(require("glob"));
 const typescript_1 = __importDefault(require("typescript"));
 const terser_1 = require("terser");
 async function internalClient(opts) {
-    const inputClientDir = path_1.join(opts.buildDir, 'client');
-    const outputInternalClientDir = path_1.join(opts.output.internalDir, 'client');
-    const outputInternalClientPolyfillsDir = path_1.join(outputInternalClientDir, 'polyfills');
+    const inputClientDir = (0, path_1.join)(opts.buildDir, 'client');
+    const outputInternalClientDir = (0, path_1.join)(opts.output.internalDir, 'client');
+    const outputInternalClientPolyfillsDir = (0, path_1.join)(outputInternalClientDir, 'polyfills');
     await fs_extra_1.default.emptyDir(outputInternalClientDir);
     await fs_extra_1.default.emptyDir(outputInternalClientPolyfillsDir);
     await copyPolyfills(opts, outputInternalClientPolyfillsDir);
     // write @stencil/core/internal/client/package.json
-    write_pkg_json_1.writePkgJson(opts, outputInternalClientDir, {
+    (0, write_pkg_json_1.writePkgJson)(opts, outputInternalClientDir, {
         name: '@stencil/core/internal/client',
         description: 'Stencil internal client platform to be imported by the Stencil Compiler and internal runtime. Breaking changes can and will happen at any time.',
         main: 'index.js',
         sideEffects: false,
     });
     const internalClientBundle = {
-        input: path_1.join(inputClientDir, 'index.js'),
+        input: (0, path_1.join)(inputClientDir, 'index.js'),
         output: {
             format: 'es',
             dir: outputInternalClientDir,
             entryFileNames: '[name].js',
             chunkFileNames: '[name].js',
-            banner: banner_1.getBanner(opts, 'Stencil Client Platform'),
+            banner: (0, banner_1.getBanner)(opts, 'Stencil Client Platform'),
             preferConst: true,
         },
         treeshake: {
@@ -48,23 +48,23 @@ async function internalClient(opts) {
                 name: 'internalClientPlugin',
                 resolveId(importee) {
                     if (importee === '@platform') {
-                        return path_1.join(inputClientDir, 'index.js');
+                        return (0, path_1.join)(inputClientDir, 'index.js');
                     }
                 },
             },
-            alias_plugin_1.aliasPlugin(opts),
-            replace_plugin_1.replacePlugin(opts),
-            reorder_statements_1.reorderCoreStatementsPlugin(),
+            (0, alias_plugin_1.aliasPlugin)(opts),
+            (0, replace_plugin_1.replacePlugin)(opts),
+            (0, reorder_statements_1.reorderCoreStatementsPlugin)(),
         ],
     };
     const internalClientPatchBrowserBundle = {
-        input: path_1.join(inputClientDir, 'client-patch-browser.js'),
+        input: (0, path_1.join)(inputClientDir, 'client-patch-browser.js'),
         output: {
             format: 'es',
             dir: outputInternalClientDir,
             entryFileNames: 'patch-browser.js',
             chunkFileNames: '[name].js',
-            banner: banner_1.getBanner(opts, 'Stencil Client Patch Browser'),
+            banner: (0, banner_1.getBanner)(opts, 'Stencil Client Patch Browser'),
             preferConst: true,
         },
         treeshake: {
@@ -94,8 +94,8 @@ async function internalClient(opts) {
                 async load(id) {
                     // bundle the css-shim into one file
                     if (id === './polyfills/css-shim.js') {
-                        const rollupBuild = await rollup_1.rollup({
-                            input: path_1.join(inputClientDir, 'polyfills', 'css-shim', 'index.js'),
+                        const rollupBuild = await (0, rollup_1.rollup)({
+                            input: (0, path_1.join)(inputClientDir, 'polyfills', 'css-shim', 'index.js'),
                             onwarn: (message) => {
                                 if (/top level of an ES module/.test(message))
                                     return;
@@ -110,10 +110,10 @@ async function internalClient(opts) {
                         });
                         let code = transpileToEs5.outputText;
                         if (opts.isProd) {
-                            const minifyResults = await terser_1.minify(code);
+                            const minifyResults = await (0, terser_1.minify)(code);
                             code = minifyResults.code;
                         }
-                        const dest = path_1.join(outputInternalClientPolyfillsDir, 'css-shim.js');
+                        const dest = (0, path_1.join)(outputInternalClientPolyfillsDir, 'css-shim.js');
                         await fs_extra_1.default.writeFile(dest, code);
                         return code;
                     }
@@ -124,36 +124,36 @@ async function internalClient(opts) {
                 name: 'internalClientRuntimePolyfills',
                 resolveId(importee) {
                     if (importee.startsWith('./polyfills')) {
-                        const fileName = path_1.basename(importee);
-                        return path_1.join(opts.srcDir, 'client', 'polyfills', fileName);
+                        const fileName = (0, path_1.basename)(importee);
+                        return (0, path_1.join)(opts.srcDir, 'client', 'polyfills', fileName);
                     }
                     return null;
                 },
             },
-            alias_plugin_1.aliasPlugin(opts),
-            replace_plugin_1.replacePlugin(opts),
-            reorder_statements_1.reorderCoreStatementsPlugin(),
+            (0, alias_plugin_1.aliasPlugin)(opts),
+            (0, replace_plugin_1.replacePlugin)(opts),
+            (0, reorder_statements_1.reorderCoreStatementsPlugin)(),
         ],
     };
     const internalClientPatchEsmBundle = Object.assign({}, internalClientPatchBrowserBundle);
-    internalClientPatchEsmBundle.input = path_1.join(inputClientDir, 'client-patch-esm.js');
+    internalClientPatchEsmBundle.input = (0, path_1.join)(inputClientDir, 'client-patch-esm.js');
     internalClientPatchEsmBundle.output = {
         format: 'es',
         dir: outputInternalClientDir,
         entryFileNames: 'patch-esm.js',
         chunkFileNames: '[name].js',
-        banner: banner_1.getBanner(opts, 'Stencil Client Patch Esm'),
+        banner: (0, banner_1.getBanner)(opts, 'Stencil Client Patch Esm'),
         preferConst: true,
     };
     return [internalClientBundle, internalClientPatchBrowserBundle, internalClientPatchEsmBundle];
 }
 exports.internalClient = internalClient;
 async function copyPolyfills(opts, outputInternalClientPolyfillsDir) {
-    const srcPolyfillsDir = path_1.join(opts.srcDir, 'client', 'polyfills');
+    const srcPolyfillsDir = (0, path_1.join)(opts.srcDir, 'client', 'polyfills');
     const srcPolyfillFiles = glob_1.default.sync('*.js', { cwd: srcPolyfillsDir });
     await Promise.all(srcPolyfillFiles.map(async (fileName) => {
-        const src = path_1.join(srcPolyfillsDir, fileName);
-        const dest = path_1.join(outputInternalClientPolyfillsDir, fileName);
+        const src = (0, path_1.join)(srcPolyfillsDir, fileName);
+        const dest = (0, path_1.join)(outputInternalClientPolyfillsDir, fileName);
         await fs_extra_1.default.copyFile(src, dest);
     }));
 }

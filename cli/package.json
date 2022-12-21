@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core/cli",
-  "version": "0.0.0-dev.20220322081806",
+  "version": "0.0.0-dev.20221221154011",
   "description": "Stencil CLI.",
   "main": "./index.cjs",
   "module": "./index.js",

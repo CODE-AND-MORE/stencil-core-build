@@ -23,13 +23,13 @@ const rollup_1 = require("rollup");
 async function run(rootDir, args) {
     try {
         if (args.includes('--release')) {
-            await release_1.release(rootDir, args);
+            await (0, release_1.release)(rootDir, args);
         }
         if (args.includes('--license')) {
-            license_1.createLicense(rootDir);
+            (0, license_1.createLicense)(rootDir);
         }
         if (args.includes('--validate-build')) {
-            await validate_build_1.validateBuild(rootDir);
+            await (0, validate_build_1.validateBuild)(rootDir);
         }
     }
     catch (e) {
@@ -45,25 +45,25 @@ exports.run = run;
  */
 async function createBuild(opts) {
     await Promise.all([
-        fs_extra_1.emptyDir(opts.output.cliDir),
-        fs_extra_1.emptyDir(opts.output.compilerDir),
-        fs_extra_1.emptyDir(opts.output.devServerDir),
-        fs_extra_1.emptyDir(opts.output.internalDir),
-        fs_extra_1.emptyDir(opts.output.mockDocDir),
-        fs_extra_1.emptyDir(opts.output.sysNodeDir),
-        fs_extra_1.emptyDir(opts.output.testingDir),
-        dependencies_json_1.updateDependenciesJson(opts),
+        (0, fs_extra_1.emptyDir)(opts.output.cliDir),
+        (0, fs_extra_1.emptyDir)(opts.output.compilerDir),
+        (0, fs_extra_1.emptyDir)(opts.output.devServerDir),
+        (0, fs_extra_1.emptyDir)(opts.output.internalDir),
+        (0, fs_extra_1.emptyDir)(opts.output.mockDocDir),
+        (0, fs_extra_1.emptyDir)(opts.output.sysNodeDir),
+        (0, fs_extra_1.emptyDir)(opts.output.testingDir),
+        (0, dependencies_json_1.updateDependenciesJson)(opts),
     ]);
-    await sys_node_1.sysNodeExternalBundles(opts);
+    await (0, sys_node_1.sysNodeExternalBundles)(opts);
     const bundles = await Promise.all([
-        cli_1.cli(opts),
-        compiler_1.compiler(opts),
-        dev_server_1.devServer(opts),
-        internal_1.internal(opts),
-        mock_doc_1.mockDoc(opts),
-        screenshot_1.screenshot(opts),
-        testing_1.testing(opts),
-        sys_node_1.sysNode(opts),
+        (0, cli_1.cli)(opts),
+        (0, compiler_1.compiler)(opts),
+        (0, dev_server_1.devServer)(opts),
+        (0, internal_1.internal)(opts),
+        (0, mock_doc_1.mockDoc)(opts),
+        (0, screenshot_1.screenshot)(opts),
+        (0, testing_1.testing)(opts),
+        (0, sys_node_1.sysNode)(opts),
     ]);
     return bundles.flat();
 }
@@ -76,7 +76,7 @@ async function bundleBuild(opts) {
     const bundles = await createBuild(opts);
     await Promise.all(bundles.map(async (rollupOption) => {
         rollupOption.onwarn = () => { };
-        const bundle = await rollup_1.rollup(rollupOption);
+        const bundle = await (0, rollup_1.rollup)(rollupOption);
         if (Array.isArray(rollupOption.output)) {
             await Promise.all(rollupOption.output.map(async (output) => {
                 await bundle.write(output);

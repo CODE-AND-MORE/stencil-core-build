@@ -44,22 +44,22 @@ exports.inlinedCompilerDepsPlugin = inlinedCompilerDepsPlugin;
  * @returns the bundled dependencies
  */
 async function bundleCompilerDeps(opts, inputDir) {
-    const cacheFile = path_1.join(opts.buildDir, 'compiler-deps-bundle-cache.js');
+    const cacheFile = (0, path_1.join)(opts.buildDir, 'compiler-deps-bundle-cache.js');
     if (!opts.isProd) {
         try {
             return await fs_extra_1.default.readFile(cacheFile, 'utf8');
         }
         catch (e) { }
     }
-    const build = await rollup_1.rollup({
-        input: path_1.join(inputDir, 'sys', 'modules', 'compiler-deps.js'),
+    const build = await (0, rollup_1.rollup)({
+        input: (0, path_1.join)(inputDir, 'sys', 'modules', 'compiler-deps.js'),
         external: ['fs', 'module', 'path', 'util', 'resolve'],
         plugins: [
-            plugin_node_resolve_1.default({
+            (0, plugin_node_resolve_1.default)({
                 preferBuiltins: false,
             }),
-            plugin_commonjs_1.default(),
-            plugin_json_1.default({
+            (0, plugin_commonjs_1.default)(),
+            (0, plugin_json_1.default)({
                 preferConst: true,
             }),
         ],

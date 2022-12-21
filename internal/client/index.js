@@ -11,7 +11,7 @@ let renderingRef = null;
 let queueCongestion = 0;
 let queuePending = false;
 /*
- Stencil Client Platform v0.0.0-dev.20220322081806 | MIT Licensed | https://stenciljs.com
+ Stencil Client Platform v0.0.0-dev.20221221154011 | MIT Licensed | https://stenciljs.com
  */
 import { BUILD, NAMESPACE } from '@stencil/core/internal/app-data';
 const win = typeof window !== 'undefined' ? window : {};
@@ -234,7 +234,7 @@ const registerStyle = (scopeId, cssText, allowCS) => {
 };
 const addStyle = (styleContainerNode, cmpMeta, mode, hostElm) => {
     let scopeId = getScopeId(cmpMeta, mode);
-    let style = styles.get(scopeId);
+    const style = styles.get(scopeId);
     if (!BUILD.attachStyles) {
         return scopeId;
     }
@@ -353,7 +353,7 @@ const h = (nodeName, vnodeData, ...children) => {
     let slotName = null;
     let simple = false;
     let lastSimple = false;
-    let vNodeChildren = [];
+    const vNodeChildren = [];
     const walk = (c) => {
         for (let i = 0; i < c.length; i++) {
             child = c[i];
@@ -594,7 +594,7 @@ const setAccessor = (elm, memberName, oldValue, newValue, isSvg, flags) => {
             if ((isProp || (isComplex && newValue !== null)) && !isSvg) {
                 try {
                     if (!elm.tagName.includes('-')) {
-                        let n = newValue == null ? '' : newValue;
+                        const n = newValue == null ? '' : newValue;
                         // Workaround for Safari, moving the <input> caret when re-assigning the same valued
                         if (memberName === 'list') {
                             isProp = false;
@@ -671,7 +671,7 @@ const updateElement = (oldVnode, newVnode, isSvgMode, memberName) => {
 };
 const createElm = (oldParentVNode, newParentVNode, childIndex, parentElm) => {
     // tslint:disable-next-line: prefer-const
-    let newVNode = newParentVNode.$children$[childIndex];
+    const newVNode = newParentVNode.$children$[childIndex];
     let i = 0;
     let elm;
     let childNode;
@@ -1014,7 +1014,7 @@ const patch = (oldVNode, newVNode) => {
 };
 const updateFallbackSlotVisibility = (elm) => {
     // tslint:disable-next-line: prefer-const
-    let childNodes = elm.childNodes;
+    const childNodes = elm.childNodes;
     let childNode;
     let i;
     let ilen;
@@ -1067,8 +1067,8 @@ const relocateSlotContent = (elm) => {
     let relocateNodeData;
     let j;
     let i = 0;
-    let childNodes = elm.childNodes;
-    let ilen = childNodes.length;
+    const childNodes = elm.childNodes;
+    const ilen = childNodes.length;
     for (; i < ilen; i++) {
         childNode = childNodes[i];
         if (childNode['s-sr'] && (node = childNode['s-cr']) && node.parentNode) {
@@ -1818,6 +1818,29 @@ const initializeDocumentHydrate = (node, orgLocNodes) => {
         }
     }
 };
+/**
+ * Parse a new property value for a given property type.
+ *
+ * While the prop value can reasonably be expected to be of `any` type as far as TypeScript's type checker is concerned,
+ * it is not safe to assume that the string returned by evaluating `typeof propValue` matches:
+ *   1. `any`, the type given to `propValue` in the function signature
+ *   2. the type stored from `propType`.
+ *
+ * This function provides the capability to parse/coerce a property's value to potentially any other JavaScript type.
+ *
+ * Property values represented in TSX preserve their type information. In the example below, the number 0 is passed to
+ * a component. This `propValue` will preserve its type information (`typeof propValue === 'number'`). Note that is
+ * based on the type of the value being passed in, not the type declared of the class member decorated with `@Prop`.
+ * ```tsx
+ * <my-cmp prop-val={0}></my-cmp>
+ * ```
+ *
+ * HTML prop values on the other hand, will always a string
+ *
+ * @param propValue the new value to coerce to some type
+ * @param propType the type of the prop, expressed as a binary number
+ * @returns the parsed/coerced value
+ */
 const parsePropertyValue = (propValue, propType) => {
     // ensure this value is of the correct prop type
     if (propValue != null && !isComplexType(propValue)) {
@@ -1851,7 +1874,10 @@ const setValue = (ref, propName, newVal, cmpMeta) => {
     const flags = hostRef.$flags$;
     const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm;
     newVal = parsePropertyValue(newVal, cmpMeta.$members$[propName][0]);
-    if ((!BUILD.lazyLoad || !(flags & 8 /* isConstructingInstance */) || oldVal === undefined) && newVal !== oldVal) {
+    // explicitly check for NaN on both sides, as `NaN === NaN` is always false
+    const areBothNaN = Number.isNaN(oldVal) && Number.isNaN(newVal);
+    const didValueChange = newVal !== oldVal && !areBothNaN;
+    if ((!BUILD.lazyLoad || !(flags & 8 /* isConstructingInstance */) || oldVal === undefined) && didValueChange) {
         // gadzooks! the property's value has changed!!
         // set our new value!
         hostRef.$instanceValues$.set(propName, newVal);
@@ -2369,7 +2395,7 @@ const patchCloneNode = (HostElementPrototype) => {
         if (BUILD.slot && !isShadowDom && deep) {
             let i = 0;
             let slotted, nonStencilNode;
-            let stencilPrivates = [
+            const stencilPrivates = [
                 's-id',
                 's-cr',
                 's-lr',
@@ -2936,7 +2962,9 @@ const loadModule = (cmpMeta, hostRef, hmrVersionId) => {
     if (module) {
         return module[exportName];
     }
+    /*!__STENCIL_STATIC_IMPORT_SWITCH__*/
     return import(
+    /* @vite-ignore */
     /* webpackInclude: /\.entry\.js$/ */
     /* webpackExclude: /\.system\.entry\.js$/ */
     /* webpackMode: "lazy" */
