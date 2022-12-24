@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -23,11 +27,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateBuild = void 0;
-const path_1 = require("path");
 const fs_extra_1 = __importDefault(require("fs-extra"));
-const options_1 = require("../utils/options");
+const path_1 = require("path");
 const rollup_1 = require("rollup");
 const typescript_1 = __importDefault(require("typescript"));
+const options_1 = require("../utils/options");
 /**
  * Used to triple check that the final build files
  * ready to be published are good to go
@@ -256,12 +260,13 @@ function validateDts(opts, dtsEntries) {
  * @param opts build options to be used to validate the compiler
  */
 async function validateCompiler(opts) {
+    var _a, _b, _c;
     const compilerPath = (0, path_1.join)(opts.output.compilerDir, 'stencil.js');
     const cliPath = (0, path_1.join)(opts.output.cliDir, 'index.cjs');
     const sysNodePath = (0, path_1.join)(opts.output.sysNodeDir, 'index.js');
-    const compiler = await Promise.resolve().then(() => __importStar(require(compilerPath)));
-    const cli = await Promise.resolve().then(() => __importStar(require(cliPath)));
-    const sysNodeApi = await Promise.resolve().then(() => __importStar(require(sysNodePath)));
+    const compiler = await (_a = compilerPath, Promise.resolve().then(() => __importStar(require(_a))));
+    const cli = await (_b = cliPath, Promise.resolve().then(() => __importStar(require(_b))));
+    const sysNodeApi = await (_c = sysNodePath, Promise.resolve().then(() => __importStar(require(_c))));
     const nodeLogger = sysNodeApi.createNodeLogger({ process });
     const nodeSys = sysNodeApi.createNodeSys({ process });
     if (!nodeSys || nodeSys.name !== 'node' || nodeSys.version.length < 4) {

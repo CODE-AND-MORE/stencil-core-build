@@ -4,16 +4,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.internalHydrate = void 0;
-const fs_extra_1 = __importDefault(require("fs-extra"));
-const path_1 = require("path");
-const bundle_dts_1 = require("../utils/bundle-dts");
-const alias_plugin_1 = require("./plugins/alias-plugin");
-const replace_plugin_1 = require("./plugins/replace-plugin");
-const banner_1 = require("../utils/banner");
 const plugin_commonjs_1 = __importDefault(require("@rollup/plugin-commonjs"));
 const plugin_node_resolve_1 = __importDefault(require("@rollup/plugin-node-resolve"));
+const fs_extra_1 = __importDefault(require("fs-extra"));
+const path_1 = require("path");
+const banner_1 = require("../utils/banner");
+const bundle_dts_1 = require("../utils/bundle-dts");
 const write_pkg_json_1 = require("../utils/write-pkg-json");
+const alias_plugin_1 = require("./plugins/alias-plugin");
 const pretty_minify_1 = require("./plugins/pretty-minify");
+const replace_plugin_1 = require("./plugins/replace-plugin");
 async function internalHydrate(opts) {
     const inputHydrateDir = (0, path_1.join)(opts.buildDir, 'hydrate');
     const outputInternalHydrateDir = (0, path_1.join)(opts.output.internalDir, 'hydrate');

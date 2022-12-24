@@ -1,10 +1,10 @@
 /*!
- Stencil Dev Server v0.0.0-dev.20221221203401 | MIT Licensed | https://stenciljs.com
+ Stencil Dev Server v0.0.0-dev.20221221224028 | MIT Licensed | https://stenciljs.com
  */
 'use strict';
 
-const child_process = require('child_process');
 const path = require('path');
+const child_process = require('child_process');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 

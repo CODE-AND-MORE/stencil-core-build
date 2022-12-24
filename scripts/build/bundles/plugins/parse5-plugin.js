@@ -4,13 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parse5Plugin = void 0;
-const fs_extra_1 = __importDefault(require("fs-extra"));
-const alias_plugin_1 = require("./alias-plugin");
-const path_1 = require("path");
 const plugin_commonjs_1 = __importDefault(require("@rollup/plugin-commonjs"));
 const plugin_node_resolve_1 = __importDefault(require("@rollup/plugin-node-resolve"));
+const fs_extra_1 = __importDefault(require("fs-extra"));
+const path_1 = require("path");
 const rollup_1 = require("rollup");
 const terser_1 = require("terser");
+const alias_plugin_1 = require("./alias-plugin");
 /**
  * Bundles parse5, an HTML serializer & parser, into the compiler
  * @param opts the options being used during a build of the Stencil compiler

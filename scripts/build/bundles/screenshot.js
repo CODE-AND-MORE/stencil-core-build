@@ -4,14 +4,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.screenshot = void 0;
-const fs_extra_1 = __importDefault(require("fs-extra"));
-const path_1 = require("path");
 const plugin_commonjs_1 = __importDefault(require("@rollup/plugin-commonjs"));
 const plugin_node_resolve_1 = __importDefault(require("@rollup/plugin-node-resolve"));
+const fs_extra_1 = __importDefault(require("fs-extra"));
+const path_1 = require("path");
+const write_pkg_json_1 = require("../utils/write-pkg-json");
 const alias_plugin_1 = require("./plugins/alias-plugin");
 const relative_path_plugin_1 = require("./plugins/relative-path-plugin");
 const replace_plugin_1 = require("./plugins/replace-plugin");
-const write_pkg_json_1 = require("../utils/write-pkg-json");
 async function screenshot(opts) {
     const inputScreenshotDir = (0, path_1.join)(opts.buildDir, 'screenshot');
     // copy @stencil/core/screenshot/index.d.ts

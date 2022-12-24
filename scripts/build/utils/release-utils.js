@@ -4,12 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postGithubRelease = exports.updateChangeLog = exports.prettyVersionDiff = exports.getNewVersion = exports.isPrereleaseVersion = exports.isValidVersionInput = exports.isValidVersion = exports.PRERELEASE_VERSIONS = exports.SEMVER_INCREMENTS = void 0;
-const fs_extra_1 = __importDefault(require("fs-extra"));
-const execa_1 = __importDefault(require("execa"));
 const ansi_colors_1 = __importDefault(require("ansi-colors"));
-const semver_1 = __importDefault(require("semver"));
+const execa_1 = __importDefault(require("execa"));
+const fs_extra_1 = __importDefault(require("fs-extra"));
 const open_1 = __importDefault(require("open"));
 const path_1 = require("path");
+const semver_1 = __importDefault(require("semver"));
 exports.SEMVER_INCREMENTS = [
     'patch',
     'minor',
@@ -40,7 +40,7 @@ exports.isValidVersionInput = isValidVersionInput;
 /**
  * Determines if the provided `version` is a semver pre-release or not
  * @param version the version string to evaluate
- * @retuns true if the `version` is a pre-release, false otherwise
+ * @returns true if the `version` is a pre-release, false otherwise
  */
 const isPrereleaseVersion = (version) => exports.PRERELEASE_VERSIONS.indexOf(version) !== -1 || Boolean(semver_1.default.prerelease(version));
 exports.isPrereleaseVersion = isPrereleaseVersion;

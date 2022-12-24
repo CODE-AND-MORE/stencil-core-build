@@ -88,61 +88,10 @@ function stopAutoApplyChanges() {
  isAutoApplyingChanges = !1, autoApplyTimer && (clearTimeout(autoApplyTimer), autoApplyTimer = void 0);
 }
 
-const appData = require("@stencil/core/internal/app-data"), mockDoc = require("@stencil/core/mock-doc"), styles = new Map, modeResolutionChain = [], cstrs = new Map, queuedTicks = [], queuedWriteTasks = [], queuedReadTasks = [], moduleLoaded = new Map, queuedLoadModules = [], caughtErrors = [], hostRefs = new Map;
-
-let customError;
-
-const defaultConsoleError = e => {
- caughtErrors.push(e);
-}, consoleError = (e, t) => (customError || defaultConsoleError)(e, t), consoleDevError = (...e) => {
- caughtErrors.push(new Error(e.join(", ")));
-}, consoleDevWarn = (...e) => {
- const t = e.filter((e => "string" == typeof e || "number" == typeof e || "boolean" == typeof e));
- console.warn.apply(console, t);
-}, nextTick = e => {
- queuedTicks.push(e);
-}, win = mockDoc.setupGlobal(global), doc = win.document;
-
-exports.supportsShadow = !0;
-
-const plt = {
- $flags$: 0,
- $resourcesUrl$: "",
- jmp: e => e(),
- raf: e => requestAnimationFrame(e),
- ael: (e, t, a, o) => e.addEventListener(t, a, o),
- rel: (e, t, a, o) => e.removeEventListener(t, a, o),
- ce: (e, t) => new win.CustomEvent(e, t)
-}, Context = {};
-
-let autoApplyTimer, isAutoApplyingChanges = !1;
-
-const isMemberInElement = (e, t) => {
- if (null != e) {
-  if (t in e) return !0;
-  const a = e.nodeName;
-  if (a) {
-   const e = cstrs.get(a.toLowerCase());
-   if (null != e && null != e.COMPILER_META && null != e.COMPILER_META.properties) return e.COMPILER_META.properties.some((e => e.name === t));
-  }
- }
- return !1;
-}, addHostEventListeners = (e, t, a, o) => {
- appData.BUILD.hostListener && a && (appData.BUILD.hostListenerTargetParent && (a = o ? a.filter((([e]) => 32 & e)) : a.filter((([e]) => !(32 & e)))), 
- a.map((([a, o, s]) => {
-  const n = appData.BUILD.hostListenerTarget ? getHostListenerTarget(e, a) : e, l = hostListenerProxy(t, s), r = hostListenerOpts(a);
-  plt.ael(n, o, l, r), (t.$rmListeners$ = t.$rmListeners$ || []).push((() => plt.rel(n, o, l, r)));
- })));
-}, hostListenerProxy = (e, t) => a => {
- try {
-  appData.BUILD.lazyLoad ? 256 & e.$flags$ ? e.$lazyInstance$[t](a) : (e.$queuedListeners$ = e.$queuedListeners$ || []).push([ t, a ]) : e.$hostElement$[t](a);
- } catch (e) {
-  consoleError(e);
- }
-}, getHostListenerTarget = (e, t) => appData.BUILD.hostListenerTargetDocument && 4 & t ? doc : appData.BUILD.hostListenerTargetWindow && 8 & t ? win : appData.BUILD.hostListenerTargetBody && 16 & t ? doc.body : appData.BUILD.hostListenerTargetParent && 32 & t ? e.parentElement : e, hostListenerOpts = e => ({
- passive: 0 != (1 & e),
- capture: 0 != (2 & e)
-}), XLINK_NS = "http://www.w3.org/1999/xlink";
+const mockDoc = require("@stencil/core/mock-doc"), appData = require("@stencil/core/internal/app-data"), styles = new Map, modeResolutionChain = [], cstrs = new Map, queuedTicks = [], queuedWriteTasks = [], queuedReadTasks = [], moduleLoaded = new Map, queuedLoadModules = [], caughtErrors = [], hostRefs = new Map, getAssetPath = e => {
+ const t = new URL(e, plt.$resourcesUrl$);
+ return t.origin !== win.location.origin ? t.href : t.pathname;
+};
 
 let i = 0;
 
@@ -152,36 +101,7 @@ const createTime = (e, t = "") => {
   return performance.mark(a), () => performance.measure(`[Stencil] ${e}() <${t}>`, a);
  }
  return () => {};
-}, rootAppliedStyles = new WeakMap, registerStyle = (e, t, a) => {
- let o = styles.get(e);
- o = t, styles.set(e, o);
-}, addStyle = (e, t, a, o) => {
- let s = getScopeId(t, a);
- const n = styles.get(s);
- if (!appData.BUILD.attachStyles) return s;
- if (e = 11 === e.nodeType ? e : doc, n) if ("string" == typeof n) {
-  e = e.head || e;
-  let a, l = rootAppliedStyles.get(e);
-  if (l || rootAppliedStyles.set(e, l = new Set), !l.has(s)) {
-   if (appData.BUILD.hydrateClientSide && e.host && (a = e.querySelector(`[sty-id="${s}"]`))) a.innerHTML = n; else {
-    if (appData.BUILD.cssVarShim && plt.$cssShim$) {
-     a = plt.$cssShim$.createHostStyle(o, s, n, !!(10 & t.$flags$));
-     const e = a["s-sc"];
-     e && (s = e, l = null);
-    } else a = doc.createElement("style"), a.innerHTML = n;
-    (appData.BUILD.hydrateServerSide || appData.BUILD.hotModuleReplacement) && a.setAttribute("sty-id", s), 
-    e.insertBefore(a, e.querySelector("link"));
-   }
-   l && l.add(s);
-  }
- } else appData.BUILD.constructableCSS && !e.adoptedStyleSheets.includes(n) && (e.adoptedStyleSheets = [ ...e.adoptedStyleSheets, n ]);
- return s;
-}, attachStyles = e => {
- const t = e.$cmpMeta$, a = e.$hostElement$, o = t.$flags$, s = createTime("attachStyles", t.$tagName$), n = addStyle(appData.BUILD.shadowDom && exports.supportsShadow && a.shadowRoot ? a.shadowRoot : a.getRootNode(), t, e.$modeName$, a);
- (appData.BUILD.shadowDom || appData.BUILD.scoped) && appData.BUILD.cssAnnotations && 10 & o && (a["s-sc"] = n, 
- a.classList.add(n + "-h"), appData.BUILD.scoped && 2 & o && a.classList.add(n + "-s")), 
- s();
-}, getScopeId = (e, t) => "sc-" + (appData.BUILD.mode && t && 32 & e.$flags$ ? e.$tagName$ + "-" + t : e.$tagName$), computeMode = e => modeResolutionChain.map((t => t(e))).find((e => !!e)), EMPTY_OBJ = {}, isComplexType = e => "object" == (e = typeof e) || "function" === e, h = (e, t, ...a) => {
+}, XLINK_NS = "http://www.w3.org/1999/xlink", EMPTY_OBJ = {}, isComplexType = e => "object" == (e = typeof e) || "function" === e, h = (e, t, ...a) => {
  let o = null, s = null, n = null, l = !1, r = !1;
  const p = [], i = t => {
   for (let a = 0; a < t.length; a++) o = t[a], Array.isArray(o) ? i(o) : null != o && "boolean" != typeof o && ((l = "function" != typeof e && !isComplexType(o)) ? o = String(o) : appData.BUILD.isDev && "function" != typeof e && void 0 === o.$flags$ && consoleDevError("vNode passed as children has unexpected type.\nMake sure it's using the correct h() function.\nEmpty objects can also be the cause, look for JSX comments that became objects."), 
@@ -233,7 +153,92 @@ const createTime = (e, t = "") => {
  if (-1 === a) return;
  const o = t.indexOf("type"), s = t.indexOf("min"), n = t.indexOf("max"), l = t.indexOf("step");
  (a < o || a < s || a < n || a < l) && consoleDevWarn('The "value" prop of <input> should be set after "min", "max", "type" and "step"');
-}, setAccessor = (e, t, a, o, s, n) => {
+}, clientHydrate = (e, t, a, o, s, n, l) => {
+ let r, p, i, d;
+ if (1 === n.nodeType) {
+  for (r = n.getAttribute("c-id"), r && (p = r.split("."), p[0] !== l && "0" !== p[0] || (i = {
+   $flags$: 0,
+   $hostId$: p[0],
+   $nodeId$: p[1],
+   $depth$: p[2],
+   $index$: p[3],
+   $tag$: n.tagName.toLowerCase(),
+   $elm$: n,
+   $attrs$: null,
+   $children$: null,
+   $key$: null,
+   $name$: null,
+   $text$: null
+  }, t.push(i), n.removeAttribute("c-id"), e.$children$ || (e.$children$ = []), e.$children$[i.$index$] = i, 
+  e = i, o && "0" === i.$depth$ && (o[i.$index$] = i.$elm$))), d = n.childNodes.length - 1; d >= 0; d--) clientHydrate(e, t, a, o, s, n.childNodes[d], l);
+  if (n.shadowRoot) for (d = n.shadowRoot.childNodes.length - 1; d >= 0; d--) clientHydrate(e, t, a, o, s, n.shadowRoot.childNodes[d], l);
+ } else if (8 === n.nodeType) p = n.nodeValue.split("."), p[1] !== l && "0" !== p[1] || (r = p[0], 
+ i = {
+  $flags$: 0,
+  $hostId$: p[1],
+  $nodeId$: p[2],
+  $depth$: p[3],
+  $index$: p[4],
+  $elm$: n,
+  $attrs$: null,
+  $children$: null,
+  $key$: null,
+  $name$: null,
+  $tag$: null,
+  $text$: null
+ }, "t" === r ? (i.$elm$ = n.nextSibling, i.$elm$ && 3 === i.$elm$.nodeType && (i.$text$ = i.$elm$.textContent, 
+ t.push(i), n.remove(), e.$children$ || (e.$children$ = []), e.$children$[i.$index$] = i, 
+ o && "0" === i.$depth$ && (o[i.$index$] = i.$elm$))) : i.$hostId$ === l && ("s" === r ? (i.$tag$ = "slot", 
+ p[5] ? n["s-sn"] = i.$name$ = p[5] : n["s-sn"] = "", n["s-sr"] = !0, appData.BUILD.shadowDom && o && (i.$elm$ = doc.createElement(i.$tag$), 
+ i.$name$ && i.$elm$.setAttribute("name", i.$name$), n.parentNode.insertBefore(i.$elm$, n), 
+ n.remove(), "0" === i.$depth$ && (o[i.$index$] = i.$elm$)), a.push(i), e.$children$ || (e.$children$ = []), 
+ e.$children$[i.$index$] = i) : "r" === r && (appData.BUILD.shadowDom && o ? n.remove() : appData.BUILD.slotRelocation && (s["s-cr"] = n, 
+ n["s-cn"] = !0)))); else if (e && "style" === e.$tag$) {
+  const t = newVNode(null, n.textContent);
+  t.$elm$ = n, t.$index$ = "0", e.$children$ = [ t ];
+ }
+}, initializeDocumentHydrate = (e, t) => {
+ if (1 === e.nodeType) {
+  let a = 0;
+  for (;a < e.childNodes.length; a++) initializeDocumentHydrate(e.childNodes[a], t);
+  if (e.shadowRoot) for (a = 0; a < e.shadowRoot.childNodes.length; a++) initializeDocumentHydrate(e.shadowRoot.childNodes[a], t);
+ } else if (8 === e.nodeType) {
+  const a = e.nodeValue.split(".");
+  "o" === a[0] && (t.set(a[1] + "." + a[2], e), e.nodeValue = "", e["s-en"] = a[3]);
+ }
+}, computeMode = e => modeResolutionChain.map((t => t(e))).find((e => !!e)), parsePropertyValue = (e, t) => null == e || isComplexType(e) ? e : appData.BUILD.propBoolean && 4 & t ? "false" !== e && ("" === e || !!e) : appData.BUILD.propNumber && 2 & t ? parseFloat(e) : appData.BUILD.propString && 1 & t ? String(e) : e, getElement = e => appData.BUILD.lazyLoad ? getHostRef(e).$hostElement$ : e, emitEvent = (e, t, a) => {
+ const o = plt.ce(t, a);
+ return e.dispatchEvent(o), o;
+}, rootAppliedStyles = new WeakMap, registerStyle = (e, t, a) => {
+ let o = styles.get(e);
+ o = t, styles.set(e, o);
+}, addStyle = (e, t, a, o) => {
+ let s = getScopeId(t, a);
+ const n = styles.get(s);
+ if (!appData.BUILD.attachStyles) return s;
+ if (e = 11 === e.nodeType ? e : doc, n) if ("string" == typeof n) {
+  e = e.head || e;
+  let a, l = rootAppliedStyles.get(e);
+  if (l || rootAppliedStyles.set(e, l = new Set), !l.has(s)) {
+   if (appData.BUILD.hydrateClientSide && e.host && (a = e.querySelector(`[sty-id="${s}"]`))) a.innerHTML = n; else {
+    if (appData.BUILD.cssVarShim && plt.$cssShim$) {
+     a = plt.$cssShim$.createHostStyle(o, s, n, !!(10 & t.$flags$));
+     const e = a["s-sc"];
+     e && (s = e, l = null);
+    } else a = doc.createElement("style"), a.innerHTML = n;
+    (appData.BUILD.hydrateServerSide || appData.BUILD.hotModuleReplacement) && a.setAttribute("sty-id", s), 
+    e.insertBefore(a, e.querySelector("link"));
+   }
+   l && l.add(s);
+  }
+ } else appData.BUILD.constructableCSS && !e.adoptedStyleSheets.includes(n) && (e.adoptedStyleSheets = [ ...e.adoptedStyleSheets, n ]);
+ return s;
+}, attachStyles = e => {
+ const t = e.$cmpMeta$, a = e.$hostElement$, o = t.$flags$, s = createTime("attachStyles", t.$tagName$), n = addStyle(appData.BUILD.shadowDom && exports.supportsShadow && a.shadowRoot ? a.shadowRoot : a.getRootNode(), t, e.$modeName$, a);
+ (appData.BUILD.shadowDom || appData.BUILD.scoped) && appData.BUILD.cssAnnotations && 10 & o && (a["s-sc"] = n, 
+ a.classList.add(n + "-h"), appData.BUILD.scoped && 2 & o && a.classList.add(n + "-s")), 
+ s();
+}, getScopeId = (e, t) => "sc-" + (appData.BUILD.mode && t && 32 & e.$flags$ ? e.$tagName$ + "-" + t : e.$tagName$), setAccessor = (e, t, a, o, s, n) => {
  if (a !== o) {
   let l = isMemberInElement(e, t), r = t.toLowerCase();
   if (appData.BUILD.vdomClass && "class" === t) {
@@ -389,10 +394,7 @@ const createElm = (e, t, a, o) => {
   checkSlotFallbackVisibility && updateFallbackSlotVisibility(n.$elm$), plt.$flags$ &= -2, 
   relocateNodes.length = 0;
  }
-}, slotReferenceDebugNode = e => doc.createComment(`<slot${e.$name$ ? ' name="' + e.$name$ + '"' : ""}> (host=${hostTagName.toLowerCase()})`), originalLocationDebugNode = e => doc.createComment("org-location for " + (e.localName ? `<${e.localName}> (host=${e["s-hn"]})` : `[${e.textContent}]`)), getElement = e => appData.BUILD.lazyLoad ? getHostRef(e).$hostElement$ : e, emitEvent = (e, t, a) => {
- const o = plt.ce(t, a);
- return e.dispatchEvent(o), o;
-}, attachToAncestor = (e, t) => {
+}, slotReferenceDebugNode = e => doc.createComment(`<slot${e.$name$ ? ' name="' + e.$name$ + '"' : ""}> (host=${hostTagName.toLowerCase()})`), originalLocationDebugNode = e => doc.createComment("org-location for " + (e.localName ? `<${e.localName}> (host=${e["s-hn"]})` : `[${e.textContent}]`)), attachToAncestor = (e, t) => {
  appData.BUILD.asyncLoading && t && !e.$onRenderResolve$ && t["s-p"] && t["s-p"].push(new Promise((t => e.$onRenderResolve$ = t)));
 }, scheduleUpdate = (e, t) => {
  if (appData.BUILD.taskQueue && appData.BUILD.updatable && (e.$flags$ |= 16), appData.BUILD.asyncLoading && 4 & e.$flags$) return void (e.$flags$ |= 512);
@@ -486,60 +488,7 @@ const callRender = (e, t, a) => {
   const a = t[e];
   "function" == typeof a.connectedCallback && a.connectedCallback(), serverSideConnected(a);
  }
-}, clientHydrate = (e, t, a, o, s, n, l) => {
- let r, p, i, d;
- if (1 === n.nodeType) {
-  for (r = n.getAttribute("c-id"), r && (p = r.split("."), p[0] !== l && "0" !== p[0] || (i = {
-   $flags$: 0,
-   $hostId$: p[0],
-   $nodeId$: p[1],
-   $depth$: p[2],
-   $index$: p[3],
-   $tag$: n.tagName.toLowerCase(),
-   $elm$: n,
-   $attrs$: null,
-   $children$: null,
-   $key$: null,
-   $name$: null,
-   $text$: null
-  }, t.push(i), n.removeAttribute("c-id"), e.$children$ || (e.$children$ = []), e.$children$[i.$index$] = i, 
-  e = i, o && "0" === i.$depth$ && (o[i.$index$] = i.$elm$))), d = n.childNodes.length - 1; d >= 0; d--) clientHydrate(e, t, a, o, s, n.childNodes[d], l);
-  if (n.shadowRoot) for (d = n.shadowRoot.childNodes.length - 1; d >= 0; d--) clientHydrate(e, t, a, o, s, n.shadowRoot.childNodes[d], l);
- } else if (8 === n.nodeType) p = n.nodeValue.split("."), p[1] !== l && "0" !== p[1] || (r = p[0], 
- i = {
-  $flags$: 0,
-  $hostId$: p[1],
-  $nodeId$: p[2],
-  $depth$: p[3],
-  $index$: p[4],
-  $elm$: n,
-  $attrs$: null,
-  $children$: null,
-  $key$: null,
-  $name$: null,
-  $tag$: null,
-  $text$: null
- }, "t" === r ? (i.$elm$ = n.nextSibling, i.$elm$ && 3 === i.$elm$.nodeType && (i.$text$ = i.$elm$.textContent, 
- t.push(i), n.remove(), e.$children$ || (e.$children$ = []), e.$children$[i.$index$] = i, 
- o && "0" === i.$depth$ && (o[i.$index$] = i.$elm$))) : i.$hostId$ === l && ("s" === r ? (i.$tag$ = "slot", 
- p[5] ? n["s-sn"] = i.$name$ = p[5] : n["s-sn"] = "", n["s-sr"] = !0, appData.BUILD.shadowDom && o && (i.$elm$ = doc.createElement(i.$tag$), 
- i.$name$ && i.$elm$.setAttribute("name", i.$name$), n.parentNode.insertBefore(i.$elm$, n), 
- n.remove(), "0" === i.$depth$ && (o[i.$index$] = i.$elm$)), a.push(i), e.$children$ || (e.$children$ = []), 
- e.$children$[i.$index$] = i) : "r" === r && (appData.BUILD.shadowDom && o ? n.remove() : appData.BUILD.slotRelocation && (s["s-cr"] = n, 
- n["s-cn"] = !0)))); else if (e && "style" === e.$tag$) {
-  const t = newVNode(null, n.textContent);
-  t.$elm$ = n, t.$index$ = "0", e.$children$ = [ t ];
- }
-}, initializeDocumentHydrate = (e, t) => {
- if (1 === e.nodeType) {
-  let a = 0;
-  for (;a < e.childNodes.length; a++) initializeDocumentHydrate(e.childNodes[a], t);
-  if (e.shadowRoot) for (a = 0; a < e.shadowRoot.childNodes.length; a++) initializeDocumentHydrate(e.shadowRoot.childNodes[a], t);
- } else if (8 === e.nodeType) {
-  const a = e.nodeValue.split(".");
-  "o" === a[0] && (t.set(a[1] + "." + a[2], e), e.nodeValue = "", e["s-en"] = a[3]);
- }
-}, parsePropertyValue = (e, t) => null == e || isComplexType(e) ? e : appData.BUILD.propBoolean && 4 & t ? "false" !== e && ("" === e || !!e) : appData.BUILD.propNumber && 2 & t ? parseFloat(e) : appData.BUILD.propString && 1 & t ? String(e) : e, getValue = (e, t) => getHostRef(e).$instanceValues$.get(t), setValue = (e, t, a, o) => {
+}, getValue = (e, t) => getHostRef(e).$instanceValues$.get(t), setValue = (e, t, a, o) => {
  const s = getHostRef(e), n = appData.BUILD.lazyLoad ? s.$hostElement$ : e, l = s.$instanceValues$.get(t), r = s.$flags$, p = appData.BUILD.lazyLoad ? s.$lazyInstance$ : n;
  a = parsePropertyValue(a, o.$members$[t][0]);
  const i = Number.isNaN(l) && Number.isNaN(a), d = a !== l && !i;
@@ -809,10 +758,22 @@ const callRender = (e, t, a) => {
  const a = [ e ];
  for (;(e = e.nextSibling) && e["s-sn"] === t; ) a.push(e);
  return a;
-}, getAssetPath = e => {
- const t = new URL(e, plt.$resourcesUrl$);
- return t.origin !== win.location.origin ? t.href : t.pathname;
-}, parseVNodeAnnotations = (e, t, a, o) => {
+}, addHostEventListeners = (e, t, a, o) => {
+ appData.BUILD.hostListener && a && (appData.BUILD.hostListenerTargetParent && (a = o ? a.filter((([e]) => 32 & e)) : a.filter((([e]) => !(32 & e)))), 
+ a.map((([a, o, s]) => {
+  const n = appData.BUILD.hostListenerTarget ? getHostListenerTarget(e, a) : e, l = hostListenerProxy(t, s), r = hostListenerOpts(a);
+  plt.ael(n, o, l, r), (t.$rmListeners$ = t.$rmListeners$ || []).push((() => plt.rel(n, o, l, r)));
+ })));
+}, hostListenerProxy = (e, t) => a => {
+ try {
+  appData.BUILD.lazyLoad ? 256 & e.$flags$ ? e.$lazyInstance$[t](a) : (e.$queuedListeners$ = e.$queuedListeners$ || []).push([ t, a ]) : e.$hostElement$[t](a);
+ } catch (e) {
+  consoleError(e);
+ }
+}, getHostListenerTarget = (e, t) => appData.BUILD.hostListenerTargetDocument && 4 & t ? doc : appData.BUILD.hostListenerTargetWindow && 8 & t ? win : appData.BUILD.hostListenerTargetBody && 16 & t ? doc.body : appData.BUILD.hostListenerTargetParent && 32 & t ? e.parentElement : e, hostListenerOpts = e => ({
+ passive: 0 != (1 & e),
+ capture: 0 != (2 & e)
+}), parseVNodeAnnotations = (e, t, a, o) => {
  null != t && (null != t["s-nr"] && o.push(t), 1 === t.nodeType && t.childNodes.forEach((t => {
   const s = getHostRef(t);
   if (null != s && !a.staticComponents.has(t.nodeName.toLowerCase())) {
@@ -874,6 +835,45 @@ const callRender = (e, t, a) => {
  };
  a.$onInstancePromise$ = new Promise((e => a.$onInstanceResolve$ = e)), a.$onReadyPromise$ = new Promise((e => a.$onReadyResolve$ = e)), 
  e["s-p"] = [], e["s-rc"] = [], addHostEventListeners(e, a, t.$listeners$, !1), hostRefs.set(e, a);
+};
+
+let customError;
+
+const defaultConsoleError = e => {
+ caughtErrors.push(e);
+}, consoleError = (e, t) => (customError || defaultConsoleError)(e, t), consoleDevError = (...e) => {
+ caughtErrors.push(new Error(e.join(", ")));
+}, consoleDevWarn = (...e) => {
+ const t = e.filter((e => "string" == typeof e || "number" == typeof e || "boolean" == typeof e));
+ console.warn(...t);
+}, nextTick = e => {
+ queuedTicks.push(e);
+}, win = mockDoc.setupGlobal(global), doc = win.document;
+
+exports.supportsShadow = !0;
+
+const plt = {
+ $flags$: 0,
+ $resourcesUrl$: "",
+ jmp: e => e(),
+ raf: e => requestAnimationFrame(e),
+ ael: (e, t, a, o) => e.addEventListener(t, a, o),
+ rel: (e, t, a, o) => e.removeEventListener(t, a, o),
+ ce: (e, t) => new win.CustomEvent(e, t)
+}, Context = {};
+
+let autoApplyTimer, isAutoApplyingChanges = !1;
+
+const isMemberInElement = (e, t) => {
+ if (null != e) {
+  if (t in e) return !0;
+  const a = e.nodeName;
+  if (a) {
+   const e = cstrs.get(a.toLowerCase());
+   if (null != e && null != e.COMPILER_META && null != e.COMPILER_META.properties) return e.COMPILER_META.properties.some((e => e.name === t));
+  }
+ }
+ return !1;
 };
 
 Object.defineProperty(exports, "Env", {
@@ -1093,5 +1093,5 @@ exports.setMode = e => modeResolutionChain.push(e), exports.setPlatformHelpers =
   }), 100));
  }));
 }, exports.stopAutoApplyChanges = stopAutoApplyChanges, exports.styles = styles, 
-exports.supportsConstructibleStylesheets = !1, exports.supportsListenerOptions = !0, 
+exports.supportsConstructableStylesheets = !1, exports.supportsListenerOptions = !0, 
 exports.win = win, exports.writeTask = writeTask;

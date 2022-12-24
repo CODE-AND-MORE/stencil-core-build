@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createReplaceData = exports.getOptions = void 0;
+const fs_extra_1 = require("fs-extra");
 const path_1 = require("path");
 const vermoji_1 = require("./vermoji");
-const fs_extra_1 = require("fs-extra");
 /**
  * Retrieves information used during a 'process' that requires knowledge of various project file paths, Stencil version
  * information, and GitHub repo metadata. A 'process' may include, but is not limited to:

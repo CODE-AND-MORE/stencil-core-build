@@ -5,13 +5,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.internal = void 0;
 const fs_extra_1 = __importDefault(require("fs-extra"));
+const path_1 = require("path");
 const bundle_dts_1 = require("../utils/bundle-dts");
+const write_pkg_json_1 = require("../utils/write-pkg-json");
 const internal_app_data_1 = require("./internal-app-data");
 const internal_platform_client_1 = require("./internal-platform-client");
 const internal_platform_hydrate_1 = require("./internal-platform-hydrate");
 const internal_platform_testing_1 = require("./internal-platform-testing");
-const path_1 = require("path");
-const write_pkg_json_1 = require("../utils/write-pkg-json");
 async function internal(opts) {
     const inputInternalDir = (0, path_1.join)(opts.buildDir, 'internal');
     await fs_extra_1.default.emptyDir(opts.output.internalDir);

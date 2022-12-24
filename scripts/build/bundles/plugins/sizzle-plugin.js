@@ -28,7 +28,7 @@ function sizzlePlugin(opts) {
         /**
          * A rollup build hook for loading sizzle. [Source](https://rollupjs.org/guide/en/#load)
          * @param id the path of the module to load
-         * @returns parse5, pre-bundled
+         * @returns sizzle, pre-bundled
          */
         async load(id) {
             if (id !== 'sizzle') {

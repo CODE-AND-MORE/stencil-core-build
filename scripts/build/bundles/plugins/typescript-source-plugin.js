@@ -111,7 +111,7 @@ async function bundleTypeScriptSource(tsPath, opts) {
  * Removes a specific section from the provided source code via commenting the offending code out
  * @param srcCode the source code to modify
  * @param removeCode the code to remove from the source
- * @return the updated source code
+ * @returns the updated source code
  */
 function removeFromSource(srcCode, removeCode) {
     if (!srcCode.includes(removeCode)) {

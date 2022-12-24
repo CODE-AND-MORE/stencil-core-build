@@ -1,20 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.bundleBuild = exports.createBuild = exports.run = void 0;
+const fs_extra_1 = require("fs-extra");
+const rollup_1 = require("rollup");
 const cli_1 = require("./bundles/cli");
 const compiler_1 = require("./bundles/compiler");
-const dependencies_json_1 = require("./utils/dependencies-json");
-const license_1 = require("./license");
 const dev_server_1 = require("./bundles/dev-server");
-const fs_extra_1 = require("fs-extra");
 const internal_1 = require("./bundles/internal");
 const mock_doc_1 = require("./bundles/mock-doc");
-const release_1 = require("./release");
 const screenshot_1 = require("./bundles/screenshot");
 const sys_node_1 = require("./bundles/sys-node");
 const testing_1 = require("./bundles/testing");
+const license_1 = require("./license");
+const release_1 = require("./release");
 const validate_build_1 = require("./test/validate-build");
-const rollup_1 = require("rollup");
+const dependencies_json_1 = require("./utils/dependencies-json");
 /**
  * Runner for releasing a new version of Stencil
  * @param rootDir the root directory of the Stencil repository

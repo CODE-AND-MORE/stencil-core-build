@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getTypeScriptDefaultLibNames = exports.updateDependenciesJson = void 0;
-const path_1 = require("path");
 const fs_extra_1 = require("fs-extra");
+const path_1 = require("path");
 async function updateDependenciesJson(opts) {
     const srcPath = (0, path_1.join)(opts.srcDir, 'compiler', 'sys', 'dependencies.json');
     const rootPath = (0, path_1.join)(opts.rootDir, 'dependencies.json');

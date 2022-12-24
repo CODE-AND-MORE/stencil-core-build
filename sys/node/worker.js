@@ -1,5 +1,5 @@
 /*!
- Stencil Node System Worker v0.0.0-dev.20221221203401 | MIT Licensed | https://stenciljs.com
+ Stencil Node System Worker v0.0.0-dev.20221221224028 | MIT Licensed | https://stenciljs.com
  */
 function _interopNamespace(e) {
  if (e && e.__esModule) return e;

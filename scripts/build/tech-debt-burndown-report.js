@@ -18,8 +18,8 @@ const fs_1 = __importDefault(require("fs"));
  */
 const prData = JSON.parse(String(fs_1.default.readFileSync('./null_errors_pr.json')));
 const mainData = JSON.parse(String(fs_1.default.readFileSync('./null_errors_main.json')));
-const errorsOnMain = mainData.length;
-const errorsOnPR = prData.length;
+const errorsOnMainCount = mainData.length;
+const errorsOnPRCount = prData.length;
 /**
  * Build up an object which maps error codes (like `TS2339`) to
  * a `Set` of all the messages we see for that code.
@@ -29,8 +29,8 @@ const getErrorCodeMessages = () => {
     const errorCodeMessageMap = {};
     prData.forEach((error) => {
         var _a;
-        let errorCode = error.value.tsError.value.errorString;
-        let message = error.value.message.value;
+        const errorCode = error.value.tsError.value.errorString;
+        const message = error.value.message.value;
         errorCodeMessageMap[errorCode] = ((_a = errorCodeMessageMap[errorCode]) !== null && _a !== void 0 ? _a : new Set()).add(message);
     });
     return errorCodeMessageMap;
@@ -47,7 +47,7 @@ const errorCodeMessages = getErrorCodeMessages();
  * @returns a map of counts for `arr`
  */
 const countArrayEntries = (arr) => {
-    let counts = new Map();
+    const counts = new Map();
     arr.forEach((entry) => {
         var _a;
         counts.set(entry, ((_a = counts.get(entry)) !== null && _a !== void 0 ? _a : 0) + 1);
@@ -104,7 +104,7 @@ const deadCodePR = processUnusedExports(unusedExportsPR);
  * @returns the collapsible section, ready for inclusion in a larger markdown context
  */
 const collapsible = (title, contentCb, lineBreak = '\n') => {
-    let out = [`<details><summary>${title}</summary>`, ''];
+    const out = [`<details><summary>${title}</summary>`, ''];
     contentCb(out);
     out.push('');
     out.push('</details>');
@@ -152,14 +152,29 @@ lines.push(`Typechecking with \`--strictNullChecks\` resulted in ${prData.length
 lines.push('');
 // we can check the number of errors just to write a different message out here
 // depending on the delta between this branch and main
-if (errorsOnPR === errorsOnMain) {
+if (errorsOnPRCount === errorsOnMainCount) {
     lines.push("That's the same number of errors on main, so at least we're not creating new ones!");
 }
-else if (errorsOnPR < errorsOnMain) {
-    lines.push(`That's ${errorsOnMain - errorsOnPR} fewer than on \`main\`! 🎉🎉🎉`);
+else if (errorsOnPRCount < errorsOnMainCount) {
+    lines.push(`That's ${errorsOnMainCount - errorsOnPRCount} fewer than on \`main\`! 🎉🎉🎉`);
 }
 else {
-    lines.push(`Unfortunately, it looks like that's an increase of ${errorsOnPR - errorsOnMain} over \`main\` 😞.`);
+    lines.push(`Unfortunately, it looks like that's an increase of ${errorsOnPRCount - errorsOnMainCount} over \`main\` 😞.`);
+    const newEntries = prData.filter((prTsError) => !mainData.some((mainTsError) => prTsError.value.path.value === mainTsError.value.path.value &&
+        prTsError.value.cursor.value.line === mainTsError.value.cursor.value.line &&
+        prTsError.value.cursor.value.col === mainTsError.value.cursor.value.col &&
+        prTsError.value.tsError.value.errorString === mainTsError.value.tsError.value.errorString &&
+        prTsError.value.message.value === mainTsError.value.message.value));
+    lines.push(collapsible('Violations Not on `main` (may be more than the count above)', (out) => {
+        out.push(tableHeader('Path', 'Location', 'Error', 'Message'));
+        newEntries.forEach(({ value }) => {
+            const location = value.cursor.value;
+            // error messages with pipes ('|') can cause formatting issues, escape them
+            const sanitizedErrorMsg = value.message.value.replace(/\|/g, '\\|').replace(/\r?\n/g, '');
+            out.push(tableRow(`${value.path.value}`, `(${location.line}, ${location.col})`, `${value.tsError.value.errorString}`, `${sanitizedErrorMsg}`));
+        });
+    }));
+    lines.push('');
 }
 lines.push('');
 lines.push('#### reports and statistics');
@@ -182,7 +197,7 @@ lines.push('');
 lines.push(collapsible('Our most common errors', (out) => {
     out.push(tableHeader('[Typescript Error Code](https://github.com/microsoft/TypeScript/blob/main/src/compiler/diagnosticMessages.json)', 'Count', 'Error messages'));
     sortEntries(errorCodeCounts).forEach(([tsErrorCode, errorCount]) => {
-        let messages = errorCodeMessages[tsErrorCode];
+        const messages = errorCodeMessages[tsErrorCode];
         out.push(tableRow(tsErrorCode, String(errorCount), `<details><summary>Error messages</summary>${[...messages]
             .map((msg) => msg.replace(/\n/g, '<br>'))
             .map((msg) => msg.replace(/\|/g, '\\|'))

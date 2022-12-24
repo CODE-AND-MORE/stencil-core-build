@@ -4,17 +4,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.testing = void 0;
-const fs_extra_1 = __importDefault(require("fs-extra"));
-const path_1 = require("path");
 const plugin_commonjs_1 = __importDefault(require("@rollup/plugin-commonjs"));
 const plugin_json_1 = __importDefault(require("@rollup/plugin-json"));
 const plugin_node_resolve_1 = __importDefault(require("@rollup/plugin-node-resolve"));
+const fs_extra_1 = __importDefault(require("fs-extra"));
+const path_1 = require("path");
+const banner_1 = require("../utils/banner");
+const write_pkg_json_1 = require("../utils/write-pkg-json");
 const alias_plugin_1 = require("./plugins/alias-plugin");
 const lazy_require_1 = require("./plugins/lazy-require");
-const replace_plugin_1 = require("./plugins/replace-plugin");
-const write_pkg_json_1 = require("../utils/write-pkg-json");
 const pretty_minify_1 = require("./plugins/pretty-minify");
-const banner_1 = require("../utils/banner");
+const replace_plugin_1 = require("./plugins/replace-plugin");
 async function testing(opts) {
     const inputDir = (0, path_1.join)(opts.buildDir, 'testing');
     await Promise.all([

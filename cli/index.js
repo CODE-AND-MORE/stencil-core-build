@@ -1,11 +1,28 @@
 /*!
- Stencil CLI v0.0.0-dev.20221221203401 | MIT Licensed | https://stenciljs.com
+ Stencil CLI v0.0.0-dev.20221221224028 | MIT Licensed | https://stenciljs.com
  */
-const toLowerCase = (str) => str.toLowerCase();
-const dashToPascalCase = (str) => toLowerCase(str)
+/**
+ * Convert a string from dash-case / kebab-case to PascalCase (or CamelCase,
+ * or whatever you call it!)
+ *
+ * @param str a string to convert
+ * @returns a converted string
+ */
+const dashToPascalCase = (str) => str
+    .toLowerCase()
     .split('-')
     .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
     .join('');
+/**
+ * Convert a string to 'camelCase'
+ *
+ * @param str the string to convert
+ * @returns the converted string
+ */
+const toCamelCase = (str) => {
+    const pascalCase = dashToPascalCase(str);
+    return pascalCase.charAt(0).toLowerCase() + pascalCase.slice(1);
+};
 const isFunction = (v) => typeof v === 'function';
 const isString = (v) => typeof v === 'string';
 
@@ -94,6 +111,8 @@ const TASK_CANCELED_MSG = `task canceled`;
  * Forward-slash paths can be used in Windows as long as they're not
  * extended-length paths and don't contain any non-ascii characters.
  * This was created since the path methods in Node.js outputs \\ paths on Windows.
+ * @param path the Windows-based path to convert
+ * @returns the converted path
  */
 const normalizePath = (path) => {
     if (typeof path !== 'string') {
@@ -155,18 +174,18 @@ const getEncodedRootLength = (path) => {
         return 0;
     const ch0 = path.charCodeAt(0);
     // POSIX or UNC
-    if (ch0 === 47 /* slash */ || ch0 === 92 /* backslash */) {
+    if (ch0 === 47 /* CharacterCodes.slash */ || ch0 === 92 /* CharacterCodes.backslash */) {
         if (path.charCodeAt(1) !== ch0)
             return 1; // POSIX: "/" (or non-normalized "\")
-        const p1 = path.indexOf(ch0 === 47 /* slash */ ? '/' : altDirectorySeparator, 2);
+        const p1 = path.indexOf(ch0 === 47 /* CharacterCodes.slash */ ? '/' : altDirectorySeparator, 2);
         if (p1 < 0)
             return path.length; // UNC: "//server" or "\\server"
         return p1 + 1; // UNC: "//server/" or "\\server\"
     }
     // DOS
-    if (isVolumeCharacter(ch0) && path.charCodeAt(1) === 58 /* colon */) {
+    if (isVolumeCharacter(ch0) && path.charCodeAt(1) === 58 /* CharacterCodes.colon */) {
         const ch2 = path.charCodeAt(2);
-        if (ch2 === 47 /* slash */ || ch2 === 92 /* backslash */)
+        if (ch2 === 47 /* CharacterCodes.slash */ || ch2 === 92 /* CharacterCodes.backslash */)
             return 3; // DOS: "c:/" or "c:\"
         if (path.length === 2)
             return 2; // DOS: "c:" (but not "c:d")
@@ -188,7 +207,7 @@ const getEncodedRootLength = (path) => {
                 isVolumeCharacter(path.charCodeAt(authorityEnd + 1))) {
                 const volumeSeparatorEnd = getFileUrlVolumeSeparatorEnd(path, authorityEnd + 2);
                 if (volumeSeparatorEnd !== -1) {
-                    if (path.charCodeAt(volumeSeparatorEnd) === 47 /* slash */) {
+                    if (path.charCodeAt(volumeSeparatorEnd) === 47 /* CharacterCodes.slash */) {
                         // URL: "file:///c:/", "file://localhost/c:/", "file:///c%3a/", "file://localhost/c%3a/"
                         return ~(volumeSeparatorEnd + 1);
                     }
@@ -206,15 +225,15 @@ const getEncodedRootLength = (path) => {
     // relative
     return 0;
 };
-const isVolumeCharacter = (charCode) => (charCode >= 97 /* a */ && charCode <= 122 /* z */) ||
-    (charCode >= 65 /* A */ && charCode <= 90 /* Z */);
+const isVolumeCharacter = (charCode) => (charCode >= 97 /* CharacterCodes.a */ && charCode <= 122 /* CharacterCodes.z */) ||
+    (charCode >= 65 /* CharacterCodes.A */ && charCode <= 90 /* CharacterCodes.Z */);
 const getFileUrlVolumeSeparatorEnd = (url, start) => {
     const ch0 = url.charCodeAt(start);
-    if (ch0 === 58 /* colon */)
+    if (ch0 === 58 /* CharacterCodes.colon */)
         return start + 1;
-    if (ch0 === 37 /* percent */ && url.charCodeAt(start + 1) === 51 /* _3 */) {
+    if (ch0 === 37 /* CharacterCodes.percent */ && url.charCodeAt(start + 1) === 51 /* CharacterCodes._3 */) {
         const ch2 = url.charCodeAt(start + 2);
-        if (ch2 === 97 /* a */ || ch2 === 65 /* A */)
+        if (ch2 === 97 /* CharacterCodes.a */ || ch2 === 65 /* CharacterCodes.A */)
             return start + 3;
     }
     return -1;
@@ -228,6 +247,22 @@ const pathComponents = (path, rootLength) => {
     }
     return [root, ...rest];
 };
+
+/**
+ * Check whether a string is a member of a ReadonlyArray<string>
+ *
+ * We need a little helper for this because unfortunately `includes` is typed
+ * on `ReadonlyArray<T>` as `(el: T): boolean` so a `string` cannot be passed
+ * to `includes` on a `ReadonlyArray` 😢 thus we have a little helper function
+ * where we do the type coercion just once.
+ *
+ * see microsoft/TypeScript#31018 for some discussion of this
+ *
+ * @param readOnlyArray the array we're checking
+ * @param maybeMember a value which is possibly a member of the array
+ * @returns whether the array contains the member or not
+ */
+const readOnlyArrayHasStringMember = (readOnlyArray, maybeMember) => readOnlyArray.includes(maybeMember);
 
 /**
  * Validates that a component tag meets required naming conventions to be used for a web component
@@ -273,174 +308,36 @@ const validateComponentTag = (tag) => {
     return undefined;
 };
 
-const parseFlags = (args, sys) => {
-    const flags = {
-        task: null,
-        args: [],
-        knownArgs: [],
-        unknownArgs: null,
-    };
-    // cmd line has more priority over npm scripts cmd
-    flags.args = args.slice();
-    if (flags.args.length > 0 && flags.args[0] && !flags.args[0].startsWith('-')) {
-        flags.task = flags.args[0];
-    }
-    parseArgs(flags, flags.args, flags.knownArgs);
-    if (sys && sys.name === 'node') {
-        const envArgs = getNpmConfigEnvArgs(sys);
-        parseArgs(flags, envArgs, flags.knownArgs);
-        envArgs.forEach((envArg) => {
-            if (!flags.args.includes(envArg)) {
-                flags.args.push(envArg);
-            }
-        });
-    }
-    if (flags.task != null) {
-        const i = flags.args.indexOf(flags.task);
-        if (i > -1) {
-            flags.args.splice(i, 1);
-        }
-    }
-    flags.unknownArgs = flags.args.filter((arg) => {
-        return !flags.knownArgs.includes(arg);
-    });
-    return flags;
-};
 /**
- * Parse command line arguments that are whitelisted via the BOOLEAN_ARG_OPTS,
- * STRING_ARG_OPTS, and NUMBER_ARG_OPTS arrays in this file. Handles leading
- * dashes on arguments, aliases that are defined for a small number of argument
- * types, and parsing values for non-boolean arguments (e.g. port number).
+ * This sets the log level hierarchy for our terminal logger, ranging from
+ * most to least verbose.
  *
- * @param flags     a ConfigFlags object
- * @param args      an array of command-line arguments to parse
- * @param knownArgs an array to which all recognized, legal arguments are added
+ * Ordering the levels like this lets us easily check whether we should log a
+ * message at a given time. For instance, if the log level is set to `'warn'`,
+ * then anything passed to the logger with level `'warn'` or `'error'` should
+ * be logged, but we should _not_ log anything with level `'info'` or `'debug'`.
+ *
+ * If we have a current log level `currentLevel` and a message with level
+ * `msgLevel` is passed to the logger, we can determine whether or not we should
+ * log it by checking if the log level on the message is further up or at the
+ * same level in the hierarchy than `currentLevel`, like so:
+ *
+ * ```ts
+ * LOG_LEVELS.indexOf(msgLevel) >= LOG_LEVELS.indexOf(currentLevel)
+ * ```
+ *
+ * NOTE: for the reasons described above, do not change the order of the entries
+ * in this array without good reason!
  */
-const parseArgs = (flags, args, knownArgs) => {
-    BOOLEAN_ARG_OPTS.forEach((booleanName) => {
-        const alias = ARG_OPTS_ALIASES[booleanName];
-        const flagKey = configCase(booleanName);
-        if (typeof flags[flagKey] !== 'boolean') {
-            flags[flagKey] = null;
-        }
-        args.forEach((cmdArg) => {
-            if (cmdArg === `--${booleanName}`) {
-                flags[flagKey] = true;
-                knownArgs.push(cmdArg);
-            }
-            else if (cmdArg === `--${flagKey}`) {
-                flags[flagKey] = true;
-                knownArgs.push(cmdArg);
-            }
-            else if (cmdArg === `--no-${booleanName}`) {
-                flags[flagKey] = false;
-                knownArgs.push(cmdArg);
-            }
-            else if (cmdArg === `--no${dashToPascalCase(booleanName)}`) {
-                flags[flagKey] = false;
-                knownArgs.push(cmdArg);
-            }
-            else if (alias && cmdArg === `-${alias}`) {
-                flags[flagKey] = true;
-                knownArgs.push(cmdArg);
-            }
-        });
-    });
-    STRING_ARG_OPTS.forEach((stringName) => {
-        const alias = ARG_OPTS_ALIASES[stringName];
-        const flagKey = configCase(stringName);
-        if (typeof flags[flagKey] !== 'string') {
-            flags[flagKey] = null;
-        }
-        for (let i = 0; i < args.length; i++) {
-            const cmdArg = args[i];
-            if (cmdArg.startsWith(`--${stringName}=`)) {
-                const values = cmdArg.split('=');
-                values.shift();
-                flags[flagKey] = values.join('=');
-                knownArgs.push(cmdArg);
-            }
-            else if (cmdArg === `--${stringName}`) {
-                flags[flagKey] = args[i + 1];
-                knownArgs.push(cmdArg);
-                knownArgs.push(args[i + 1]);
-            }
-            else if (cmdArg === `--${flagKey}`) {
-                flags[flagKey] = args[i + 1];
-                knownArgs.push(cmdArg);
-                knownArgs.push(args[i + 1]);
-            }
-            else if (cmdArg.startsWith(`--${flagKey}=`)) {
-                const values = cmdArg.split('=');
-                values.shift();
-                flags[flagKey] = values.join('=');
-                knownArgs.push(cmdArg);
-            }
-            else if (alias) {
-                if (cmdArg.startsWith(`-${alias}=`)) {
-                    const values = cmdArg.split('=');
-                    values.shift();
-                    flags[flagKey] = values.join('=');
-                    knownArgs.push(cmdArg);
-                }
-                else if (cmdArg === `-${alias}`) {
-                    flags[flagKey] = args[i + 1];
-                    knownArgs.push(args[i + 1]);
-                }
-            }
-        }
-    });
-    NUMBER_ARG_OPTS.forEach((numberName) => {
-        const alias = ARG_OPTS_ALIASES[numberName];
-        const flagKey = configCase(numberName);
-        if (typeof flags[flagKey] !== 'number') {
-            flags[flagKey] = null;
-        }
-        for (let i = 0; i < args.length; i++) {
-            const cmdArg = args[i];
-            if (cmdArg.startsWith(`--${numberName}=`)) {
-                const values = cmdArg.split('=');
-                values.shift();
-                flags[flagKey] = parseInt(values.join(''), 10);
-                knownArgs.push(cmdArg);
-            }
-            else if (cmdArg === `--${numberName}`) {
-                flags[flagKey] = parseInt(args[i + 1], 10);
-                knownArgs.push(args[i + 1]);
-            }
-            else if (cmdArg.startsWith(`--${flagKey}=`)) {
-                const values = cmdArg.split('=');
-                values.shift();
-                flags[flagKey] = parseInt(values.join(''), 10);
-                knownArgs.push(cmdArg);
-            }
-            else if (cmdArg === `--${flagKey}`) {
-                flags[flagKey] = parseInt(args[i + 1], 10);
-                knownArgs.push(args[i + 1]);
-            }
-            else if (alias) {
-                if (cmdArg.startsWith(`-${alias}=`)) {
-                    const values = cmdArg.split('=');
-                    values.shift();
-                    flags[flagKey] = parseInt(values.join(''), 10);
-                    knownArgs.push(cmdArg);
-                }
-                else if (cmdArg === `-${alias}`) {
-                    flags[flagKey] = parseInt(args[i + 1], 10);
-                    knownArgs.push(args[i + 1]);
-                }
-            }
-        }
-    });
-};
-const configCase = (prop) => {
-    prop = dashToPascalCase(prop);
-    return prop.charAt(0).toLowerCase() + prop.slice(1);
-};
-const BOOLEAN_ARG_OPTS = [
+const LOG_LEVELS = ['debug', 'info', 'warn', 'error'];
+
+/**
+ * All the Boolean options supported by the Stencil CLI
+ */
+const BOOLEAN_CLI_FLAGS = [
     'build',
     'cache',
-    'check-version',
+    'checkVersion',
     'ci',
     'compare',
     'debug',
@@ -455,58 +352,620 @@ const BOOLEAN_ARG_OPTS = [
     'log',
     'open',
     'prerender',
-    'prerender-external',
+    'prerenderExternal',
     'prod',
     'profile',
-    'service-worker',
+    'serviceWorker',
     'screenshot',
     'serve',
-    'skip-node-check',
+    'skipNodeCheck',
     'spec',
     'ssr',
     'stats',
-    'update-screenshot',
+    'updateScreenshot',
     'verbose',
     'version',
     'watch',
+    // JEST CLI OPTIONS
+    'all',
+    'automock',
+    'bail',
+    // 'cache', Stencil already supports this argument
+    'changedFilesWithAncestor',
+    // 'ci', Stencil already supports this argument
+    'clearCache',
+    'clearMocks',
+    'collectCoverage',
+    'color',
+    'colors',
+    'coverage',
+    // 'debug', Stencil already supports this argument
+    'detectLeaks',
+    'detectOpenHandles',
+    'errorOnDeprecated',
+    'expand',
+    'findRelatedTests',
+    'forceExit',
+    'init',
+    'injectGlobals',
+    'json',
+    'lastCommit',
+    'listTests',
+    'logHeapUsage',
+    'noStackTrace',
+    'notify',
+    'onlyChanged',
+    'onlyFailures',
+    'passWithNoTests',
+    'resetMocks',
+    'resetModules',
+    'restoreMocks',
+    'runInBand',
+    'runTestsByPath',
+    'showConfig',
+    'silent',
+    'skipFilter',
+    'testLocationInResults',
+    'updateSnapshot',
+    'useStderr',
+    // 'verbose', Stencil already supports this argument
+    // 'version', Stencil already supports this argument
+    // 'watch', Stencil already supports this argument
+    'watchAll',
+    'watchman',
 ];
-const NUMBER_ARG_OPTS = ['max-workers', 'port'];
-const STRING_ARG_OPTS = [
+/**
+ * All the Number options supported by the Stencil CLI
+ */
+const NUMBER_CLI_FLAGS = [
+    'port',
+    // JEST CLI ARGS
+    'maxConcurrency',
+    'testTimeout',
+];
+/**
+ * All the String options supported by the Stencil CLI
+ */
+const STRING_CLI_FLAGS = [
     'address',
     'config',
-    'docs-json',
+    'docsApi',
+    'docsJson',
     'emulate',
-    'log-level',
     'root',
-    'screenshot-connector',
+    'screenshotConnector',
+    // JEST CLI ARGS
+    'cacheDirectory',
+    'changedSince',
+    'collectCoverageFrom',
+    // 'config', Stencil already supports this argument
+    'coverageDirectory',
+    'coverageThreshold',
+    'env',
+    'filter',
+    'globalSetup',
+    'globalTeardown',
+    'globals',
+    'haste',
+    'moduleNameMapper',
+    'notifyMode',
+    'outputFile',
+    'preset',
+    'prettierPath',
+    'resolver',
+    'rootDir',
+    'runner',
+    'testEnvironment',
+    'testEnvironmentOptions',
+    'testFailureExitCode',
+    'testNamePattern',
+    'testResultsProcessor',
+    'testRunner',
+    'testSequencer',
+    'testURL',
+    'timers',
+    'transform',
 ];
-const ARG_OPTS_ALIASES = {
-    config: 'c',
-    help: 'h',
-    port: 'p',
-    version: 'v',
+const STRING_ARRAY_CLI_FLAGS = [
+    'collectCoverageOnlyFrom',
+    'coveragePathIgnorePatterns',
+    'coverageReporters',
+    'moduleDirectories',
+    'moduleFileExtensions',
+    'modulePathIgnorePatterns',
+    'modulePaths',
+    'projects',
+    'reporters',
+    'roots',
+    'selectProjects',
+    'setupFiles',
+    'setupFilesAfterEnv',
+    'snapshotSerializers',
+    'testMatch',
+    'testPathIgnorePatterns',
+    'testPathPattern',
+    'testRegex',
+    'transformIgnorePatterns',
+    'unmockedModulePathPatterns',
+    'watchPathIgnorePatterns',
+];
+/**
+ * All the CLI arguments which may have string or number values
+ *
+ * `maxWorkers` is an argument which is used both by Stencil _and_ by Jest,
+ * which means that we need to support parsing both string and number values.
+ */
+const STRING_NUMBER_CLI_FLAGS = ['maxWorkers'];
+/**
+ * All the LogLevel-type options supported by the Stencil CLI
+ *
+ * This is a bit silly since there's only one such argument atm,
+ * but this approach lets us make sure that we're handling all
+ * our arguments in a type-safe way.
+ */
+const LOG_LEVEL_CLI_FLAGS = ['logLevel'];
+/**
+ * For a small subset of CLI options we support a short alias e.g. `'h'` for `'help'`
+ */
+const CLI_FLAG_ALIASES = {
+    c: 'config',
+    h: 'help',
+    p: 'port',
+    v: 'version',
 };
-const getNpmConfigEnvArgs = (sys) => {
-    // process.env.npm_config_argv
-    // {"remain":["4444"],"cooked":["run","serve","--port","4444"],"original":["run","serve","--port","4444"]}
-    let args = [];
-    try {
-        const npmConfigArgs = sys.getEnvironmentVar('npm_config_argv');
-        if (npmConfigArgs) {
-            args = JSON.parse(npmConfigArgs).original;
-            if (args[0] === 'run') {
-                args = args.slice(2);
-            }
+/**
+ * A regular expression which can be used to match a CLI flag for one of our
+ * short aliases.
+ */
+const CLI_FLAG_REGEX = new RegExp(`^-[chpv]{1}$`);
+/**
+ * Helper function for initializing a `ConfigFlags` object. Provide any overrides
+ * for default values and off you go!
+ *
+ * @param init an object with any overrides for default values
+ * @returns a complete CLI flag object
+ */
+const createConfigFlags = (init = {}) => {
+    const flags = {
+        task: null,
+        args: [],
+        knownArgs: [],
+        unknownArgs: [],
+        ...init,
+    };
+    return flags;
+};
+
+/**
+ * Parse command line arguments into a structured `ConfigFlags` object
+ *
+ * @param args an array of CLI flags
+ * @param _sys an optional compiler system
+ * @returns a structured ConfigFlags object
+ */
+const parseFlags = (args, _sys) => {
+    // TODO(STENCIL-509): remove the _sys parameter here ^^ (for v3)
+    const flags = createConfigFlags();
+    // cmd line has more priority over npm scripts cmd
+    flags.args = Array.isArray(args) ? args.slice() : [];
+    if (flags.args.length > 0 && flags.args[0] && !flags.args[0].startsWith('-')) {
+        flags.task = flags.args[0];
+        // if the first argument was a "task" (like `build`, `test`, etc) then
+        // we go on to parse the _rest_ of the CLI args
+        parseArgs(flags, args.slice(1));
+    }
+    else {
+        // we didn't find a leading flag, so we should just parse them all
+        parseArgs(flags, flags.args);
+    }
+    if (flags.task != null) {
+        const i = flags.args.indexOf(flags.task);
+        if (i > -1) {
+            flags.args.splice(i, 1);
         }
     }
-    catch (e) { }
-    return args;
+    // to find unknown / unrecognized arguments we filter `args`, including only
+    // arguments whose normalized form is not found in `knownArgs`. `knownArgs`
+    // is populated during the call to `parseArgs` above. For arguments like
+    // `--foobar` the string `"--foobar"` will be added, while for more
+    // complicated arguments like `--bizBoz=bop` or `--bizBoz bop` just the
+    // string `"--bizBoz"` will be added.
+    flags.unknownArgs = flags.args.filter((arg) => !flags.knownArgs.includes(parseEqualsArg(arg)[0]));
+    return flags;
+};
+/**
+ * Parse the supported command line flags which are enumerated in the
+ * `config-flags` module. Handles leading dashes on arguments, aliases that are
+ * defined for a small number of arguments, and parsing values for non-boolean
+ * arguments (e.g. port number for the dev server).
+ *
+ * This parses the following grammar:
+ *
+ * CLIArguments    → ""
+ *                 | CLITerm ( " " CLITerm )* ;
+ * CLITerm         → EqualsArg
+ *                 | AliasEqualsArg
+ *                 | AliasArg
+ *                 | NegativeDashArg
+ *                 | NegativeArg
+ *                 | SimpleArg ;
+ * EqualsArg       → "--" ArgName "=" CLIValue ;
+ * AliasEqualsArg  → "-" AliasName "=" CLIValue ;
+ * AliasArg        → "-" AliasName ( " " CLIValue )? ;
+ * NegativeDashArg → "--no-" ArgName ;
+ * NegativeArg     → "--no" ArgName ;
+ * SimpleArg       → "--" ArgName ( " " CLIValue )? ;
+ * ArgName         → /^[a-zA-Z-]+$/ ;
+ * AliasName       → /^[a-z]{1}$/ ;
+ * CLIValue        → '"' /^[a-zA-Z0-9]+$/ '"'
+ *                 | /^[a-zA-Z0-9]+$/ ;
+ *
+ * There are additional constraints (not shown in the grammar for brevity's sake)
+ * on the type of `CLIValue` which will be associated with a particular argument.
+ * We enforce this by declaring lists of boolean, string, etc arguments and
+ * checking the types of values before setting them.
+ *
+ * We don't need to turn the list of CLI arg tokens into any kind of
+ * intermediate representation since we aren't concerned with doing anything
+ * other than setting the correct values on our ConfigFlags object. So we just
+ * parse the array of string arguments using a recursive-descent approach
+ * (which is not very deep since our grammar is pretty simple) and make the
+ * modifications we need to make to the {@link ConfigFlags} object as we go.
+ *
+ * @param flags a ConfigFlags object to which parsed arguments will be added
+ * @param args  an array of command-line arguments to parse
+ */
+const parseArgs = (flags, args) => {
+    const argsCopy = args.concat();
+    while (argsCopy.length > 0) {
+        // there are still unprocessed args to deal with
+        parseCLITerm(flags, argsCopy);
+    }
+};
+/**
+ * Given an array of CLI arguments, parse it and perform a series of side
+ * effects (setting values on the provided `ConfigFlags` object).
+ *
+ * @param flags a {@link ConfigFlags} object which is updated as we parse the CLI
+ * arguments
+ * @param args a list of args to work through. This function (and some functions
+ * it calls) calls `Array.prototype.shift` to get the next argument to look at,
+ * so this parameter will be modified.
+ */
+const parseCLITerm = (flags, args) => {
+    // pull off the first arg from the argument array
+    const arg = args.shift();
+    // array is empty, we're done!
+    if (arg === undefined)
+        return;
+    // EqualsArg → "--" ArgName "=" CLIValue ;
+    if (arg.startsWith('--') && arg.includes('=')) {
+        // we're dealing with an EqualsArg, we have a special helper for that
+        const [originalArg, value] = parseEqualsArg(arg);
+        setCLIArg(flags, arg.split('=')[0], normalizeFlagName(originalArg), value);
+    }
+    // AliasEqualsArg  → "-" AliasName "=" CLIValue ;
+    else if (arg.startsWith('-') && arg.includes('=')) {
+        // we're dealing with an AliasEqualsArg, we have a special helper for that
+        const [originalArg, value] = parseEqualsArg(arg);
+        setCLIArg(flags, arg.split('=')[0], normalizeFlagName(originalArg), value);
+    }
+    // AliasArg → "-" AliasName ( " " CLIValue )? ;
+    else if (CLI_FLAG_REGEX.test(arg)) {
+        // this is a short alias, like `-c` for Config
+        setCLIArg(flags, arg, normalizeFlagName(arg), parseCLIValue(args));
+    }
+    // NegativeDashArg → "--no-" ArgName ;
+    else if (arg.startsWith('--no-') && arg.length > '--no-'.length) {
+        // this is a `NegativeDashArg` term, so we need to normalize the negative
+        // flag name and then set an appropriate value
+        const normalized = normalizeNegativeFlagName(arg);
+        setCLIArg(flags, arg, normalized, '');
+    }
+    // NegativeArg → "--no" ArgName ;
+    else if (arg.startsWith('--no') &&
+        !readOnlyArrayHasStringMember(BOOLEAN_CLI_FLAGS, normalizeFlagName(arg)) &&
+        readOnlyArrayHasStringMember(BOOLEAN_CLI_FLAGS, normalizeNegativeFlagName(arg))) {
+        // possibly dealing with a `NegativeArg` here. There is a little ambiguity
+        // here because we have arguments that already begin with `no` like
+        // `notify`, so we need to test if a normalized form of the raw argument is
+        // a valid and supported boolean flag.
+        setCLIArg(flags, arg, normalizeNegativeFlagName(arg), '');
+    }
+    // SimpleArg → "--" ArgName ( " " CLIValue )? ;
+    else if (arg.startsWith('--') && arg.length > '--'.length) {
+        setCLIArg(flags, arg, normalizeFlagName(arg), parseCLIValue(args));
+    }
+    // if we get here it is not an argument in our list of supported arguments.
+    // This doesn't necessarily mean we want to report an error or anything
+    // though! Instead, with unknown / unrecognized arguments we stick them into
+    // the `unknownArgs` array, which is used when we pass CLI args to Jest, for
+    // instance. So we just return void here.
+};
+/**
+ * Normalize a 'negative' flag name, just to do a little pre-processing before
+ * we pass it to `setCLIArg`.
+ *
+ * @param flagName the flag name to normalize
+ * @returns a normalized flag name
+ */
+const normalizeNegativeFlagName = (flagName) => {
+    const trimmed = flagName.replace(/^--no[-]?/, '');
+    return normalizeFlagName(trimmed.charAt(0).toLowerCase() + trimmed.slice(1));
+};
+/**
+ * Normalize a flag name by:
+ *
+ * - replacing any leading dashes (`--foo` -> `foo`)
+ * - converting `dash-case` to camelCase (if necessary)
+ *
+ * Normalizing in this context basically means converting the various
+ * supported flag spelling variants to the variant defined in our lists of
+ * supported arguments (e.g. BOOLEAN_CLI_FLAGS, etc). So, for instance,
+ * `--log-level` should be converted to `logLevel`.
+ *
+ * @param flagName the flag name to normalize
+ * @returns a normalized flag name
+ *
+ */
+const normalizeFlagName = (flagName) => {
+    const trimmed = flagName.replace(/^-+/, '');
+    return trimmed.includes('-') ? toCamelCase(trimmed) : trimmed;
+};
+/**
+ * Set a value on a provided {@link ConfigFlags} object, given an argument
+ * name and a raw string value. This function dispatches to other functions
+ * which make sure that the string value can be properly parsed into a JS
+ * runtime value of the right type (e.g. number, string, etc).
+ *
+ * @throws if a value cannot be parsed to the right type for a given flag
+ * @param flags a {@link ConfigFlags} object
+ * @param rawArg the raw argument name matched by the parser
+ * @param normalizedArg an argument with leading control characters (`--`,
+ * `--no-`, etc) removed
+ * @param value the raw value to be set onto the config flags object
+ */
+const setCLIArg = (flags, rawArg, normalizedArg, value) => {
+    normalizedArg = dereferenceAlias(normalizedArg);
+    // We're setting a boolean!
+    if (readOnlyArrayHasStringMember(BOOLEAN_CLI_FLAGS, normalizedArg)) {
+        flags[normalizedArg] =
+            typeof value === 'string'
+                ? Boolean(value)
+                : // no value was supplied, default to true
+                    true;
+        flags.knownArgs.push(rawArg);
+    }
+    // We're setting a string!
+    else if (readOnlyArrayHasStringMember(STRING_CLI_FLAGS, normalizedArg)) {
+        if (typeof value === 'string') {
+            flags[normalizedArg] = value;
+            flags.knownArgs.push(rawArg);
+            flags.knownArgs.push(value);
+        }
+        else {
+            throwCLIParsingError(rawArg, 'expected a string argument but received nothing');
+        }
+    }
+    // We're setting a string, but it's one where the user can pass multiple values,
+    // like `--reporters="default" --reporters="jest-junit"`
+    else if (readOnlyArrayHasStringMember(STRING_ARRAY_CLI_FLAGS, normalizedArg)) {
+        if (typeof value === 'string') {
+            if (!Array.isArray(flags[normalizedArg])) {
+                flags[normalizedArg] = [];
+            }
+            const targetArray = flags[normalizedArg];
+            // this is irritating, but TS doesn't know that the `!Array.isArray`
+            // check above guarantees we have an array to work with here, and it
+            // doesn't want to narrow the type of `flags[normalizedArg]`, so we need
+            // to grab a reference to that array and then `Array.isArray` that. Bah!
+            if (Array.isArray(targetArray)) {
+                targetArray.push(value);
+                flags.knownArgs.push(rawArg);
+                flags.knownArgs.push(value);
+            }
+        }
+        else {
+            throwCLIParsingError(rawArg, 'expected a string argument but received nothing');
+        }
+    }
+    // We're setting a number!
+    else if (readOnlyArrayHasStringMember(NUMBER_CLI_FLAGS, normalizedArg)) {
+        if (typeof value === 'string') {
+            const parsed = parseInt(value, 10);
+            if (isNaN(parsed)) {
+                throwNumberParsingError(rawArg, value);
+            }
+            else {
+                flags[normalizedArg] = parsed;
+                flags.knownArgs.push(rawArg);
+                flags.knownArgs.push(value);
+            }
+        }
+        else {
+            throwCLIParsingError(rawArg, 'expected a number argument but received nothing');
+        }
+    }
+    // We're setting a value which could be either a string _or_ a number
+    else if (readOnlyArrayHasStringMember(STRING_NUMBER_CLI_FLAGS, normalizedArg)) {
+        if (typeof value === 'string') {
+            if (CLI_ARG_STRING_REGEX.test(value)) {
+                // if it matches the regex we treat it like a string
+                flags[normalizedArg] = value;
+            }
+            else {
+                const parsed = Number(value);
+                if (isNaN(parsed)) {
+                    // parsing didn't go so well, we gotta get out of here
+                    // this is unlikely given our regex guard above
+                    // but hey, this is ultimately JS so let's be safe
+                    throwNumberParsingError(rawArg, value);
+                }
+                else {
+                    flags[normalizedArg] = parsed;
+                }
+            }
+            flags.knownArgs.push(rawArg);
+            flags.knownArgs.push(value);
+        }
+        else {
+            throwCLIParsingError(rawArg, 'expected a string or a number but received nothing');
+        }
+    }
+    // We're setting the log level, which can only be a set of specific string values
+    else if (readOnlyArrayHasStringMember(LOG_LEVEL_CLI_FLAGS, normalizedArg)) {
+        if (typeof value === 'string') {
+            if (isLogLevel(value)) {
+                flags[normalizedArg] = value;
+                flags.knownArgs.push(rawArg);
+                flags.knownArgs.push(value);
+            }
+            else {
+                throwCLIParsingError(rawArg, `expected to receive a valid log level but received "${String(value)}"`);
+            }
+        }
+        else {
+            throwCLIParsingError(rawArg, 'expected to receive a valid log level but received nothing');
+        }
+    }
+};
+/**
+ * We use this regular expression to detect CLI parameters which
+ * should be parsed as string values (as opposed to numbers) for
+ * the argument types for which we support both a string and a
+ * number value.
+ *
+ * The regex tests for the presence of at least one character which is
+ * _not_ a digit (`\d`), a period (`\.`), or one of the characters `"e"`,
+ * `"E"`, `"+"`, or `"-"` (the latter four characters are necessary to
+ * support the admittedly unlikely use of scientific notation, like `"4e+0"`
+ * for `4`).
+ *
+ * Thus we'll match a string like `"50%"`, but not a string like `"50"` or
+ * `"5.0"`. If it matches a given string we conclude that the string should
+ * be parsed as a string literal, rather than using `Number` to convert it
+ * to a number.
+ */
+const CLI_ARG_STRING_REGEX = /[^\d\.Ee\+\-]+/g;
+const Empty = Symbol('Empty');
+/**
+ * A little helper which tries to parse a CLI value (as opposed to a flag) off
+ * of the argument array.
+ *
+ * We support a variety of different argument formats, but all of them start
+ * with `-`, so we can check the first character to test whether the next token
+ * in our array of CLI arguments is a flag name or a value.
+ *
+ * @param args an array of CLI args
+ * @returns either a string result or an Empty sentinel
+ */
+const parseCLIValue = (args) => {
+    // it's possible the arguments array is empty, if so, return empty
+    if (args[0] === undefined) {
+        return Empty;
+    }
+    // all we're concerned with here is that it does not start with `"-"`,
+    // which would indicate it should be parsed as a CLI flag and not a value.
+    if (!args[0].startsWith('-')) {
+        // It's not a flag, so we return the value and defer any specific parsing
+        // until later on.
+        const value = args.shift();
+        if (typeof value === 'string') {
+            return value;
+        }
+    }
+    return Empty;
+};
+/**
+ * Parse an 'equals' argument, which is a CLI argument-value pair in the
+ * format `--foobar=12` (as opposed to a space-separated format like
+ * `--foobar 12`).
+ *
+ * To parse this we split on the `=`, returning the first part as the argument
+ * name and the second part as the value. We join the value on `"="` in case
+ * there is another `"="` in the argument.
+ *
+ * This function is safe to call with any arg, and can therefore be used as
+ * an argument 'normalizer'. If CLI argument is not an 'equals' argument then
+ * the return value will be a tuple of the original argument and an empty
+ * string `""` for the value.
+ *
+ * In code terms, if you do:
+ *
+ * ```ts
+ * const [arg, value] = parseEqualsArg("--myArgument")
+ * ```
+ *
+ * Then `arg` will be `"--myArgument"` and `value` will be `""`, whereas if
+ * you do:
+ *
+ *
+ * ```ts
+ * const [arg, value] = parseEqualsArg("--myArgument=myValue")
+ * ```
+ *
+ * Then `arg` will be `"--myArgument"` and `value` will be `"myValue"`.
+ *
+ * @param arg the arg in question
+ * @returns a tuple containing the arg name and the value (if present)
+ */
+const parseEqualsArg = (arg) => {
+    const [originalArg, ...splitSections] = arg.split('=');
+    const value = splitSections.join('=');
+    return [originalArg, value === '' ? Empty : value];
+};
+/**
+ * Small helper for getting type-system-level assurance that a `string` can be
+ * narrowed to a `LogLevel`
+ *
+ * @param maybeLogLevel the string to check
+ * @returns whether this is a `LogLevel`
+ */
+const isLogLevel = (maybeLogLevel) => readOnlyArrayHasStringMember(LOG_LEVELS, maybeLogLevel);
+/**
+ * A little helper for constructing and throwing an error message with info
+ * about what went wrong
+ *
+ * @param flag the flag which encountered the error
+ * @param message a message specific to the error which was encountered
+ */
+const throwCLIParsingError = (flag, message) => {
+    throw new Error(`when parsing CLI flag "${flag}": ${message}`);
+};
+/**
+ * Throw a specific error for the situation where we ran into an issue parsing
+ * a number.
+ *
+ * @param flag the flag for which we encountered the issue
+ * @param value what we were trying to parse
+ */
+const throwNumberParsingError = (flag, value) => {
+    throwCLIParsingError(flag, `expected a number but received "${value}"`);
+};
+/**
+ * A little helper to 'dereference' a flag alias, which if you squint a little
+ * you can think of like a pointer to a full flag name. Thus 'c' is like a
+ * pointer to 'config', so here we're doing something like `*c`. Of course, this
+ * being JS, this is just a metaphor!
+ *
+ * If no 'dereference' is found for the possible alias we just return the
+ * passed string unmodified.
+ *
+ * @param maybeAlias a string which _could_ be an alias to a full flag name
+ * @returns the full aliased flag name, if found, or the passed string if not
+ */
+const dereferenceAlias = (maybeAlias) => {
+    const possibleDereference = CLI_FLAG_ALIASES[maybeAlias];
+    if (typeof possibleDereference === 'string') {
+        return possibleDereference;
+    }
+    return maybeAlias;
 };
 
 const dependencies = [
 	{
 		name: "@stencil/core",
-		version: "0.0.0-dev.20221221203401",
+		version: "0.0.0-dev.20221221224028",
 		main: "compiler/stencil.js",
 		resources: [
 			"package.json",
@@ -543,13 +1002,16 @@ const dependencies = [
 			"compiler/lib.es2019.array.d.ts",
 			"compiler/lib.es2019.d.ts",
 			"compiler/lib.es2019.full.d.ts",
+			"compiler/lib.es2019.intl.d.ts",
 			"compiler/lib.es2019.object.d.ts",
 			"compiler/lib.es2019.string.d.ts",
 			"compiler/lib.es2019.symbol.d.ts",
 			"compiler/lib.es2020.bigint.d.ts",
 			"compiler/lib.es2020.d.ts",
+			"compiler/lib.es2020.date.d.ts",
 			"compiler/lib.es2020.full.d.ts",
 			"compiler/lib.es2020.intl.d.ts",
+			"compiler/lib.es2020.number.d.ts",
 			"compiler/lib.es2020.promise.d.ts",
 			"compiler/lib.es2020.sharedmemory.d.ts",
 			"compiler/lib.es2020.string.d.ts",
@@ -560,6 +1022,14 @@ const dependencies = [
 			"compiler/lib.es2021.promise.d.ts",
 			"compiler/lib.es2021.string.d.ts",
 			"compiler/lib.es2021.weakref.d.ts",
+			"compiler/lib.es2022.array.d.ts",
+			"compiler/lib.es2022.d.ts",
+			"compiler/lib.es2022.error.d.ts",
+			"compiler/lib.es2022.full.d.ts",
+			"compiler/lib.es2022.intl.d.ts",
+			"compiler/lib.es2022.object.d.ts",
+			"compiler/lib.es2022.sharedmemory.d.ts",
+			"compiler/lib.es2022.string.d.ts",
 			"compiler/lib.es5.d.ts",
 			"compiler/lib.es6.d.ts",
 			"compiler/lib.esnext.d.ts",
@@ -604,28 +1074,125 @@ const dependencies = [
 	},
 	{
 		name: "terser",
-		version: "5.6.1",
+		version: "5.16.1",
 		main: "dist/bundle.min.js"
 	},
 	{
 		name: "typescript",
-		version: "4.5.4",
+		version: "4.9.4",
 		main: "lib/typescript.js"
 	}
 ];
 
+const IS_NODE_ENV = typeof global !== 'undefined' &&
+    typeof require === 'function' &&
+    !!global.process &&
+    typeof __filename === 'string' &&
+    (!global.origin || typeof global.origin !== 'string');
+const IS_BROWSER_ENV = typeof location !== 'undefined' && typeof navigator !== 'undefined' && typeof XMLHttpRequest !== 'undefined';
+
+/**
+ * Creates an instance of a logger
+ * @returns the new logger instance
+ */
+const createLogger = () => {
+    let useColors = IS_BROWSER_ENV;
+    let level = 'info';
+    return {
+        enableColors: (uc) => (useColors = uc),
+        getLevel: () => level,
+        setLevel: (l) => (level = l),
+        emoji: (e) => e,
+        info: console.log.bind(console),
+        warn: console.warn.bind(console),
+        error: console.error.bind(console),
+        debug: console.debug.bind(console),
+        red: (msg) => msg,
+        green: (msg) => msg,
+        yellow: (msg) => msg,
+        blue: (msg) => msg,
+        magenta: (msg) => msg,
+        cyan: (msg) => msg,
+        gray: (msg) => msg,
+        bold: (msg) => msg,
+        dim: (msg) => msg,
+        bgRed: (msg) => msg,
+        createTimeSpan: (_startMsg, _debug = false) => ({
+            duration: () => 0,
+            finish: () => 0,
+        }),
+        printDiagnostics(diagnostics) {
+            diagnostics.forEach((diagnostic) => logDiagnostic(diagnostic, useColors));
+        },
+    };
+};
+const logDiagnostic = (diagnostic, useColors) => {
+    let color = BLUE;
+    let prefix = 'Build';
+    let msg = '';
+    if (diagnostic.level === 'error') {
+        color = RED;
+        prefix = 'Error';
+    }
+    else if (diagnostic.level === 'warn') {
+        color = YELLOW;
+        prefix = 'Warning';
+    }
+    if (diagnostic.header) {
+        prefix = diagnostic.header;
+    }
+    const filePath = diagnostic.relFilePath || diagnostic.absFilePath;
+    if (filePath) {
+        msg += filePath;
+        if (typeof diagnostic.lineNumber === 'number' && diagnostic.lineNumber > 0) {
+            msg += ', line ' + diagnostic.lineNumber;
+            if (typeof diagnostic.columnNumber === 'number' && diagnostic.columnNumber > 0) {
+                msg += ', column ' + diagnostic.columnNumber;
+            }
+        }
+        msg += '\n';
+    }
+    msg += diagnostic.messageText;
+    if (diagnostic.lines && diagnostic.lines.length > 0) {
+        diagnostic.lines.forEach((l) => {
+            msg += '\n' + l.lineNumber + ':  ' + l.text;
+        });
+        msg += '\n';
+    }
+    if (useColors) {
+        const styledPrefix = [
+            '%c' + prefix,
+            `background: ${color}; color: white; padding: 2px 3px; border-radius: 2px; font-size: 0.8em;`,
+        ];
+        console.log(...styledPrefix, msg);
+    }
+    else if (diagnostic.level === 'error') {
+        console.error(msg);
+    }
+    else if (diagnostic.level === 'warn') {
+        console.warn(msg);
+    }
+    else {
+        console.log(msg);
+    }
+};
+const YELLOW = `#f39c12`;
+const RED = `#c0392b`;
+const BLUE = `#3498db`;
+
+/**
+ * Attempt to find a Stencil configuration file on the file system
+ * @param opts the options needed to find the configuration file
+ * @returns the results of attempting to find a configuration file on disk
+ */
 const findConfig = async (opts) => {
     const sys = opts.sys;
     const cwd = sys.getCurrentDirectory();
-    const results = {
-        configPath: null,
-        rootDir: normalizePath(cwd),
-        diagnostics: [],
-    };
+    const rootDir = normalizePath(cwd);
     let configPath = opts.configPath;
     if (isString(configPath)) {
         if (!sys.platformPath.isAbsolute(configPath)) {
-            // passed in a custom stencil config location
+            // passed in a custom stencil config location,
             // but it's relative, so prefix the cwd
             configPath = normalizePath(sys.platformPath.join(cwd, configPath));
         }
@@ -636,8 +1203,13 @@ const findConfig = async (opts) => {
     }
     else {
         // nothing was passed in, use the current working directory
-        configPath = results.rootDir;
+        configPath = rootDir;
     }
+    const results = {
+        configPath,
+        rootDir: normalizePath(cwd),
+        diagnostics: [],
+    };
     const stat = await sys.stat(configPath);
     if (stat.error) {
         const diagnostic = buildError(results.diagnostics);
@@ -670,12 +1242,33 @@ const loadCoreCompiler = async (sys) => {
     return globalThis.stencil;
 };
 
+/**
+ * Log the name of this package (`@stencil/core`) to an output stream
+ *
+ * The output stream is determined by the {@link Logger} instance that is provided as an argument to this function
+ *
+ * The name of the package may not be logged, by design, for certain `task` types and logging levels
+ *
+ * @param logger the logging entity to use to output the name of the package
+ * @param task the current task
+ */
 const startupLog = (logger, task) => {
     if (task === 'info' || task === 'serve' || task === 'version') {
         return;
     }
     logger.info(logger.cyan(`@stencil/core`));
 };
+/**
+ * Log this package's version to an output stream
+ *
+ * The output stream is determined by the {@link Logger} instance that is provided as an argument to this function
+ *
+ * The package version may not be logged, by design, for certain `task` types and logging levels
+ *
+ * @param logger the logging entity to use for output
+ * @param task the current task
+ * @param coreCompiler the compiler instance to derive version information from
+ */
 const startupLogVersion = (logger, task, coreCompiler) => {
     if (task === 'info' || task === 'serve' || task === 'version') {
         return;
@@ -691,11 +1284,25 @@ const startupLogVersion = (logger, task, coreCompiler) => {
     startupMsg += logger.emoji(' ' + coreCompiler.vermoji);
     logger.info(startupMsg);
 };
+/**
+ * Log details from a {@link CompilerSystem} used by Stencil to an output stream
+ *
+ * The output stream is determined by the {@link Logger} instance that is provided as an argument to this function
+ *
+ * @param sys the `CompilerSystem` to report details on
+ * @param logger the logging entity to use for output
+ * @param flags user set flags for the current invocation of Stencil
+ * @param coreCompiler the compiler instance being used for this invocation of Stencil
+ */
 const loadedCompilerLog = (sys, logger, flags, coreCompiler) => {
     const sysDetails = sys.details;
     const runtimeInfo = `${sys.name} ${sys.version}`;
-    const platformInfo = `${sysDetails.platform}, ${sysDetails.cpuModel}`;
-    const statsInfo = `cpus: ${sys.hardwareConcurrency}, freemem: ${Math.round(sysDetails.freemem() / 1000000)}MB, totalmem: ${Math.round(sysDetails.totalmem / 1000000)}MB`;
+    const platformInfo = sysDetails
+        ? `${sysDetails.platform}, ${sysDetails.cpuModel}`
+        : `Unknown Platform, Unknown CPU Model`;
+    const statsInfo = sysDetails
+        ? `cpus: ${sys.hardwareConcurrency}, freemem: ${Math.round(sysDetails.freemem() / 1000000)}MB, totalmem: ${Math.round(sysDetails.totalmem / 1000000)}MB`
+        : 'Unknown CPU Core Count, Unknown Memory';
     if (logger.getLevel() === 'debug') {
         logger.debug(runtimeInfo);
         logger.debug(platformInfo);
@@ -709,6 +1316,14 @@ const loadedCompilerLog = (sys, logger, flags, coreCompiler) => {
         logger.info(statsInfo);
     }
 };
+/**
+ * Log various warnings to an output stream
+ *
+ * The output stream is determined by the {@link Logger} instance attached to the `config` argument to this function
+ *
+ * @param coreCompiler the compiler instance being used for this invocation of Stencil
+ * @param config a validated configuration object to be used for this run of Stencil
+ */
 const startupCompilerLog = (coreCompiler, config) => {
     if (config.suppressLogs === true) {
         return;
@@ -726,6 +1341,21 @@ const startupCompilerLog = (coreCompiler, config) => {
         }
         if (!config.enableCache) {
             logger.warn(`Disabling cache during development will slow down incremental builds.`);
+        }
+    }
+};
+
+const startCheckVersion = async (config, currentVersion) => {
+    if (config.devMode && !config.flags.ci && !currentVersion.includes('-dev.') && isFunction(config.sys.checkVersion)) {
+        return config.sys.checkVersion(config.logger, currentVersion);
+    }
+    return null;
+};
+const printCheckVersionResults = async (versionChecker) => {
+    if (versionChecker) {
+        const checkVersionResults = await versionChecker;
+        if (isFunction(checkVersionResults)) {
+            checkVersionResults();
         }
     }
 };
@@ -759,21 +1389,6 @@ const runPrerenderTask = async (coreCompiler, config, hydrateAppFilePath, compon
         catchError(diagnostics, e);
     }
     return diagnostics;
-};
-
-const startCheckVersion = async (config, currentVersion) => {
-    if (config.devMode && !config.flags.ci && !currentVersion.includes('-dev.') && isFunction(config.sys.checkVersion)) {
-        return config.sys.checkVersion(config.logger, currentVersion);
-    }
-    return null;
-};
-const printCheckVersionResults = async (versionChecker) => {
-    if (versionChecker) {
-        const checkVersionResults = await versionChecker;
-        if (isFunction(checkVersionResults)) {
-            checkVersionResults();
-        }
-    }
 };
 
 const taskWatch = async (coreCompiler, config) => {
@@ -822,6 +1437,15 @@ const taskWatch = async (coreCompiler, config) => {
     }
 };
 
+const isOutputTargetHydrate = (o) => o.type === DIST_HYDRATE_SCRIPT;
+const isOutputTargetDocs = (o) => o.type === DOCS_README || o.type === DOCS_JSON || o.type === DOCS_CUSTOM || o.type === DOCS_VSCODE;
+const DIST_HYDRATE_SCRIPT = 'dist-hydrate-script';
+const DOCS_CUSTOM = 'docs-custom';
+const DOCS_JSON = 'docs-json';
+const DOCS_README = 'docs-readme';
+const DOCS_VSCODE = 'docs-vscode';
+const WWW = 'www';
+
 const tryFn = async (fn, ...args) => {
     try {
         return await fn(...args);
@@ -831,12 +1455,11 @@ const tryFn = async (fn, ...args) => {
     }
     return null;
 };
-const isInteractive = (sys, config, object) => {
-    var _a;
+const isInteractive = (sys, flags, object) => {
     const terminalInfo = object ||
         Object.freeze({
             tty: sys.isTTY() ? true : false,
-            ci: ['CI', 'BUILD_ID', 'BUILD_NUMBER', 'BITBUCKET_COMMIT', 'CODEBUILD_BUILD_ARN'].filter((v) => !!sys.getEnvironmentVar(v)).length > 0 || !!((_a = config.flags) === null || _a === void 0 ? void 0 : _a.ci),
+            ci: ['CI', 'BUILD_ID', 'BUILD_NUMBER', 'BITBUCKET_COMMIT', 'CODEBUILD_BUILD_ARN'].filter((v) => { var _a; return !!((_a = sys.getEnvironmentVar) === null || _a === void 0 ? void 0 : _a.call(sys, v)); }).length > 0 || !!flags.ci,
         });
     return terminalInfo.tty && !terminalInfo.ci;
 };
@@ -861,30 +1484,19 @@ async function readJson(sys, path) {
 }
 /**
  * Does the command have the debug flag?
- * @param config The config passed into the Stencil command
+ * @param flags The configuration flags passed into the Stencil command
  * @returns true if --debug has been passed, otherwise false
  */
-function hasDebug(config) {
-    return config.flags.debug;
+function hasDebug(flags) {
+    return !!flags.debug;
 }
 /**
  * Does the command have the verbose and debug flags?
- * @param config The config passed into the Stencil command
+ * @param flags The configuration flags passed into the Stencil command
  * @returns true if both --debug and --verbose have been passed, otherwise false
  */
-function hasVerbose(config) {
-    return config.flags.verbose && hasDebug(config);
-}
-
-/**
- * Used to determine if tracking should occur.
- * @param config The config passed into the Stencil command
- * @param sys The system where the command is invoked
- * @param ci whether or not the process is running in a Continuous Integration (CI) environment
- * @returns true if telemetry should be sent, false otherwise
- */
-async function shouldTrack(config, sys, ci) {
-    return !ci && isInteractive(sys, config) && (await checkTelemetry(sys));
+function hasVerbose(flags) {
+    return !!flags.verbose && hasDebug(flags);
 }
 
 const isTest$1 = () => process.env.JEST_WORKER_ID !== undefined;
@@ -905,7 +1517,7 @@ async function readConfig(sys) {
         };
         await writeConfig(sys, config);
     }
-    else if (!UUID_REGEX.test(config['tokens.telemetry'])) {
+    else if (!config['tokens.telemetry'] || !UUID_REGEX.test(config['tokens.telemetry'])) {
         const newUuid = uuidv4();
         await writeConfig(sys, { ...config, 'tokens.telemetry': newUuid });
         config['tokens.telemetry'] = newUuid;
@@ -941,44 +1553,46 @@ async function updateConfig(sys, newOptions) {
     return await writeConfig(sys, Object.assign(config, newOptions));
 }
 
-const isOutputTargetDocs = (o) => o.type === DOCS_README || o.type === DOCS_JSON || o.type === DOCS_CUSTOM || o.type === DOCS_VSCODE;
-const DOCS_CUSTOM = 'docs-custom';
-const DOCS_JSON = 'docs-json';
-const DOCS_README = 'docs-readme';
-const DOCS_VSCODE = 'docs-vscode';
-const WWW = 'www';
+/**
+ * Used to determine if tracking should occur.
+ * @param config The config passed into the Stencil command
+ * @param sys The system where the command is invoked
+ * @param ci whether or not the process is running in a Continuous Integration (CI) environment
+ * @returns true if telemetry should be sent, false otherwise
+ */
+async function shouldTrack(config, sys, ci) {
+    return !ci && isInteractive(sys, config.flags) && (await checkTelemetry(sys));
+}
 
 /**
  * Used to within taskBuild to provide the component_count property.
  *
  * @param sys The system where the command is invoked
  * @param config The config passed into the Stencil command
- * @param logger The tool used to do logging
  * @param coreCompiler The compiler used to do builds
  * @param result The results of a compiler build.
  */
-async function telemetryBuildFinishedAction(sys, config, logger, coreCompiler, result) {
-    const tracking = await shouldTrack(config, sys, config.flags.ci);
+async function telemetryBuildFinishedAction(sys, config, coreCompiler, result) {
+    const tracking = await shouldTrack(config, sys, !!config.flags.ci);
     if (!tracking) {
         return;
     }
-    const component_count = Object.keys(result.componentGraph).length;
+    const component_count = result.componentGraph ? Object.keys(result.componentGraph).length : undefined;
     const data = await prepareData(coreCompiler, config, sys, result.duration, component_count);
     await sendMetric(sys, config, 'stencil_cli_command', data);
-    logger.debug(`${logger.blue('Telemetry')}: ${logger.gray(JSON.stringify(data))}`);
+    config.logger.debug(`${config.logger.blue('Telemetry')}: ${config.logger.gray(JSON.stringify(data))}`);
 }
 /**
  * A function to wrap a compiler task function around. Will send telemetry if, and only if, the machine allows.
+ *
  * @param sys The system where the command is invoked
  * @param config The config passed into the Stencil command
- * @param logger The tool used to do logging
  * @param coreCompiler The compiler used to do builds
  * @param action A Promise-based function to call in order to get the duration of any given command.
  * @returns void
  */
-async function telemetryAction(sys, config, logger, coreCompiler, action) {
-    var _a;
-    const tracking = await shouldTrack(config, sys, !!((_a = config === null || config === void 0 ? void 0 : config.flags) === null || _a === void 0 ? void 0 : _a.ci));
+async function telemetryAction(sys, config, coreCompiler, action) {
+    const tracking = await shouldTrack(config, sys, !!config.flags.ci);
     let duration = undefined;
     let error;
     if (action) {
@@ -998,11 +1612,20 @@ async function telemetryAction(sys, config, logger, coreCompiler, action) {
     }
     const data = await prepareData(coreCompiler, config, sys, duration);
     await sendMetric(sys, config, 'stencil_cli_command', data);
-    logger.debug(`${logger.blue('Telemetry')}: ${logger.gray(JSON.stringify(data))}`);
+    config.logger.debug(`${config.logger.blue('Telemetry')}: ${config.logger.gray(JSON.stringify(data))}`);
     if (error) {
         throw error;
     }
 }
+/**
+ * Helper function to determine if a Stencil configuration builds an application.
+ *
+ * This function is a rough approximation whether an application is generated as a part of a Stencil build, based on
+ * contents of the project's `stencil.config.ts` file.
+ *
+ * @param config the configuration used by the Stencil project
+ * @returns true if we believe the project generates an application, false otherwise
+ */
 function hasAppTarget(config) {
     return config.outputTargets.some((target) => target.type === WWW && (!!target.serviceWorker || (!!target.baseUrl && target.baseUrl !== '/')));
 }
@@ -1010,48 +1633,151 @@ function isUsingYarn(sys) {
     var _a;
     return ((_a = sys.getEnvironmentVar('npm_execpath')) === null || _a === void 0 ? void 0 : _a.includes('yarn')) || false;
 }
-async function getActiveTargets(config) {
+/**
+ * Build a list of the different types of output targets used in a Stencil configuration.
+ *
+ * Duplicate entries will not be returned from the list
+ *
+ * @param config the configuration used by the Stencil project
+ * @returns a unique list of output target types found in the Stencil configuration
+ */
+function getActiveTargets(config) {
     const result = config.outputTargets.map((t) => t.type);
     return Array.from(new Set(result));
 }
+/**
+ * Prepare data for telemetry
+ *
+ * @param coreCompiler the core compiler
+ * @param config the current Stencil config
+ * @param sys the compiler system instance in use
+ * @param duration_ms the duration of the action being tracked
+ * @param component_count the number of components being built (optional)
+ * @returns a Promise wrapping data for the telemetry endpoint
+ */
 const prepareData = async (coreCompiler, config, sys, duration_ms, component_count = undefined) => {
+    var _a, _b, _c;
     const { typescript, rollup } = coreCompiler.versions || { typescript: 'unknown', rollup: 'unknown' };
     const { packages, packagesNoVersions } = await getInstalledPackages(sys, config);
-    const targets = await getActiveTargets(config);
+    const targets = getActiveTargets(config);
     const yarn = isUsingYarn(sys);
     const stencil = coreCompiler.version || 'unknown';
     const system = `${sys.name} ${sys.version}`;
-    const os_name = sys.details.platform;
-    const os_version = sys.details.release;
-    const cpu_model = sys.details.cpuModel;
+    const os_name = (_a = sys.details) === null || _a === void 0 ? void 0 : _a.platform;
+    const os_version = (_b = sys.details) === null || _b === void 0 ? void 0 : _b.release;
+    const cpu_model = (_c = sys.details) === null || _c === void 0 ? void 0 : _c.cpuModel;
     const build = coreCompiler.buildId || 'unknown';
     const has_app_pwa_config = hasAppTarget(config);
+    const anonymizedConfig = anonymizeConfigForTelemetry(config);
+    const is_browser_env = IS_BROWSER_ENV;
     return {
-        yarn,
-        duration_ms,
+        arguments: config.flags.args,
+        build,
         component_count,
-        targets,
+        config: anonymizedConfig,
+        cpu_model,
+        duration_ms,
+        has_app_pwa_config,
+        is_browser_env,
+        os_name,
+        os_version,
         packages,
         packages_no_versions: packagesNoVersions,
-        arguments: config.flags.args,
-        task: config.flags.task,
+        rollup,
         stencil,
         system,
         system_major: getMajorVersion(system),
-        os_name,
-        os_version,
-        cpu_model,
-        build,
+        targets,
+        task: config.flags.task,
         typescript,
-        rollup,
-        has_app_pwa_config,
+        yarn,
     };
 };
+// props in output targets for which we retain their original values when
+// preparing a config for telemetry
+//
+// we omit the values of all other fields on output targets.
+const OUTPUT_TARGET_KEYS_TO_KEEP = ['type'];
+// top-level config props that we anonymize for telemetry
+const CONFIG_PROPS_TO_ANONYMIZE = [
+    'rootDir',
+    'fsNamespace',
+    'packageJsonFilePath',
+    'namespace',
+    'srcDir',
+    'srcIndexHtml',
+    'buildLogFilePath',
+    'cacheDir',
+    'configPath',
+    'tsconfig',
+];
+// Props we delete entirely from the config for telemetry
+//
+// TODO(STENCIL-469): Investigate improving anonymization for tsCompilerOptions and devServer
+const CONFIG_PROPS_TO_DELETE = [
+    'commonjs',
+    'devServer',
+    'env',
+    'logger',
+    'rollupConfig',
+    'sys',
+    'testing',
+    'tsCompilerOptions',
+];
 /**
- * Reads package-lock.json, yarn.lock, and package.json files in order to cross reference
+ * Anonymize the config for telemetry, replacing potentially revealing config props
+ * with a placeholder string if they are present (this lets us still track how frequently
+ * these config options are being used)
+ *
+ * @param config the config to anonymize
+ * @returns an anonymized copy of the same config
+ */
+const anonymizeConfigForTelemetry = (config) => {
+    const anonymizedConfig = { ...config };
+    for (const prop of CONFIG_PROPS_TO_ANONYMIZE) {
+        if (anonymizedConfig[prop] !== undefined) {
+            anonymizedConfig[prop] = 'omitted';
+        }
+    }
+    anonymizedConfig.outputTargets = config.outputTargets.map((target) => {
+        // Anonymize the outputTargets on our configuration, taking advantage of the
+        // optional 2nd argument to `JSON.stringify`. If anything is not a string
+        // we retain it so that any nested properties are handled, else we check
+        // whether it's in our 'keep' list to decide whether to keep it or replace it
+        // with `"omitted"`.
+        const anonymizedOT = JSON.parse(JSON.stringify(target, (key, value) => {
+            if (!(typeof value === 'string')) {
+                return value;
+            }
+            if (OUTPUT_TARGET_KEYS_TO_KEEP.includes(key)) {
+                return value;
+            }
+            return 'omitted';
+        }));
+        // this prop has to be handled separately because it is an array
+        // so the replace function above will be called with all of its
+        // members, giving us `["omitted", "omitted", ...]`.
+        //
+        // Instead, we check for its presence and manually copy over.
+        if (isOutputTargetHydrate(target) && target.external) {
+            anonymizedOT['external'] = target.external.concat();
+        }
+        return anonymizedOT;
+    });
+    // TODO(STENCIL-469): Investigate improving anonymization for tsCompilerOptions and devServer
+    for (const prop of CONFIG_PROPS_TO_DELETE) {
+        delete anonymizedConfig[prop];
+    }
+    return anonymizedConfig;
+};
+/**
+ * Reads package-lock.json, yarn.lock, and package.json files in order to cross-reference
  * the dependencies and devDependencies properties. Pulls up the current installed version
  * of each package under the @stencil, @ionic, and @capacitor scopes.
- * @returns string[]
+ *
+ * @param sys the system instance where telemetry is invoked
+ * @param config the Stencil configuration associated with the current task that triggered telemetry
+ * @returns an object listing all dev and production dependencies under the aforementioned scopes
  */
 async function getInstalledPackages(sys, config) {
     let packages = [];
@@ -1082,7 +1808,7 @@ async function getInstalledPackages(sys, config) {
         return { packages, packagesNoVersions };
     }
     catch (err) {
-        hasDebug(config) && console.error(err);
+        hasDebug(config.flags) && console.error(err);
         return { packages, packagesNoVersions };
     }
 }
@@ -1130,7 +1856,13 @@ function sanitizeDeclaredVersion(version) {
     return version.replace(/[*^~]/g, '');
 }
 /**
- * If telemetry is enabled, send a metric via IPC to a forked process for uploading.
+ * If telemetry is enabled, send a metric to an external data store
+ *
+ * @param sys the system instance where telemetry is invoked
+ * @param config the Stencil configuration associated with the current task that triggered telemetry
+ * @param name the name of a trackable metric. Note this name is not necessarily a scalar value to track, like
+ * "Stencil Version". For example, "stencil_cli_command" is a name that is used to track all CLI command information.
+ * @param value the data to send to the external data store under the provided name argument
  */
 async function sendMetric(sys, config, name, value) {
     const session_id = await getTelemetryToken(sys);
@@ -1141,10 +1873,11 @@ async function sendMetric(sys, config, name, value) {
         value,
         session_id,
     };
-    await sendTelemetry(sys, config, { type: 'telemetry', message });
+    await sendTelemetry(sys, config, message);
 }
 /**
  * Used to read the config file's tokens.telemetry property.
+ *
  * @param sys The system where the command is invoked
  * @returns string
  */
@@ -1166,7 +1899,7 @@ async function sendTelemetry(sys, config, data) {
     try {
         const now = new Date().toISOString();
         const body = {
-            metrics: [data.message],
+            metrics: [data],
             sent_at: now,
         };
         // This request is only made if telemetry is on.
@@ -1177,15 +1910,15 @@ async function sendTelemetry(sys, config, data) {
             },
             body: JSON.stringify(body),
         });
-        hasVerbose(config) &&
-            console.debug('\nSent %O metric to events service (status: %O)', data.message.name, response.status, '\n');
+        hasVerbose(config.flags) &&
+            console.debug('\nSent %O metric to events service (status: %O)', data.name, response.status, '\n');
         if (response.status !== 204) {
-            hasVerbose(config) &&
+            hasVerbose(config.flags) &&
                 console.debug('\nBad response from events service. Request body: %O', response.body.toString(), '\n');
         }
     }
     catch (e) {
-        hasVerbose(config) && console.debug('Telemetry request failed:', e);
+        hasVerbose(config.flags) && console.debug('Telemetry request failed:', e);
     }
 }
 /**
@@ -1227,7 +1960,7 @@ function getMajorVersion(version) {
     return parts[0];
 }
 
-const taskBuild = async (coreCompiler, config, sys) => {
+const taskBuild = async (coreCompiler, config) => {
     if (config.flags.watch) {
         // watch build
         await taskWatch(coreCompiler, config);
@@ -1240,10 +1973,7 @@ const taskBuild = async (coreCompiler, config, sys) => {
         const versionChecker = startCheckVersion(config, coreCompiler.version);
         const compiler = await coreCompiler.createCompiler(config);
         const results = await compiler.build();
-        // TODO(STENCIL-148) make this parameter no longer optional, remove the surrounding if statement
-        if (sys) {
-            await telemetryBuildFinishedAction(sys, config, config.logger, coreCompiler, results);
-        }
+        await telemetryBuildFinishedAction(config.sys, config, coreCompiler, results);
         await compiler.destroy();
         if (results.hasError) {
             exitCode = 1;
@@ -1276,12 +2006,6 @@ const taskDocs = async (coreCompiler, config) => {
     await compiler.destroy();
 };
 
-const IS_NODE_ENV = typeof global !== 'undefined' &&
-    typeof require === 'function' &&
-    !!global.process &&
-    typeof __filename === 'string' &&
-    (!global.origin || typeof global.origin !== 'string');
-
 /**
  * Task to generate component boilerplate and write it to disk. This task can
  * cause the program to exit with an error under various circumstances, such as
@@ -1310,13 +2034,24 @@ const taskGenerate = async (coreCompiler, config) => {
     const { prompt } = await import('../sys/node/prompts.js');
     const input = config.flags.unknownArgs.find((arg) => !arg.startsWith('-')) ||
         (await prompt({ name: 'tagName', type: 'text', message: 'Component tag name (dash-case):' })).tagName;
+    if (undefined === input) {
+        // in some shells (e.g. Windows PowerShell), hitting Ctrl+C results in a TypeError printed to the console.
+        // explicitly return here to avoid printing the error message.
+        return;
+    }
     const { dir, base: componentName } = path.parse(input);
     const tagError = validateComponentTag(componentName);
     if (tagError) {
         config.logger.error(tagError);
         return config.sys.exit(1);
     }
-    const extensionsToGenerate = ['tsx', ...(await chooseFilesToGenerate())];
+    const filesToGenerateExt = await chooseFilesToGenerate();
+    if (undefined === filesToGenerateExt) {
+        // in some shells (e.g. Windows PowerShell), hitting Ctrl+C results in a TypeError printed to the console.
+        // explicitly return here to avoid printing the error message.
+        return;
+    }
+    const extensionsToGenerate = ['tsx', ...filesToGenerateExt];
     const testFolder = extensionsToGenerate.some(isTest) ? 'test' : '';
     const outDir = path.join(absoluteSrcDir, 'components', dir, componentName);
     await config.sys.createDir(path.join(outDir, testFolder), { recursive: true });
@@ -1329,7 +2064,10 @@ const taskGenerate = async (coreCompiler, config) => {
     if (!writtenFiles) {
         return config.sys.exit(1);
     }
-    // TODO(STENCIL-424): Investigate moving these console.log calls to config.logger.info
+    // We use `console.log` here rather than our `config.logger` because we don't want
+    // our TUI messages to be prefixed with timestamps and so on.
+    //
+    // See STENCIL-424 for details.
     console.log();
     console.log(`${config.logger.gray('$')} stencil generate ${input}`);
     console.log();
@@ -1443,7 +2181,10 @@ const getBoilerplateByExtension = (tagName, extension, withCss) => {
     }
 };
 /**
- * Get the boilerplate for a component.
+ * Get the boilerplate for a file containing the definition of a component
+ * @param tagName the name of the tag to give the component
+ * @param hasStyle designates if the component has an external stylesheet or not
+ * @returns the contents of a file that defines a component
  */
 const getComponentBoilerplate = (tagName, hasStyle) => {
     const decorator = [`{`];
@@ -1470,14 +2211,17 @@ export class ${toPascalCase(tagName)} {
 `;
 };
 /**
- * Get the boilerplate for style.
+ * Get the boilerplate for style for a generated component
+ * @returns a boilerplate CSS block
  */
 const getStyleUrlBoilerplate = () => `:host {
   display: block;
 }
 `;
 /**
- * Get the boilerplate for a spec test.
+ * Get the boilerplate for a file containing a spec (unit) test for a component
+ * @param tagName the name of the tag associated with the component under test
+ * @returns the contents of a file that unit tests a component
  */
 const getSpecTestBoilerplate = (tagName) => `import { newSpecPage } from '@stencil/core/testing';
 import { ${toPascalCase(tagName)} } from '../${tagName}';
@@ -1499,30 +2243,41 @@ describe('${tagName}', () => {
 });
 `;
 /**
- * Get the boilerplate for an E2E test.
+ * Get the boilerplate for a file containing an end-to-end (E2E) test for a component
+ * @param tagName the name of the tag associated with the component under test
+ * @returns the contents of a file that E2E tests a component
  */
-const getE2eTestBoilerplate = (name) => `import { newE2EPage } from '@stencil/core/testing';
+const getE2eTestBoilerplate = (tagName) => `import { newE2EPage } from '@stencil/core/testing';
 
-describe('${name}', () => {
+describe('${tagName}', () => {
   it('renders', async () => {
     const page = await newE2EPage();
-    await page.setContent('<${name}></${name}>');
+    await page.setContent('<${tagName}></${tagName}>');
 
-    const element = await page.find('${name}');
+    const element = await page.find('${tagName}');
     expect(element).toHaveClass('hydrated');
   });
 });
 `;
 /**
  * Convert a dash case string to pascal case.
+ * @param str the string to convert
+ * @returns the converted input as pascal case
  */
 const toPascalCase = (str) => str.split('-').reduce((res, part) => res + part[0].toUpperCase() + part.slice(1), '');
 
-const taskTelemetry = async (config, sys, logger) => {
+/**
+ * Entrypoint for the Telemetry task
+ * @param flags configuration flags provided to Stencil when a task was called (either this task or a task that invokes
+ * telemetry)
+ * @param sys the abstraction for interfacing with the operating system
+ * @param logger a logging implementation to log the results out to the user
+ */
+const taskTelemetry = async (flags, sys, logger) => {
     const prompt = logger.dim(sys.details.platform === 'windows' ? '>' : '$');
-    const isEnabling = config.flags.args.includes('on');
-    const isDisabling = config.flags.args.includes('off');
-    const INFORMATION = `Opt in or our of telemetry. Information about the data we collect is available on our website: ${logger.bold('https://stenciljs.com/telemetry')}`;
+    const isEnabling = flags.args.includes('on');
+    const isDisabling = flags.args.includes('off');
+    const INFORMATION = `Opt in or out of telemetry. Information about the data we collect is available on our website: ${logger.bold('https://stenciljs.com/telemetry')}`;
     const THANK_YOU = `Thank you for helping to make Stencil better! 💖`;
     const ENABLED_MESSAGE = `${logger.green('Enabled')}. ${THANK_YOU}\n\n`;
     const DISABLED_MESSAGE = `${logger.red('Disabled')}\n\n`;
@@ -1550,7 +2305,14 @@ const taskTelemetry = async (config, sys, logger) => {
   `);
 };
 
-const taskHelp = async (config, logger, sys) => {
+/**
+ * Entrypoint for the Help task, providing Stencil usage context to the user
+ * @param flags configuration flags provided to Stencil when a task was call (either this task or a task that invokes
+ * telemetry)
+ * @param logger a logging implementation to log the results out to the user
+ * @param sys the abstraction for interfacing with the operating system
+ */
+const taskHelp = async (flags, logger, sys) => {
     const prompt = logger.dim(sys.details.platform === 'windows' ? '>' : '$');
     console.log(`
   ${logger.bold('Build:')} ${logger.dim('Build components for development or production.')}
@@ -1581,10 +2343,7 @@ const taskHelp = async (config, logger, sys) => {
     ${prompt} ${logger.green('stencil generate')} or ${logger.green('stencil g')}
 
 `);
-    // TODO(STENCIL-148) make this parameter no longer optional, remove the surrounding if statement
-    if (sys) {
-        await taskTelemetry(config, sys, logger);
-    }
+    await taskTelemetry(flags, sys, logger);
     console.log(`
   ${logger.bold('Examples:')}
 
@@ -1640,37 +2399,41 @@ const taskServe = async (config) => {
     });
 };
 
+/**
+ * Entrypoint for any Stencil tests
+ * @param config a validated Stencil configuration entity
+ */
 const taskTest = async (config) => {
     if (!IS_NODE_ENV) {
         config.logger.error(`"test" command is currently only implemented for a NodeJS environment`);
         return config.sys.exit(1);
     }
+    config.buildDocs = false;
+    const testingRunOpts = {
+        e2e: !!config.flags.e2e,
+        screenshot: !!config.flags.screenshot,
+        spec: !!config.flags.spec,
+        updateScreenshot: !!config.flags.updateScreenshot,
+    };
+    // always ensure we have jest modules installed
+    const ensureModuleIds = ['@types/jest', 'jest', 'jest-cli'];
+    if (testingRunOpts.e2e) {
+        // if it's an e2e test, also make sure we're got
+        // puppeteer modules installed and if browserExecutablePath is provided don't download Chromium use only puppeteer-core instead
+        const puppeteer = config.testing.browserExecutablePath ? 'puppeteer-core' : 'puppeteer';
+        ensureModuleIds.push(puppeteer);
+        if (testingRunOpts.screenshot) {
+            // ensure we've got pixelmatch for screenshots
+            config.logger.warn(config.logger.yellow(`EXPERIMENTAL: screenshot visual diff testing is currently under heavy development and has not reached a stable status. However, any assistance testing would be appreciated.`));
+        }
+    }
+    // ensure we've got the required modules installed
+    const diagnostics = await config.sys.lazyRequire.ensure(config.rootDir, ensureModuleIds);
+    if (diagnostics.length > 0) {
+        config.logger.printDiagnostics(diagnostics);
+        return config.sys.exit(1);
+    }
     try {
-        config.buildDocs = false;
-        const testingRunOpts = {
-            e2e: !!config.flags.e2e,
-            screenshot: !!config.flags.screenshot,
-            spec: !!config.flags.spec,
-            updateScreenshot: !!config.flags.updateScreenshot,
-        };
-        // always ensure we have jest modules installed
-        const ensureModuleIds = ['@types/jest', 'jest', 'jest-cli'];
-        if (testingRunOpts.e2e) {
-            // if it's an e2e test, also make sure we're got
-            // puppeteer modules installed and if browserExecutablePath is provided don't download Chromium use only puppeteer-core instead
-            const puppeteer = config.testing.browserExecutablePath ? 'puppeteer-core' : 'puppeteer';
-            ensureModuleIds.push(puppeteer);
-            if (testingRunOpts.screenshot) {
-                // ensure we've got pixelmatch for screenshots
-                config.logger.warn(config.logger.yellow(`EXPERIMENTAL: screenshot visual diff testing is currently under heavy development and has not reached a stable status. However, any assistance testing would be appreciated.`));
-            }
-        }
-        // ensure we've got the required modules installed
-        const diagnostics = await config.sys.lazyRequire.ensure(config.rootDir, ensureModuleIds);
-        if (diagnostics.length > 0) {
-            config.logger.printDiagnostics(diagnostics);
-            return config.sys.exit(1);
-        }
         // let's test!
         const { createTesting } = await import('../testing/index.js');
         const testing = await createTesting(config);
@@ -1689,7 +2452,7 @@ const taskTest = async (config) => {
 const run = async (init) => {
     const { args, logger, sys } = init;
     try {
-        const flags = parseFlags(args, sys);
+        const flags = parseFlags(args);
         const task = flags.task;
         if (flags.debug || flags.verbose) {
             logger.setLevel('debug');
@@ -1700,8 +2463,8 @@ const run = async (init) => {
         if (isFunction(sys.applyGlobalPatch)) {
             sys.applyGlobalPatch(sys.getCurrentDirectory());
         }
-        if (task === 'help' || flags.help) {
-            await taskHelp({ flags: { task: 'help', args }, outputTargets: [] }, logger, sys);
+        if (!task || task === 'help' || flags.help) {
+            await taskHelp(createConfigFlags({ task: 'help', args }), logger, sys);
             return;
         }
         startupLog(logger, task);
@@ -1727,9 +2490,7 @@ const run = async (init) => {
         startupLogVersion(logger, task, coreCompiler);
         loadedCompilerLog(sys, logger, flags, coreCompiler);
         if (task === 'info') {
-            await telemetryAction(sys, { flags: { task: 'info' }, outputTargets: [] }, logger, coreCompiler, async () => {
-                await taskInfo(coreCompiler, sys, logger);
-            });
+            taskInfo(coreCompiler, sys, logger);
             return;
         }
         const validated = await coreCompiler.loadConfig({
@@ -1750,7 +2511,7 @@ const run = async (init) => {
             sys.applyGlobalPatch(validated.config.rootDir);
         }
         await sys.ensureResources({ rootDir: validated.config.rootDir, logger, dependencies: dependencies });
-        await telemetryAction(sys, validated.config, logger, coreCompiler, async () => {
+        await telemetryAction(sys, validated.config, coreCompiler, async () => {
             await runTask(coreCompiler, validated.config, task, sys);
         });
     }
@@ -1762,44 +2523,58 @@ const run = async (init) => {
         }
     }
 };
+/**
+ * Run a specified task
+ * @param coreCompiler an instance of a minimal, bootstrap compiler for running the specified task
+ * @param config a configuration for the Stencil project to apply to the task run
+ * @param task the task to run
+ * @param sys the {@link CompilerSystem} for interacting with the operating system
+ * @public
+ */
 const runTask = async (coreCompiler, config, task, sys) => {
-    config.flags = config.flags || { task };
-    config.outputTargets = config.outputTargets || [];
+    var _a, _b, _c, _d, _e, _f;
+    const logger = (_a = config.logger) !== null && _a !== void 0 ? _a : createLogger();
+    const strictConfig = {
+        ...config,
+        flags: createConfigFlags((_b = config.flags) !== null && _b !== void 0 ? _b : { task }),
+        logger,
+        outputTargets: (_c = config.outputTargets) !== null && _c !== void 0 ? _c : [],
+        rootDir: (_d = config.rootDir) !== null && _d !== void 0 ? _d : '/',
+        sys: (_e = sys !== null && sys !== void 0 ? sys : config.sys) !== null && _e !== void 0 ? _e : coreCompiler.createSystem({ logger }),
+        testing: (_f = config.testing) !== null && _f !== void 0 ? _f : {},
+    };
     switch (task) {
         case 'build':
-            await taskBuild(coreCompiler, config, sys);
+            await taskBuild(coreCompiler, strictConfig);
             break;
         case 'docs':
-            await taskDocs(coreCompiler, config);
+            await taskDocs(coreCompiler, strictConfig);
             break;
         case 'generate':
         case 'g':
-            await taskGenerate(coreCompiler, config);
+            await taskGenerate(coreCompiler, strictConfig);
             break;
         case 'help':
-            await taskHelp(config, config.logger, sys);
+            await taskHelp(strictConfig.flags, strictConfig.logger, sys);
             break;
         case 'prerender':
-            await taskPrerender(coreCompiler, config);
+            await taskPrerender(coreCompiler, strictConfig);
             break;
         case 'serve':
-            await taskServe(config);
+            await taskServe(strictConfig);
             break;
         case 'telemetry':
-            // TODO(STENCIL-148) make this parameter no longer optional, remove the surrounding if statement
-            if (sys) {
-                await taskTelemetry(config, sys, config.logger);
-            }
+            await taskTelemetry(strictConfig.flags, sys, strictConfig.logger);
             break;
         case 'test':
-            await taskTest(config);
+            await taskTest(strictConfig);
             break;
         case 'version':
             console.log(coreCompiler.version);
             break;
         default:
-            config.logger.error(`${config.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`);
-            await taskHelp(config, config.logger, sys);
+            strictConfig.logger.error(`${strictConfig.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`);
+            await taskHelp(strictConfig.flags, strictConfig.logger, sys);
             return config.sys.exit(1);
     }
 };

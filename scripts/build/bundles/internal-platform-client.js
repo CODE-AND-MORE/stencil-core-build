@@ -5,16 +5,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.internalClient = void 0;
 const fs_extra_1 = __importDefault(require("fs-extra"));
+const glob_1 = __importDefault(require("glob"));
 const path_1 = require("path");
-const alias_plugin_1 = require("./plugins/alias-plugin");
-const replace_plugin_1 = require("./plugins/replace-plugin");
-const reorder_statements_1 = require("./plugins/reorder-statements");
+const rollup_1 = require("rollup");
+const terser_1 = require("terser");
+const typescript_1 = __importDefault(require("typescript"));
 const banner_1 = require("../utils/banner");
 const write_pkg_json_1 = require("../utils/write-pkg-json");
-const rollup_1 = require("rollup");
-const glob_1 = __importDefault(require("glob"));
-const typescript_1 = __importDefault(require("typescript"));
-const terser_1 = require("terser");
+const alias_plugin_1 = require("./plugins/alias-plugin");
+const reorder_statements_1 = require("./plugins/reorder-statements");
+const replace_plugin_1 = require("./plugins/replace-plugin");
 async function internalClient(opts) {
     const inputClientDir = (0, path_1.join)(opts.buildDir, 'client');
     const outputInternalClientDir = (0, path_1.join)(opts.output.internalDir, 'client');

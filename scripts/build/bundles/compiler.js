@@ -4,25 +4,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.compiler = void 0;
-const fs_extra_1 = __importDefault(require("fs-extra"));
-const path_1 = require("path");
 const plugin_commonjs_1 = __importDefault(require("@rollup/plugin-commonjs"));
 const plugin_json_1 = __importDefault(require("@rollup/plugin-json"));
 const plugin_node_resolve_1 = __importDefault(require("@rollup/plugin-node-resolve"));
-const alias_plugin_1 = require("./plugins/alias-plugin");
+const fs_extra_1 = __importDefault(require("fs-extra"));
+const magic_string_1 = __importDefault(require("magic-string"));
+const path_1 = require("path");
+const rollup_plugin_sourcemaps_1 = __importDefault(require("rollup-plugin-sourcemaps"));
+const terser_1 = require("terser");
 const banner_1 = require("../utils/banner");
 const dependencies_json_1 = require("../utils/dependencies-json");
+const write_pkg_json_1 = require("../utils/write-pkg-json");
+const alias_plugin_1 = require("./plugins/alias-plugin");
 const inlined_compiler_deps_plugin_1 = require("./plugins/inlined-compiler-deps-plugin");
 const parse5_plugin_1 = require("./plugins/parse5-plugin");
 const replace_plugin_1 = require("./plugins/replace-plugin");
 const sizzle_plugin_1 = require("./plugins/sizzle-plugin");
 const sys_modules_plugin_1 = require("./plugins/sys-modules-plugin");
-const write_pkg_json_1 = require("../utils/write-pkg-json");
-const typescript_source_plugin_1 = require("./plugins/typescript-source-plugin");
-const rollup_plugin_sourcemaps_1 = __importDefault(require("rollup-plugin-sourcemaps"));
-const terser_1 = require("terser");
 const terser_plugin_1 = require("./plugins/terser-plugin");
-const magic_string_1 = __importDefault(require("magic-string"));
+const typescript_source_plugin_1 = require("./plugins/typescript-source-plugin");
 /**
  * Generates a rollup configuration for the `compiler` submodule of the project
  * @param opts the options being used during a build of the Stencil compiler
@@ -43,6 +43,15 @@ async function compiler(opts) {
         main: compilerFileName,
         types: compilerDtsName,
     });
+    // copy and edit compiler/sys/in-memory-fs.d.ts
+    let inMemoryFsDts = await fs_extra_1.default.readFile((0, path_1.join)(inputDir, 'sys', 'in-memory-fs.d.ts'), 'utf8');
+    inMemoryFsDts = inMemoryFsDts.replace('@stencil/core/internal', '../../internal/index');
+    await fs_extra_1.default.mkdir((0, path_1.join)(opts.output.compilerDir, 'sys'));
+    await fs_extra_1.default.writeFile((0, path_1.join)(opts.output.compilerDir, 'sys', 'in-memory-fs.d.ts'), inMemoryFsDts);
+    // copy and edit compiler/transpile.d.ts
+    let transpileDts = await fs_extra_1.default.readFile((0, path_1.join)(inputDir, 'transpile.d.ts'), 'utf8');
+    transpileDts = transpileDts.replace('@stencil/core/internal', '../internal/index');
+    await fs_extra_1.default.writeFile((0, path_1.join)(opts.output.compilerDir, 'transpile.d.ts'), transpileDts);
     /**
      * These files are wrap the compiler in an Immediately-Invoked Function Expression (IIFE). The intro contains the
      * first half of the IIFE, and the outro contains the second half. Those files are not valid JavaScript on their own,
@@ -99,6 +108,7 @@ async function compiler(opts) {
                     if (id === 'fsevents') {
                         return id;
                     }
+                    return null;
                 },
                 /**
                  * A rollup build hook for loading the Stencil mock-doc module, Microsoft's TypeScript event tracer, the V8

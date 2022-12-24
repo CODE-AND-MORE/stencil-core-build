@@ -4,12 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.inlinedCompilerDepsPlugin = void 0;
-const fs_extra_1 = __importDefault(require("fs-extra"));
-const path_1 = require("path");
-const rollup_1 = require("rollup");
 const plugin_commonjs_1 = __importDefault(require("@rollup/plugin-commonjs"));
 const plugin_json_1 = __importDefault(require("@rollup/plugin-json"));
 const plugin_node_resolve_1 = __importDefault(require("@rollup/plugin-node-resolve"));
+const fs_extra_1 = __importDefault(require("fs-extra"));
+const path_1 = require("path");
+const rollup_1 = require("rollup");
 /**
  * Generates a rollup configuration for loading external, third party scripts that are required by the Stencil compiler
  * into the core package.

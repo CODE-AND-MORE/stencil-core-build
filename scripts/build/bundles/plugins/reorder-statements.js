@@ -34,7 +34,7 @@ function reorderStatements(code) {
                 const letNoInitializerStatements = s.filter(isLetNoInitializer);
                 const letWithInitializer = s.filter(isLetWithInitializer);
                 const otherStatements = s.filter((n) => !isLet(n) && !typescript_1.default.isImportDeclaration(n) && !typescript_1.default.isExportDeclaration(n));
-                return typescript_1.default.updateSourceFileNode(tsSourceFile, [
+                return typescript_1.default.factory.updateSourceFile(tsSourceFile, [
                     ...letNoInitializerStatements,
                     ...letWithInitializer,
                     ...importStatements,

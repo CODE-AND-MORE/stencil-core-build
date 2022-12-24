@@ -7,10 +7,10 @@ exports.runReleaseTasks = void 0;
 const ansi_colors_1 = __importDefault(require("ansi-colors"));
 const execa_1 = __importDefault(require("execa"));
 const listr_1 = __importDefault(require("listr"));
-const release_utils_1 = require("./utils/release-utils");
-const validate_build_1 = require("./test/validate-build");
-const license_1 = require("./license");
 const build_1 = require("./build");
+const license_1 = require("./license");
+const validate_build_1 = require("./test/validate-build");
+const release_utils_1 = require("./utils/release-utils");
 /**
  * Runs a litany of tasks used to ensure a safe release of a new version of Stencil
  * @param opts build options containing the metadata needed to release a new version of Stencil
@@ -171,19 +171,6 @@ function runReleaseTasks(opts, args) {
                 return (0, execa_1.default)(cmd, cmdArgs, { cwd: rootDir });
             },
         });
-        if (opts.tag !== 'next' && opts.tag !== 'test') {
-            tasks.push({
-                title: 'Also set "next" npm tag on @stencil/core',
-                task: () => {
-                    const cmd = 'npm';
-                    const cmdArgs = ['dist-tag', 'add', '@stencil/core@' + opts.version, 'next'];
-                    if (isDryRun) {
-                        return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
-                    }
-                    return (0, execa_1.default)(cmd, cmdArgs, { cwd: rootDir });
-                },
-            });
-        }
     }
     if (opts.isPublishRelease) {
         tasks.push({

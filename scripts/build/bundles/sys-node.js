@@ -4,17 +4,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sysNodeExternalBundles = exports.sysNode = void 0;
-const fs_extra_1 = __importDefault(require("fs-extra"));
-const path_1 = require("path");
-const webpack_1 = __importDefault(require("webpack"));
-const terser_1 = require("terser");
 const plugin_commonjs_1 = __importDefault(require("@rollup/plugin-commonjs"));
 const plugin_node_resolve_1 = __importDefault(require("@rollup/plugin-node-resolve"));
-const relative_path_plugin_1 = require("./plugins/relative-path-plugin");
+const fs_extra_1 = __importDefault(require("fs-extra"));
+const path_1 = require("path");
+const terser_1 = require("terser");
+const webpack_1 = __importDefault(require("webpack"));
+const banner_1 = require("../utils/banner");
+const write_pkg_json_1 = require("../utils/write-pkg-json");
 const alias_plugin_1 = require("./plugins/alias-plugin");
 const pretty_minify_1 = require("./plugins/pretty-minify");
-const write_pkg_json_1 = require("../utils/write-pkg-json");
-const banner_1 = require("../utils/banner");
+const relative_path_plugin_1 = require("./plugins/relative-path-plugin");
 async function sysNode(opts) {
     const inputDir = (0, path_1.join)(opts.buildDir, 'sys', 'node');
     const inputFile = (0, path_1.join)(inputDir, 'index.js');

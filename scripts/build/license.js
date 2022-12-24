@@ -17,11 +17,9 @@ const entryDeps = [
     '@yarnpkg/lockfile',
     'ansi-colors',
     'autoprefixer',
-    'css',
     'exit',
     'glob',
     'graceful-fs',
-    'fast-deep-equal',
     'is-extglob',
     'merge-source-map',
     'minimatch',
@@ -200,6 +198,7 @@ function getContributors(contributors) {
     if (contributors) {
         return getAuthor(contributors);
     }
+    return null;
 }
 /**
  * Formats an individual contributor's information
@@ -221,6 +220,7 @@ function getAuthor(contributor) {
     if (typeof contributor.url === 'string') {
         return contributor.url;
     }
+    return null;
 }
 /**
  * Retrieve the license file for a dependency. This function assumes that the license will be provided in an external
@@ -239,6 +239,7 @@ function getBundledDepLicenseContent(opts, moduleId) {
         }
         catch (e) { }
     }
+    return null;
 }
 /**
  * Determines if a dependency's license should be included in the generated license file or not

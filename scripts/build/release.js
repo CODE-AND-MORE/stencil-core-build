@@ -4,13 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.release = void 0;
-const fs_extra_1 = __importDefault(require("fs-extra"));
 const ansi_colors_1 = __importDefault(require("ansi-colors"));
 const execa_1 = __importDefault(require("execa"));
+const fs_extra_1 = __importDefault(require("fs-extra"));
 const inquirer_1 = __importDefault(require("inquirer"));
-const options_1 = require("./utils/options");
-const release_tasks_1 = require("./release-tasks");
 const path_1 = require("path");
+const release_tasks_1 = require("./release-tasks");
+const options_1 = require("./utils/options");
 const release_utils_1 = require("./utils/release-utils");
 /**
  * Runner for creating a release of Stencil
@@ -76,13 +76,15 @@ async function prepareRelease(opts, args, releaseDataPath) {
         },
         {
             type: 'input',
-            name: 'version',
-            message: 'Version',
+            // this name is intentionally different from 'version' above to make the `when` check below work properly
+            // (this prompt should only run if `version` was not already input)
+            name: 'specifiedVersion',
+            message: 'Specify Version',
             when: (answers) => !answers.version,
             filter: (input) => ((0, release_utils_1.isValidVersionInput)(input) ? (0, release_utils_1.getNewVersion)(pkg.version, input) : input),
             validate: (input) => {
                 if (!(0, release_utils_1.isValidVersionInput)(input)) {
-                    return 'Please specify a valid semver, for example, `1.2.3`. See http://semver.org';
+                    return 'Please specify a valid semver, for example, `1.2.3`, or `3.0.0-alpha.0`. See http://semver.org';
                 }
                 return true;
             },
@@ -91,15 +93,18 @@ async function prepareRelease(opts, args, releaseDataPath) {
             type: 'confirm',
             name: 'confirm',
             message: (answers) => {
-                return `Prepare release ${opts.vermoji}  ${ansi_colors_1.default.yellow(answers.version)} from ${oldVersion}. Continue?`;
+                var _a;
+                const version = (_a = answers.version) !== null && _a !== void 0 ? _a : answers.specifiedVersion;
+                return `Prepare release ${opts.vermoji}  ${ansi_colors_1.default.yellow(version)} from ${oldVersion}. Continue?`;
             },
         },
     ];
     await inquirer_1.default
         .prompt(prompts)
         .then((answers) => {
+        var _a;
         if (answers.confirm) {
-            opts.version = answers.version;
+            opts.version = (_a = answers.version) !== null && _a !== void 0 ? _a : answers.specifiedVersion;
             // write `release-data.json`
             fs_extra_1.default.writeJsonSync(releaseDataPath, opts, { spaces: 2 });
             (0, release_tasks_1.runReleaseTasks)(opts, args);
@@ -153,15 +158,16 @@ async function publishRelease(opts, args) {
         },
         {
             type: 'input',
-            name: 'tag',
-            message: 'Tag',
+            // this name is intentionally different from 'tag' above. if they collide, this input prompt will not run.
+            name: 'specifiedTag',
+            message: 'Specify Tag',
             when: (answers) => !pkg.private && (0, release_utils_1.isPrereleaseVersion)(opts.version) && !answers.tag,
             validate: (input) => {
                 if (input.length === 0) {
-                    return 'Please specify a tag, for example, `next`.';
+                    return 'Please specify a tag, for example, `next` or `3.0.0-alpha.0`.';
                 }
                 else if (input.toLowerCase() === 'latest') {
-                    return "It's not possible to publish pre-releases under the `latest` tag. Please specify something else, for example, `next`.";
+                    return "It's not possible to publish pre-releases under the `latest` tag. Please specify something else, for example, `next` or `3.0.0-alpha.0`.";
                 }
                 return true;
             },
@@ -170,7 +176,8 @@ async function publishRelease(opts, args) {
             type: 'confirm',
             name: 'confirm',
             message: (answers) => {
-                opts.tag = answers.tag;
+                var _a;
+                opts.tag = (_a = answers.tag) !== null && _a !== void 0 ? _a : answers.specifiedTag;
                 const tagPart = opts.tag ? ` and tag this release in npm as ${ansi_colors_1.default.yellow(opts.tag)}` : '';
                 return `Will publish ${opts.vermoji}  ${ansi_colors_1.default.yellow(opts.version)}${tagPart}. Continue?`;
             },
