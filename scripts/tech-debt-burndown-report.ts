@@ -69,8 +69,8 @@ interface TSError {
 const prData: TSError[] = JSON.parse(String(fs.readFileSync('./null_errors_pr.json')));
 const mainData: TSError[] = JSON.parse(String(fs.readFileSync('./null_errors_main.json')));
 
-const errorsOnMain = mainData.length;
-const errorsOnPR = prData.length;
+const errorsOnMainCount = mainData.length;
+const errorsOnPRCount = prData.length;
 
 /**
  * Build up an object which maps error codes (like `TS2339`) to
@@ -81,8 +81,8 @@ const getErrorCodeMessages = (): Record<string, Set<string>> => {
   const errorCodeMessageMap = {};
 
   prData.forEach((error) => {
-    let errorCode = error.value.tsError.value.errorString;
-    let message = error.value.message.value;
+    const errorCode = error.value.tsError.value.errorString;
+    const message = error.value.message.value;
     errorCodeMessageMap[errorCode] = (errorCodeMessageMap[errorCode] ?? new Set()).add(message);
   });
 
@@ -102,7 +102,7 @@ const errorCodeMessages = getErrorCodeMessages();
  * @returns a map of counts for `arr`
  */
 const countArrayEntries = <T>(arr: Array<T>): Map<T, number> => {
-  let counts = new Map<T, number>();
+  const counts = new Map<T, number>();
 
   arr.forEach((entry) => {
     counts.set(entry, (counts.get(entry) ?? 0) + 1);
@@ -180,7 +180,7 @@ const deadCodePR = processUnusedExports(unusedExportsPR);
  * @returns the collapsible section, ready for inclusion in a larger markdown context
  */
 const collapsible = (title: string, contentCb: (out: string[]) => void, lineBreak = '\n'): string => {
-  let out = [`<details><summary>${title}</summary>`, ''];
+  const out = [`<details><summary>${title}</summary>`, ''];
   contentCb(out);
   out.push('');
   out.push('</details>');
@@ -237,12 +237,46 @@ lines.push('');
 
 // we can check the number of errors just to write a different message out here
 // depending on the delta between this branch and main
-if (errorsOnPR === errorsOnMain) {
+if (errorsOnPRCount === errorsOnMainCount) {
   lines.push("That's the same number of errors on main, so at least we're not creating new ones!");
-} else if (errorsOnPR < errorsOnMain) {
-  lines.push(`That's ${errorsOnMain - errorsOnPR} fewer than on \`main\`! 🎉🎉🎉`);
+} else if (errorsOnPRCount < errorsOnMainCount) {
+  lines.push(`That's ${errorsOnMainCount - errorsOnPRCount} fewer than on \`main\`! 🎉🎉🎉`);
 } else {
-  lines.push(`Unfortunately, it looks like that's an increase of ${errorsOnPR - errorsOnMain} over \`main\` 😞.`);
+  lines.push(
+    `Unfortunately, it looks like that's an increase of ${errorsOnPRCount - errorsOnMainCount} over \`main\` 😞.`
+  );
+  const newEntries = prData.filter(
+    (prTsError) =>
+      !mainData.some(
+        (mainTsError) =>
+          prTsError.value.path.value === mainTsError.value.path.value &&
+          prTsError.value.cursor.value.line === mainTsError.value.cursor.value.line &&
+          prTsError.value.cursor.value.col === mainTsError.value.cursor.value.col &&
+          prTsError.value.tsError.value.errorString === mainTsError.value.tsError.value.errorString &&
+          prTsError.value.message.value === mainTsError.value.message.value
+      )
+  );
+  lines.push(
+    collapsible('Violations Not on `main` (may be more than the count above)', (out: string[]) => {
+      out.push(tableHeader('Path', 'Location', 'Error', 'Message'));
+
+      newEntries.forEach(({ value }) => {
+        const location = value.cursor.value;
+        // error messages with pipes ('|') can cause formatting issues, escape them
+        const sanitizedErrorMsg = value.message.value.replace(/\|/g, '\\|').replace(/\r?\n/g, '');
+        out.push(
+          tableRow(
+            `${value.path.value}`,
+            `(${location.line}, ${location.col})`,
+            `${value.tsError.value.errorString}`,
+            `${sanitizedErrorMsg}`
+          )
+        );
+      });
+    })
+  );
+
+  lines.push('');
 }
 
 lines.push('');
@@ -281,7 +315,7 @@ lines.push(
     );
 
     sortEntries(errorCodeCounts).forEach(([tsErrorCode, errorCount]) => {
-      let messages = errorCodeMessages[tsErrorCode];
+      const messages = errorCodeMessages[tsErrorCode];
 
       out.push(
         tableRow(

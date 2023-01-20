@@ -1659,7 +1659,7 @@ export interface EmulateViewport {
  * in this array without good reason!
  */
 export declare const LOG_LEVELS: readonly ["debug", "info", "warn", "error"];
-export type LogLevel = typeof LOG_LEVELS[number];
+export type LogLevel = (typeof LOG_LEVELS)[number];
 /**
  * Common logger to be used by the compiler, dev-server and CLI. The CLI will use a
  * NodeJS based console logging and colors, and the web will use browser based

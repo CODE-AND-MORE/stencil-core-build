@@ -1,5 +1,5 @@
 /*!
- Stencil CLI (CommonJS) v0.0.0-dev.20221221224028 | MIT Licensed | https://stenciljs.com
+ Stencil CLI (CommonJS) v0.0.0-dev.20230120194607 | MIT Licensed | https://stenciljs.com
  */
 'use strict';
 
@@ -989,7 +989,7 @@ const dereferenceAlias = (maybeAlias) => {
 const dependencies = [
 	{
 		name: "@stencil/core",
-		version: "0.0.0-dev.20221221224028",
+		version: "0.0.0-dev.20230120194607",
 		main: "compiler/stencil.js",
 		resources: [
 			"package.json",

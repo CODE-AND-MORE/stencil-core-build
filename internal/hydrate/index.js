@@ -1,3 +1,8 @@
+function queryNonceMetaTagContent(e) {
+ var t, o, n;
+ return null !== (n = null === (o = null === (t = e.head) || void 0 === t ? void 0 : t.querySelector('meta[name="csp-nonce"]')) || void 0 === o ? void 0 : o.getAttribute("content")) && void 0 !== n ? n : void 0;
+}
+
 function componentOnReady() {
  return getHostRef(this).$onReadyPromise$;
 }
@@ -6,8 +11,8 @@ function forceUpdate() {}
 
 function hydrateApp(e, t, o, n, s) {
  function l() {
-  if (global.clearTimeout(p), i.clear(), r.clear(), !h) {
-   h = !0;
+  if (global.clearTimeout(p), i.clear(), r.clear(), !u) {
+   u = !0;
    try {
     t.clientHydrateAnnotations && insertVdomAnnotations(e.document, t.staticComponents), 
     e.dispatchEvent(new e.Event("DOMContentLoaded")), e.document.createElement = c, 
@@ -22,9 +27,9 @@ function hydrateApp(e, t, o, n, s) {
   renderCatchError(t, o, e), l();
  }
  const r = new Set, i = new Set, d = new Set, c = e.document.createElement, $ = e.document.createElementNS, m = Promise.resolve();
- let p, h = !1;
+ let p, u = !1;
  try {
-  function u() {
+  function h() {
    return g(this);
   }
   function f(e) {
@@ -33,7 +38,7 @@ function hydrateApp(e, t, o, n, s) {
      $tagName$: e.nodeName.toLowerCase(),
      $flags$: null
     }, null);
-    null != t && null != t.cmpMeta && (i.add(e), e.connectedCallback = u, registerHost(e, t.cmpMeta), 
+    null != t && null != t.cmpMeta && (i.add(e), e.connectedCallback = h, registerHost(e, t.cmpMeta), 
     function o(e, t) {
      if ("function" != typeof e.componentOnReady && (e.componentOnReady = componentOnReady), 
      "function" != typeof e.forceUpdate && (e.forceUpdate = forceUpdate), 1 & t.$flags$ && (e.shadowRoot = e), 
@@ -316,26 +321,28 @@ const createTime = (e, t = "") => {
  let n = styles.get(e);
  n = t, styles.set(e, n);
 }, addStyle = (e, t, o, n) => {
- let s = getScopeId(t, o);
- const l = styles.get(s);
- if (!BUILD.attachStyles) return s;
- if (e = 11 === e.nodeType ? e : doc, l) if ("string" == typeof l) {
+ var s;
+ let l = getScopeId(t, o);
+ const a = styles.get(l);
+ if (!BUILD.attachStyles) return l;
+ if (e = 11 === e.nodeType ? e : doc, a) if ("string" == typeof a) {
   e = e.head || e;
-  let o, a = rootAppliedStyles.get(e);
-  if (a || rootAppliedStyles.set(e, a = new Set), !a.has(s)) {
-   if (BUILD.hydrateClientSide && e.host && (o = e.querySelector(`[sty-id="${s}"]`))) o.innerHTML = l; else {
+  let o, r = rootAppliedStyles.get(e);
+  if (r || rootAppliedStyles.set(e, r = new Set), !r.has(l)) {
+   if (BUILD.hydrateClientSide && e.host && (o = e.querySelector(`[sty-id="${l}"]`))) o.innerHTML = a; else {
     if (BUILD.cssVarShim && plt.$cssShim$) {
-     o = plt.$cssShim$.createHostStyle(n, s, l, !!(10 & t.$flags$));
+     o = plt.$cssShim$.createHostStyle(n, l, a, !!(10 & t.$flags$));
      const e = o["s-sc"];
-     e && (s = e, a = null);
-    } else o = doc.createElement("style"), o.innerHTML = l;
-    (BUILD.hydrateServerSide || BUILD.hotModuleReplacement) && o.setAttribute("sty-id", s), 
+     e && (l = e, r = null);
+    } else o = doc.createElement("style"), o.innerHTML = a;
+    const i = null !== (s = plt.$nonce$) && void 0 !== s ? s : queryNonceMetaTagContent(doc);
+    null != i && o.setAttribute("nonce", i), (BUILD.hydrateServerSide || BUILD.hotModuleReplacement) && o.setAttribute("sty-id", l), 
     e.insertBefore(o, e.querySelector("link"));
    }
-   a && a.add(s);
+   r && r.add(l);
   }
- } else BUILD.constructableCSS && !e.adoptedStyleSheets.includes(l) && (e.adoptedStyleSheets = [ ...e.adoptedStyleSheets, l ]);
- return s;
+ } else BUILD.constructableCSS && !e.adoptedStyleSheets.includes(a) && (e.adoptedStyleSheets = [ ...e.adoptedStyleSheets, a ]);
+ return l;
 }, attachStyles = e => {
  const t = e.$cmpMeta$, o = e.$hostElement$, n = t.$flags$, s = createTime("attachStyles", t.$tagName$), l = addStyle(BUILD.shadowDom && supportsShadow && o.shadowRoot ? o.shadowRoot : o.getRootNode(), t, e.$modeName$, o);
  (BUILD.shadowDom || BUILD.scoped) && BUILD.cssAnnotations && 10 & n && (o["s-sc"] = l, 
@@ -413,17 +420,17 @@ const createElm = (e, t, o, n) => {
  BUILD.vdomText && null !== a ? BUILD.vdomText && BUILD.slotRelocation && (r = o["s-cr"]) ? r.parentNode.textContent = a : BUILD.vdomText && e.$text$ !== a && (o.data = a) : (BUILD.svg && (isSvgMode = "svg" === l || "foreignObject" !== l && isSvgMode), 
  (BUILD.vdomAttribute || BUILD.reflect) && (BUILD.slot && "slot" === l || updateElement(e, t, isSvgMode)), 
  BUILD.updatable && null !== n && null !== s ? ((e, t, o, n) => {
-  let s, l, a = 0, r = 0, i = 0, d = 0, c = t.length - 1, $ = t[0], m = t[c], p = n.length - 1, h = n[0], u = n[p];
-  for (;a <= c && r <= p; ) if (null == $) $ = t[++a]; else if (null == m) m = t[--c]; else if (null == h) h = n[++r]; else if (null == u) u = n[--p]; else if (isSameVnode($, h)) patch($, h), 
-  $ = t[++a], h = n[++r]; else if (isSameVnode(m, u)) patch(m, u), m = t[--c], u = n[--p]; else if (isSameVnode($, u)) !BUILD.slotRelocation || "slot" !== $.$tag$ && "slot" !== u.$tag$ || putBackInOriginalLocation($.$elm$.parentNode, !1), 
-  patch($, u), e.insertBefore($.$elm$, m.$elm$.nextSibling), $ = t[++a], u = n[--p]; else if (isSameVnode(m, h)) !BUILD.slotRelocation || "slot" !== $.$tag$ && "slot" !== u.$tag$ || putBackInOriginalLocation(m.$elm$.parentNode, !1), 
-  patch(m, h), e.insertBefore(m.$elm$, $.$elm$), m = t[--c], h = n[++r]; else {
-   if (i = -1, BUILD.vdomKey) for (d = a; d <= c; ++d) if (t[d] && null !== t[d].$key$ && t[d].$key$ === h.$key$) {
+  let s, l, a = 0, r = 0, i = 0, d = 0, c = t.length - 1, $ = t[0], m = t[c], p = n.length - 1, u = n[0], h = n[p];
+  for (;a <= c && r <= p; ) if (null == $) $ = t[++a]; else if (null == m) m = t[--c]; else if (null == u) u = n[++r]; else if (null == h) h = n[--p]; else if (isSameVnode($, u)) patch($, u), 
+  $ = t[++a], u = n[++r]; else if (isSameVnode(m, h)) patch(m, h), m = t[--c], h = n[--p]; else if (isSameVnode($, h)) !BUILD.slotRelocation || "slot" !== $.$tag$ && "slot" !== h.$tag$ || putBackInOriginalLocation($.$elm$.parentNode, !1), 
+  patch($, h), e.insertBefore($.$elm$, m.$elm$.nextSibling), $ = t[++a], h = n[--p]; else if (isSameVnode(m, u)) !BUILD.slotRelocation || "slot" !== $.$tag$ && "slot" !== h.$tag$ || putBackInOriginalLocation(m.$elm$.parentNode, !1), 
+  patch(m, u), e.insertBefore(m.$elm$, $.$elm$), m = t[--c], u = n[++r]; else {
+   if (i = -1, BUILD.vdomKey) for (d = a; d <= c; ++d) if (t[d] && null !== t[d].$key$ && t[d].$key$ === u.$key$) {
     i = d;
     break;
    }
-   BUILD.vdomKey && i >= 0 ? (l = t[i], l.$tag$ !== h.$tag$ ? s = createElm(t && t[r], o, i, e) : (patch(l, h), 
-   t[i] = void 0, s = l.$elm$), h = n[++r]) : (s = createElm(t && t[r], o, r, e), h = n[++r]), 
+   BUILD.vdomKey && i >= 0 ? (l = t[i], l.$tag$ !== u.$tag$ ? s = createElm(t && t[r], o, i, e) : (patch(l, u), 
+   t[i] = void 0, s = l.$elm$), u = n[++r]) : (s = createElm(t && t[r], o, r, e), u = n[++r]), 
    s && (BUILD.slotRelocation ? parentReferenceNode($.$elm$).insertBefore(s, referenceNode($.$elm$)) : $.$elm$.parentNode.insertBefore(s, $.$elm$));
   }
   a > c ? addVnodes(e, null == n[p + 1] ? null : n[p + 1].$elm$, o, n, r, p) : BUILD.updatable && r > p && removeVnodes(t, a, c);
@@ -860,6 +867,7 @@ const callRender = (e, t, o) => {
  for (;(e = e.nextSibling) && e["s-sn"] === t; ) o.push(e);
  return o;
 }, bootstrapLazy = (e, t = {}) => {
+ var o;
  BUILD.profile && performance.mark && performance.mark("st:app:start"), (() => {
   if (BUILD.devTools) {
    const e = win.stencil = win.stencil || {}, t = e.inspect;
@@ -907,29 +915,29 @@ const callRender = (e, t, o) => {
    };
   }
  })();
- const o = createTime("bootstrapLazy"), n = [], s = t.exclude || [], l = win.customElements, a = doc.head, r = a.querySelector("meta[charset]"), i = doc.createElement("style"), d = [], c = doc.querySelectorAll("[sty-id]");
- let $, m = !0, p = 0;
+ const n = createTime("bootstrapLazy"), s = [], l = t.exclude || [], a = win.customElements, r = doc.head, i = r.querySelector("meta[charset]"), d = doc.createElement("style"), c = [], $ = doc.querySelectorAll("[sty-id]");
+ let m, p = !0, u = 0;
  if (Object.assign(plt, t), plt.$resourcesUrl$ = new URL(t.resourcesUrl || "./", doc.baseURI).href, 
  BUILD.asyncQueue && t.syncQueue && (plt.$flags$ |= 4), BUILD.hydrateClientSide && (plt.$flags$ |= 2), 
- BUILD.hydrateClientSide && BUILD.shadowDom) for (;p < c.length; p++) registerStyle(c[p].getAttribute("sty-id"), c[p].innerHTML.replace(/\/\*!@([^\/]+)\*\/[^\{]+\{/g, "$1{"));
- e.map((e => {
+ BUILD.hydrateClientSide && BUILD.shadowDom) for (;u < $.length; u++) registerStyle($[u].getAttribute("sty-id"), $[u].innerHTML.replace(/\/\*!@([^\/]+)\*\/[^\{]+\{/g, "$1{"));
+ if (e.map((e => {
   e[1].map((o => {
-   const a = {
+   const n = {
     $flags$: o[0],
     $tagName$: o[1],
     $members$: o[2],
     $listeners$: o[3]
    };
-   BUILD.member && (a.$members$ = o[2]), BUILD.hostListener && (a.$listeners$ = o[3]), 
-   BUILD.reflect && (a.$attrsToReflect$ = []), BUILD.watchCallback && (a.$watchers$ = {}), 
-   BUILD.shadowDom && !supportsShadow && 1 & a.$flags$ && (a.$flags$ |= 8);
-   const r = BUILD.transformTagName && t.transformTagName ? t.transformTagName(a.$tagName$) : a.$tagName$, i = class extends HTMLElement {
+   BUILD.member && (n.$members$ = o[2]), BUILD.hostListener && (n.$listeners$ = o[3]), 
+   BUILD.reflect && (n.$attrsToReflect$ = []), BUILD.watchCallback && (n.$watchers$ = {}), 
+   BUILD.shadowDom && !supportsShadow && 1 & n.$flags$ && (n.$flags$ |= 8);
+   const r = BUILD.transformTagName && t.transformTagName ? t.transformTagName(n.$tagName$) : n.$tagName$, i = class extends HTMLElement {
     constructor(e) {
-     super(e), registerHost(e = this, a), BUILD.shadowDom && 1 & a.$flags$ && (BUILD.hydrateServerSide || "shadowRoot" in e || (e.shadowRoot = e)), 
-     BUILD.slotChildNodesFix && patchChildSlotNodes(e, a);
+     super(e), registerHost(e = this, n), BUILD.shadowDom && 1 & n.$flags$ && (BUILD.hydrateServerSide || "shadowRoot" in e || (e.shadowRoot = e)), 
+     BUILD.slotChildNodesFix && patchChildSlotNodes(e, n);
     }
     connectedCallback() {
-     $ && (clearTimeout($), $ = null), m ? d.push(this) : plt.jmp((() => connectedCallback(this)));
+     m && (clearTimeout(m), m = null), p ? c.push(this) : plt.jmp((() => connectedCallback(this)));
     }
     disconnectedCallback() {
      plt.jmp((() => disconnectedCallback(this)));
@@ -945,14 +953,17 @@ const callRender = (e, t, o) => {
      n.$flags$ = 1, e["s-hmr-load"] = () => {
       delete e["s-hmr-load"];
      }, initializeComponent(e, n, t);
-    })(this, a);
-   }), BUILD.scopedSlotTextContentFix && patchTextContent(i.prototype, a), a.$lazyBundleId$ = e[0], 
-   s.includes(r) || l.get(r) || (n.push(r), l.define(r, proxyComponent(i, a, 1)));
+    })(this, n);
+   }), BUILD.scopedSlotTextContentFix && patchTextContent(i.prototype, n), n.$lazyBundleId$ = e[0], 
+   l.includes(r) || a.get(r) || (s.push(r), a.define(r, proxyComponent(i, n, 1)));
   }));
- })), BUILD.invisiblePrehydration && (BUILD.hydratedClass || BUILD.hydratedAttribute) && (i.innerHTML = n + "{visibility:hidden}.hydrated{visibility:inherit}", 
- i.setAttribute("data-styles", ""), a.insertBefore(i, r ? r.nextSibling : a.firstChild)), 
- m = !1, d.length ? d.map((e => e.connectedCallback())) : BUILD.profile ? plt.jmp((() => $ = setTimeout(appDidLoad, 30, "timeout"))) : plt.jmp((() => $ = setTimeout(appDidLoad, 30))), 
- o();
+ })), BUILD.invisiblePrehydration && (BUILD.hydratedClass || BUILD.hydratedAttribute)) {
+  d.innerHTML = s + "{visibility:hidden}.hydrated{visibility:inherit}", d.setAttribute("data-styles", "");
+  const e = null !== (o = plt.$nonce$) && void 0 !== o ? o : queryNonceMetaTagContent(doc);
+  null != e && d.setAttribute("nonce", e), r.insertBefore(d, i ? i.nextSibling : r.firstChild);
+ }
+ p = !1, c.length ? c.map((e => e.connectedCallback())) : BUILD.profile ? plt.jmp((() => m = setTimeout(appDidLoad, 30, "timeout"))) : plt.jmp((() => m = setTimeout(appDidLoad, 30))), 
+ n();
 }, getConnect = (e, t) => {
  const o = () => {
   let e = doc.querySelector(t);
@@ -980,7 +991,7 @@ const callRender = (e, t, o) => {
  } catch (e) {
   consoleError(e);
  }
-}, getHostListenerTarget = (e, t) => BUILD.hostListenerTargetDocument && 4 & t ? doc : BUILD.hostListenerTargetWindow && 8 & t ? win : BUILD.hostListenerTargetBody && 16 & t ? doc.body : BUILD.hostListenerTargetParent && 32 & t ? e.parentElement : e, hostListenerOpts = e => 0 != (2 & e), insertVdomAnnotations = (e, t) => {
+}, getHostListenerTarget = (e, t) => BUILD.hostListenerTargetDocument && 4 & t ? doc : BUILD.hostListenerTargetWindow && 8 & t ? win : BUILD.hostListenerTargetBody && 16 & t ? doc.body : BUILD.hostListenerTargetParent && 32 & t ? e.parentElement : e, hostListenerOpts = e => 0 != (2 & e), setNonce = e => plt.$nonce$ = e, insertVdomAnnotations = (e, t) => {
  if (null != e) {
   const o = {
    hostIds: 0,
@@ -1134,4 +1145,4 @@ const cmpModules = new Map, getModule = e => {
  isTesting: !1
 }, styles = new Map, modeResolutionChain = [];
 
-export { Build, Context, Fragment, Host, addHostEventListeners, bootstrapLazy, cmpModules, connectedCallback, consoleDevError, consoleDevInfo, consoleDevWarn, consoleError, createEvent, defineCustomElement, disconnectedCallback, doc, forceModeUpdate, forceUpdate$1 as forceUpdate, getAssetPath, getConnect, getContext, getElement, getHostRef, getMode, getRenderingRef, getValue, hAsync as h, hydrateApp, insertVdomAnnotations, isMemberInElement, loadModule, modeResolutionChain, nextTick, parsePropertyValue, plt, postUpdateComponent, proxyComponent, proxyCustomElement, readTask, registerComponents, registerHost, registerInstance, renderVdom, setAssetPath, setErrorHandler, setMode, setPlatformHelpers, setValue, styles, supportsConstructableStylesheets, supportsListenerOptions, supportsShadow, win, writeTask };
+export { Build, Context, Fragment, Host, addHostEventListeners, bootstrapLazy, cmpModules, connectedCallback, consoleDevError, consoleDevInfo, consoleDevWarn, consoleError, createEvent, defineCustomElement, disconnectedCallback, doc, forceModeUpdate, forceUpdate$1 as forceUpdate, getAssetPath, getConnect, getContext, getElement, getHostRef, getMode, getRenderingRef, getValue, hAsync as h, hydrateApp, insertVdomAnnotations, isMemberInElement, loadModule, modeResolutionChain, nextTick, parsePropertyValue, plt, postUpdateComponent, proxyComponent, proxyCustomElement, readTask, registerComponents, registerHost, registerInstance, renderVdom, setAssetPath, setErrorHandler, setMode, setNonce, setPlatformHelpers, setValue, styles, supportsConstructableStylesheets, supportsListenerOptions, supportsShadow, win, writeTask };

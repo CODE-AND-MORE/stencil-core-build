@@ -1,3 +1,8 @@
+function queryNonceMetaTagContent(e) {
+ var t, a, o;
+ return null !== (o = null === (a = null === (t = e.head) || void 0 === t ? void 0 : t.querySelector('meta[name="csp-nonce"]')) || void 0 === a ? void 0 : a.getAttribute("content")) && void 0 !== o ? o : void 0;
+}
+
 function writeTask(e) {
  queuedWriteTasks.push(e);
 }
@@ -213,26 +218,28 @@ const createTime = (e, t = "") => {
  let o = styles.get(e);
  o = t, styles.set(e, o);
 }, addStyle = (e, t, a, o) => {
- let s = getScopeId(t, a);
- const n = styles.get(s);
- if (!appData.BUILD.attachStyles) return s;
- if (e = 11 === e.nodeType ? e : doc, n) if ("string" == typeof n) {
+ var s;
+ let n = getScopeId(t, a);
+ const l = styles.get(n);
+ if (!appData.BUILD.attachStyles) return n;
+ if (e = 11 === e.nodeType ? e : doc, l) if ("string" == typeof l) {
   e = e.head || e;
-  let a, l = rootAppliedStyles.get(e);
-  if (l || rootAppliedStyles.set(e, l = new Set), !l.has(s)) {
-   if (appData.BUILD.hydrateClientSide && e.host && (a = e.querySelector(`[sty-id="${s}"]`))) a.innerHTML = n; else {
+  let a, r = rootAppliedStyles.get(e);
+  if (r || rootAppliedStyles.set(e, r = new Set), !r.has(n)) {
+   if (appData.BUILD.hydrateClientSide && e.host && (a = e.querySelector(`[sty-id="${n}"]`))) a.innerHTML = l; else {
     if (appData.BUILD.cssVarShim && plt.$cssShim$) {
-     a = plt.$cssShim$.createHostStyle(o, s, n, !!(10 & t.$flags$));
+     a = plt.$cssShim$.createHostStyle(o, n, l, !!(10 & t.$flags$));
      const e = a["s-sc"];
-     e && (s = e, l = null);
-    } else a = doc.createElement("style"), a.innerHTML = n;
-    (appData.BUILD.hydrateServerSide || appData.BUILD.hotModuleReplacement) && a.setAttribute("sty-id", s), 
+     e && (n = e, r = null);
+    } else a = doc.createElement("style"), a.innerHTML = l;
+    const p = null !== (s = plt.$nonce$) && void 0 !== s ? s : queryNonceMetaTagContent(doc);
+    null != p && a.setAttribute("nonce", p), (appData.BUILD.hydrateServerSide || appData.BUILD.hotModuleReplacement) && a.setAttribute("sty-id", n), 
     e.insertBefore(a, e.querySelector("link"));
    }
-   l && l.add(s);
+   r && r.add(n);
   }
- } else appData.BUILD.constructableCSS && !e.adoptedStyleSheets.includes(n) && (e.adoptedStyleSheets = [ ...e.adoptedStyleSheets, n ]);
- return s;
+ } else appData.BUILD.constructableCSS && !e.adoptedStyleSheets.includes(l) && (e.adoptedStyleSheets = [ ...e.adoptedStyleSheets, l ]);
+ return n;
 }, attachStyles = e => {
  const t = e.$cmpMeta$, a = e.$hostElement$, o = t.$flags$, s = createTime("attachStyles", t.$tagName$), n = addStyle(appData.BUILD.shadowDom && exports.supportsShadow && a.shadowRoot ? a.shadowRoot : a.getRootNode(), t, e.$modeName$, a);
  (appData.BUILD.shadowDom || appData.BUILD.scoped) && appData.BUILD.cssAnnotations && 10 & o && (a["s-sc"] = n, 
@@ -312,20 +319,20 @@ const createElm = (e, t, a, o) => {
  appData.BUILD.vdomText && null !== l ? appData.BUILD.vdomText && appData.BUILD.slotRelocation && (r = a["s-cr"]) ? r.parentNode.textContent = l : appData.BUILD.vdomText && e.$text$ !== l && (a.data = l) : (appData.BUILD.svg && (isSvgMode = "svg" === n || "foreignObject" !== n && isSvgMode), 
  (appData.BUILD.vdomAttribute || appData.BUILD.reflect) && (appData.BUILD.slot && "slot" === n || updateElement(e, t, isSvgMode)), 
  appData.BUILD.updatable && null !== o && null !== s ? ((e, t, a, o) => {
-  let s, n, l = 0, r = 0, p = 0, i = 0, d = t.length - 1, c = t[0], $ = t[d], m = o.length - 1, u = o[0], h = o[m];
-  for (;l <= d && r <= m; ) if (null == c) c = t[++l]; else if (null == $) $ = t[--d]; else if (null == u) u = o[++r]; else if (null == h) h = o[--m]; else if (isSameVnode(c, u)) patch(c, u), 
-  c = t[++l], u = o[++r]; else if (isSameVnode($, h)) patch($, h), $ = t[--d], h = o[--m]; else if (isSameVnode(c, h)) !appData.BUILD.slotRelocation || "slot" !== c.$tag$ && "slot" !== h.$tag$ || putBackInOriginalLocation(c.$elm$.parentNode, !1), 
-  patch(c, h), e.insertBefore(c.$elm$, $.$elm$.nextSibling), c = t[++l], h = o[--m]; else if (isSameVnode($, u)) !appData.BUILD.slotRelocation || "slot" !== c.$tag$ && "slot" !== h.$tag$ || putBackInOriginalLocation($.$elm$.parentNode, !1), 
-  patch($, u), e.insertBefore($.$elm$, c.$elm$), $ = t[--d], u = o[++r]; else {
-   if (p = -1, appData.BUILD.vdomKey) for (i = l; i <= d; ++i) if (t[i] && null !== t[i].$key$ && t[i].$key$ === u.$key$) {
+  let s, n, l = 0, r = 0, p = 0, i = 0, d = t.length - 1, c = t[0], $ = t[d], u = o.length - 1, m = o[0], h = o[u];
+  for (;l <= d && r <= u; ) if (null == c) c = t[++l]; else if (null == $) $ = t[--d]; else if (null == m) m = o[++r]; else if (null == h) h = o[--u]; else if (isSameVnode(c, m)) patch(c, m), 
+  c = t[++l], m = o[++r]; else if (isSameVnode($, h)) patch($, h), $ = t[--d], h = o[--u]; else if (isSameVnode(c, h)) !appData.BUILD.slotRelocation || "slot" !== c.$tag$ && "slot" !== h.$tag$ || putBackInOriginalLocation(c.$elm$.parentNode, !1), 
+  patch(c, h), e.insertBefore(c.$elm$, $.$elm$.nextSibling), c = t[++l], h = o[--u]; else if (isSameVnode($, m)) !appData.BUILD.slotRelocation || "slot" !== c.$tag$ && "slot" !== h.$tag$ || putBackInOriginalLocation($.$elm$.parentNode, !1), 
+  patch($, m), e.insertBefore($.$elm$, c.$elm$), $ = t[--d], m = o[++r]; else {
+   if (p = -1, appData.BUILD.vdomKey) for (i = l; i <= d; ++i) if (t[i] && null !== t[i].$key$ && t[i].$key$ === m.$key$) {
     p = i;
     break;
    }
-   appData.BUILD.vdomKey && p >= 0 ? (n = t[p], n.$tag$ !== u.$tag$ ? s = createElm(t && t[r], a, p, e) : (patch(n, u), 
-   t[p] = void 0, s = n.$elm$), u = o[++r]) : (s = createElm(t && t[r], a, r, e), u = o[++r]), 
+   appData.BUILD.vdomKey && p >= 0 ? (n = t[p], n.$tag$ !== m.$tag$ ? s = createElm(t && t[r], a, p, e) : (patch(n, m), 
+   t[p] = void 0, s = n.$elm$), m = o[++r]) : (s = createElm(t && t[r], a, r, e), m = o[++r]), 
    s && (appData.BUILD.slotRelocation ? parentReferenceNode(c.$elm$).insertBefore(s, referenceNode(c.$elm$)) : c.$elm$.parentNode.insertBefore(s, c.$elm$));
   }
-  l > d ? addVnodes(e, null == o[m + 1] ? null : o[m + 1].$elm$, a, o, r, m) : appData.BUILD.updatable && r > m && removeVnodes(t, l, d);
+  l > d ? addVnodes(e, null == o[u + 1] ? null : o[u + 1].$elm$, a, o, r, u) : appData.BUILD.updatable && r > u && removeVnodes(t, l, d);
  })(a, o, t, s) : null !== s ? (appData.BUILD.updatable && appData.BUILD.vdomText && null !== e.$text$ && (a.textContent = ""), 
  addVnodes(a, null, t, s, 0, s.length - 1)) : appData.BUILD.updatable && null !== o && removeVnodes(o, 0, o.length - 1), 
  appData.BUILD.svg && isSvgMode && "svg" === n && (isSvgMode = !1));
@@ -888,6 +895,7 @@ Object.defineProperty(exports, "Env", {
  isTesting: !0
 }, exports.Context = Context, exports.Fragment = (e, t) => t, exports.Host = Host, 
 exports.addHostEventListeners = addHostEventListeners, exports.bootstrapLazy = (e, t = {}) => {
+ var a;
  appData.BUILD.profile && performance.mark && performance.mark("st:app:start"), (() => {
   if (appData.BUILD.devTools) {
    const e = win.stencil = win.stencil || {}, t = e.inspect;
@@ -935,34 +943,34 @@ exports.addHostEventListeners = addHostEventListeners, exports.bootstrapLazy = (
    };
   }
  })();
- const a = createTime("bootstrapLazy"), o = [], s = t.exclude || [], n = win.customElements, l = doc.head, r = l.querySelector("meta[charset]"), p = doc.createElement("style"), i = [], d = doc.querySelectorAll("[sty-id]");
- let c, $ = !0, m = 0;
+ const o = createTime("bootstrapLazy"), s = [], n = t.exclude || [], l = win.customElements, r = doc.head, p = r.querySelector("meta[charset]"), i = doc.createElement("style"), d = [], c = doc.querySelectorAll("[sty-id]");
+ let $, u = !0, m = 0;
  if (Object.assign(plt, t), plt.$resourcesUrl$ = new URL(t.resourcesUrl || "./", doc.baseURI).href, 
  appData.BUILD.asyncQueue && t.syncQueue && (plt.$flags$ |= 4), appData.BUILD.hydrateClientSide && (plt.$flags$ |= 2), 
- appData.BUILD.hydrateClientSide && appData.BUILD.shadowDom) for (;m < d.length; m++) registerStyle(d[m].getAttribute("sty-id"), d[m].innerHTML.replace(/\/\*!@([^\/]+)\*\/[^\{]+\{/g, "$1{"));
- e.map((e => {
+ appData.BUILD.hydrateClientSide && appData.BUILD.shadowDom) for (;m < c.length; m++) registerStyle(c[m].getAttribute("sty-id"), c[m].innerHTML.replace(/\/\*!@([^\/]+)\*\/[^\{]+\{/g, "$1{"));
+ if (e.map((e => {
   e[1].map((a => {
-   const l = {
+   const o = {
     $flags$: a[0],
     $tagName$: a[1],
     $members$: a[2],
     $listeners$: a[3]
    };
-   appData.BUILD.member && (l.$members$ = a[2]), appData.BUILD.hostListener && (l.$listeners$ = a[3]), 
-   appData.BUILD.reflect && (l.$attrsToReflect$ = []), appData.BUILD.watchCallback && (l.$watchers$ = {}), 
-   appData.BUILD.shadowDom && !exports.supportsShadow && 1 & l.$flags$ && (l.$flags$ |= 8);
-   const r = appData.BUILD.transformTagName && t.transformTagName ? t.transformTagName(l.$tagName$) : l.$tagName$, p = class extends HTMLElement {
+   appData.BUILD.member && (o.$members$ = a[2]), appData.BUILD.hostListener && (o.$listeners$ = a[3]), 
+   appData.BUILD.reflect && (o.$attrsToReflect$ = []), appData.BUILD.watchCallback && (o.$watchers$ = {}), 
+   appData.BUILD.shadowDom && !exports.supportsShadow && 1 & o.$flags$ && (o.$flags$ |= 8);
+   const r = appData.BUILD.transformTagName && t.transformTagName ? t.transformTagName(o.$tagName$) : o.$tagName$, p = class extends HTMLElement {
     constructor(e) {
-     super(e), registerHost(e = this, l), appData.BUILD.shadowDom && 1 & l.$flags$ && (exports.supportsShadow ? appData.BUILD.shadowDelegatesFocus ? e.attachShadow({
+     super(e), registerHost(e = this, o), appData.BUILD.shadowDom && 1 & o.$flags$ && (exports.supportsShadow ? appData.BUILD.shadowDelegatesFocus ? e.attachShadow({
       mode: "open",
-      delegatesFocus: !!(16 & l.$flags$)
+      delegatesFocus: !!(16 & o.$flags$)
      }) : e.attachShadow({
       mode: "open"
      }) : appData.BUILD.hydrateServerSide || "shadowRoot" in e || (e.shadowRoot = e)), 
-     appData.BUILD.slotChildNodesFix && patchChildSlotNodes(e, l);
+     appData.BUILD.slotChildNodesFix && patchChildSlotNodes(e, o);
     }
     connectedCallback() {
-     c && (clearTimeout(c), c = null), $ ? i.push(this) : plt.jmp((() => connectedCallback(this)));
+     $ && (clearTimeout($), $ = null), u ? d.push(this) : plt.jmp((() => connectedCallback(this)));
     }
     disconnectedCallback() {
      plt.jmp((() => disconnectedCallback(this)));
@@ -978,14 +986,17 @@ exports.addHostEventListeners = addHostEventListeners, exports.bootstrapLazy = (
      o.$flags$ = 1, e["s-hmr-load"] = () => {
       delete e["s-hmr-load"];
      }, initializeComponent(e, o, t);
-    })(this, l);
-   }), appData.BUILD.scopedSlotTextContentFix && patchTextContent(p.prototype, l), 
-   l.$lazyBundleId$ = e[0], s.includes(r) || n.get(r) || (o.push(r), n.define(r, proxyComponent(p, l, 1)));
+    })(this, o);
+   }), appData.BUILD.scopedSlotTextContentFix && patchTextContent(p.prototype, o), 
+   o.$lazyBundleId$ = e[0], n.includes(r) || l.get(r) || (s.push(r), l.define(r, proxyComponent(p, o, 1)));
   }));
- })), appData.BUILD.invisiblePrehydration && (appData.BUILD.hydratedClass || appData.BUILD.hydratedAttribute) && (p.innerHTML = o + "{visibility:hidden}.hydrated{visibility:inherit}", 
- p.setAttribute("data-styles", ""), l.insertBefore(p, r ? r.nextSibling : l.firstChild)), 
- $ = !1, i.length ? i.map((e => e.connectedCallback())) : appData.BUILD.profile ? plt.jmp((() => c = setTimeout(appDidLoad, 30, "timeout"))) : plt.jmp((() => c = setTimeout(appDidLoad, 30))), 
- a();
+ })), appData.BUILD.invisiblePrehydration && (appData.BUILD.hydratedClass || appData.BUILD.hydratedAttribute)) {
+  i.innerHTML = s + "{visibility:hidden}.hydrated{visibility:inherit}", i.setAttribute("data-styles", "");
+  const e = null !== (a = plt.$nonce$) && void 0 !== a ? a : queryNonceMetaTagContent(doc);
+  null != e && i.setAttribute("nonce", e), r.insertBefore(i, p ? p.nextSibling : r.firstChild);
+ }
+ u = !1, d.length ? d.map((e => e.connectedCallback())) : appData.BUILD.profile ? plt.jmp((() => $ = setTimeout(appDidLoad, 30, "timeout"))) : plt.jmp((() => $ = setTimeout(appDidLoad, 30))), 
+ o();
 }, exports.connectedCallback = connectedCallback, exports.consoleDevError = consoleDevError, 
 exports.consoleDevInfo = (...e) => {}, exports.consoleDevWarn = consoleDevWarn, 
 exports.consoleError = consoleError, exports.createEvent = (e, t, a) => {
@@ -1073,16 +1084,17 @@ exports.readTask = readTask, exports.registerComponents = e => {
  return t.$lazyInstance$ = e, hostRefs.set(e, t);
 }, exports.registerModule = function registerModule(e, t) {
  moduleLoaded.set(e, t);
-}, exports.renderVdom = renderVdom, exports.resetPlatform = function resetPlatform() {
+}, exports.renderVdom = renderVdom, exports.resetPlatform = function resetPlatform(e = {}) {
  win && "function" == typeof win.close && win.close(), hostRefs.clear(), styles.clear(), 
- plt.$flags$ = 0, Object.keys(Context).forEach((e => delete Context[e])), null != plt.$orgLocNodes$ && (plt.$orgLocNodes$.clear(), 
- plt.$orgLocNodes$ = void 0), win.location.href = plt.$resourcesUrl$ = "http://testing.stenciljs.com/", 
- function e() {
+ plt.$flags$ = 0, Object.keys(Context).forEach((e => delete Context[e])), Object.assign(plt, e), 
+ null != plt.$orgLocNodes$ && (plt.$orgLocNodes$.clear(), plt.$orgLocNodes$ = void 0), 
+ win.location.href = plt.$resourcesUrl$ = "http://testing.stenciljs.com/", function t() {
   queuedTicks.length = 0, queuedWriteTasks.length = 0, queuedReadTasks.length = 0, 
   moduleLoaded.clear(), queuedLoadModules.length = 0, caughtErrors.length = 0;
  }(), stopAutoApplyChanges(), cstrs.clear();
 }, exports.setAssetPath = e => plt.$resourcesUrl$ = e, exports.setErrorHandler = e => customError = e, 
-exports.setMode = e => modeResolutionChain.push(e), exports.setPlatformHelpers = e => {
+exports.setMode = e => modeResolutionChain.push(e), exports.setNonce = e => plt.$nonce$ = e, 
+exports.setPlatformHelpers = e => {
  Object.assign(plt, e);
 }, exports.setPlatformOptions = e => Object.assign(plt, e), exports.setSupportsShadowDom = e => {
  exports.supportsShadow = e;

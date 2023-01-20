@@ -1,5 +1,5 @@
 /*!
- Stencil Testing v0.0.0-dev.20221221224028 | MIT Licensed | https://stenciljs.com
+ Stencil Testing v0.0.0-dev.20230120194607 | MIT Licensed | https://stenciljs.com
  */
 function _lazyRequire(e) {
  return new Proxy({}, {
@@ -2965,7 +2965,7 @@ const COMMON_DIR_MODULE_EXTS = [ ".tsx", ".ts", ".mjs", ".js", ".jsx", ".json", 
  d("/");
  const C = {
   name: "in-memory",
-  version: "0.0.0-dev.20221221224028",
+  version: "0.0.0-dev.20230120194607",
   events: a,
   access: async e => u(e),
   accessSync: u,
@@ -3986,27 +3986,28 @@ exports.createJestPuppeteerEnvironment = function createJestPuppeteerEnvironment
  }
  return t;
 }, exports.newSpecPage = async function newSpecPage(e) {
+ var t;
  if (null == e) throw new Error("NewSpecPageOptions required");
- testing.resetPlatform(), resetBuildConditionals(appData.BUILD), Array.isArray(e.components) && testing.registerComponents(e.components), 
- e.hydrateClientSide && (e.includeAnnotations = !0), e.hydrateServerSide ? (e.includeAnnotations = !0, 
- testing.setSupportsShadowDom(!1)) : (e.includeAnnotations = !!e.includeAnnotations, 
+ testing.resetPlatform(null !== (t = e.platform) && void 0 !== t ? t : {}), resetBuildConditionals(appData.BUILD), 
+ Array.isArray(e.components) && testing.registerComponents(e.components), e.hydrateClientSide && (e.includeAnnotations = !0), 
+ e.hydrateServerSide ? (e.includeAnnotations = !0, testing.setSupportsShadowDom(!1)) : (e.includeAnnotations = !!e.includeAnnotations, 
  !1 === e.supportsShadowDom ? testing.setSupportsShadowDom(!1) : testing.setSupportsShadowDom(!0)), 
  appData.BUILD.cssAnnotations = e.includeAnnotations;
- const t = new Set;
+ const r = new Set;
  testing.win.__stencil_spec_options = e;
- const r = testing.win.document, s = {
+ const s = testing.win.document, n = {
   win: testing.win,
-  doc: r,
-  body: r.body,
+  doc: s,
+  body: s.body,
   build: appData.BUILD,
   styles: testing.styles,
-  setContent: e => (r.body.innerHTML = e, testing.flushAll()),
+  setContent: e => (s.body.innerHTML = e, testing.flushAll()),
   waitForChanges: testing.flushAll,
   flushLoadModule: testing.flushLoadModule,
   flushQueue: testing.flushQueue
- }, n = e.components.map((e => {
+ }, o = e.components.map((e => {
   if (null == e.COMPILER_META) throw new Error('Invalid component class: Missing static "COMPILER_META" property.');
-  t.add(e.COMPILER_META.tagName), e.isProxied = !1, function r(e) {
+  r.add(e.COMPILER_META.tagName), e.isProxied = !1, function t(e) {
    var t, r, s, n, o, i;
    "function" == typeof (null === (t = e.prototype) || void 0 === t ? void 0 : t.__componentWillLoad) && (e.prototype.componentWillLoad = e.prototype.__componentWillLoad, 
    e.prototype.__componentWillLoad = null), "function" == typeof (null === (r = e.prototype) || void 0 === r ? void 0 : r.__componentWillUpdate) && (e.prototype.componentWillUpdate = e.prototype.__componentWillUpdate, 
@@ -4044,7 +4045,7 @@ exports.createJestPuppeteerEnvironment = function createJestPuppeteerEnvironment
    return trimFalsy([ r, e.tagName, Object.keys(s).length > 0 ? s : void 0, n.length > 0 ? n : void 0 ]);
   })(e, !0))) ])(s, [ e.COMPILER_META ]);
   return o;
- })), o = (e => {
+ })), i = (e => {
   const t = e.some((e => e.htmlTagNames.includes("slot"))), r = e.some((e => "shadow" === e.encapsulation)), s = e.some((e => "shadow" !== e.encapsulation && e.htmlTagNames.includes("slot"))), n = {
    allRenderFn: e.every((e => e.hasRenderFn)),
    cmpDidLoad: e.some((e => e.hasComponentDidLoadFn)),
@@ -4104,24 +4105,24 @@ exports.createJestPuppeteerEnvironment = function createJestPuppeteerEnvironment
   return n.asyncLoading = n.cmpWillUpdate || n.cmpWillLoad || n.cmpWillRender, n.vdomAttribute = n.vdomAttribute || n.reflect, 
   n.vdomPropOrAttr = n.vdomPropOrAttr || n.reflect, n;
  })(e.components.map((e => e.COMPILER_META)));
- if (e.strictBuild ? Object.assign(appData.BUILD, o) : Object.keys(o).forEach((e => {
-  !0 === o[e] && (appData.BUILD[e] = !0);
+ if (e.strictBuild ? Object.assign(appData.BUILD, i) : Object.keys(i).forEach((e => {
+  !0 === i[e] && (appData.BUILD[e] = !0);
  })), appData.BUILD.asyncLoading = !0, e.hydrateClientSide ? (appData.BUILD.hydrateClientSide = !0, 
  appData.BUILD.hydrateServerSide = !1) : e.hydrateServerSide && (appData.BUILD.hydrateServerSide = !0, 
  appData.BUILD.hydrateClientSide = !1), appData.BUILD.cloneNodeFix = !1, appData.BUILD.shadowDomShim = !1, 
- appData.BUILD.safari10 = !1, appData.BUILD.attachStyles = !!e.attachStyles, "string" == typeof e.url && (s.win.location.href = e.url), 
- "string" == typeof e.direction && s.doc.documentElement.setAttribute("dir", e.direction), 
- "string" == typeof e.language && s.doc.documentElement.setAttribute("lang", e.language), 
+ appData.BUILD.safari10 = !1, appData.BUILD.attachStyles = !!e.attachStyles, "string" == typeof e.url && (n.win.location.href = e.url), 
+ "string" == typeof e.direction && n.doc.documentElement.setAttribute("dir", e.direction), 
+ "string" == typeof e.language && n.doc.documentElement.setAttribute("lang", e.language), 
  "string" == typeof e.cookie) try {
-  s.doc.cookie = e.cookie;
+  n.doc.cookie = e.cookie;
  } catch (e) {}
  if ("string" == typeof e.referrer) try {
-  s.doc.referrer = e.referrer;
+  n.doc.referrer = e.referrer;
  } catch (e) {}
  if ("string" == typeof e.userAgent) try {
-  s.win.navigator.userAgent = e.userAgent;
+  n.win.navigator.userAgent = e.userAgent;
  } catch (e) {}
- if (testing.bootstrapLazy(n), "function" == typeof e.template) {
+ if (testing.bootstrapLazy(o), "function" == typeof e.template) {
   const t = {
    $ancestorComponent$: void 0,
    $flags$: 0,
@@ -4130,26 +4131,26 @@ exports.createJestPuppeteerEnvironment = function createJestPuppeteerEnvironment
     $flags$: 0,
     $tagName$: "body"
    },
-   $hostElement$: s.body
+   $hostElement$: n.body
   };
   testing.renderVdom(t, e.template());
- } else "string" == typeof e.html && (s.body.innerHTML = e.html);
- !1 !== e.flushQueue && await s.waitForChanges();
- let i = null;
- return Object.defineProperty(s, "root", {
+ } else "string" == typeof e.html && (n.body.innerHTML = e.html);
+ !1 !== e.flushQueue && await n.waitForChanges();
+ let a = null;
+ return Object.defineProperty(n, "root", {
   get() {
-   if (null == i && (i = findRootComponent(t, s.body)), null != i) return i;
-   const e = s.body.firstElementChild;
+   if (null == a && (a = findRootComponent(r, n.body)), null != a) return a;
+   const e = n.body.firstElementChild;
    return null != e ? e : null;
   }
- }), Object.defineProperty(s, "rootInstance", {
+ }), Object.defineProperty(n, "rootInstance", {
   get() {
-   const e = testing.getHostRef(s.root);
+   const e = testing.getHostRef(n.root);
    return null != e ? e.$lazyInstance$ : null;
   }
- }), e.hydrateServerSide && testing.insertVdomAnnotations(r, []), e.autoApplyChanges && (testing.startAutoApplyChanges(), 
- s.waitForChanges = () => (console.error('waitForChanges() cannot be used manually if the "startAutoApplyChanges" option is enabled'), 
- Promise.resolve())), s;
+ }), e.hydrateServerSide && testing.insertVdomAnnotations(s, []), e.autoApplyChanges && (testing.startAutoApplyChanges(), 
+ n.waitForChanges = () => (console.error('waitForChanges() cannot be used manually if the "startAutoApplyChanges" option is enabled'), 
+ Promise.resolve())), n;
 }, exports.shuffleArray = function shuffleArray(e) {
  let t, r, s = e.length;
  for (;0 !== s; ) r = Math.floor(Math.random() * s), s -= 1, t = e[s], e[s] = e[r], 
