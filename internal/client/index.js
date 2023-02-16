@@ -799,7 +799,7 @@ const setAccessor = (elm, memberName, oldValue, newValue, isSvg, flags) => {
             }
         }
         else if (BUILD.vdomListener &&
-            (BUILD.lazyLoad ? !isProp : !elm.__lookupSetter__(memberName)) &&
+            (BUILD.lazyLoad && Object.getPrototypeOf(elm).componentOnReady ? !isProp : !elm.__lookupSetter__(memberName)) &&
             memberName[0] === 'o' &&
             memberName[1] === 'n') {
             // Event Handlers
